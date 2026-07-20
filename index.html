@@ -25,6 +25,8 @@
     --panel-sub: #C9BFA8;
     --partner1: #B8823D;
     --partner2: #3B2A1D;
+    --packages-card: #F9F4E8;
+    --packages-border: #EDE3CC;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100%; }
@@ -117,6 +119,17 @@
     border: 1px solid var(--border); background: var(--bg); padding: 7px 10px;
     border-radius: 6px; font-size: 14.5px; color: var(--ink); font-family: inherit; width: 100%;
   }
+  .select-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A5550' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    cursor: pointer;
+  }
  
   .divider-row {
     border-top: 1px dashed var(--border); padding-top: 10px;
@@ -165,6 +178,7 @@
   .add-line-btn:hover { border-color: var(--accent); color: var(--accent); }
  
   .booking-card { background: var(--booking-card); border-color: var(--booking-border); }
+  #card-packages, #card-stock { background: var(--packages-card); border-color: var(--packages-border); }
  
   .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   @media (max-width: 720px) {
@@ -172,25 +186,61 @@
   }
  
   .package-list { display: flex; flex-direction: column; gap: 8px; }
+  .package-row { display: flex; align-items: stretch; gap: 8px; }
   .package-option {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    width: 100%; text-align: left; font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; gap: 0;
+    flex: 1 1 auto; min-width: 0; text-align: left; font-family: inherit; cursor: pointer;
     border: 1px solid var(--border); background: var(--bg); border-radius: 8px;
-    padding: 9px 12px; transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    padding: 9px 12px; position: relative;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
   }
   .package-option:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .package-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .package-option.active {
     border-color: var(--accent); background: rgba(184,130,61,0.1);
     box-shadow: inset 0 0 0 1px var(--accent);
   }
+  .package-row.editing .package-option { flex-direction: column; align-items: stretch; cursor: default; transform: none; }
+  .package-row.editing .package-option:hover { transform: none; }
+  .package-display { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; }
+  .package-row.editing .package-display { display: none; }
   .package-name { font-size: 13.5px; font-weight: 600; color: var(--ink); flex: 1 1 auto; }
   .package-star { color: var(--accent); font-size: 11px; }
   .package-meta { font-size: 11px; color: var(--sub); flex: 1 1 auto; }
   .package-price { font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; font-weight: 600; color: var(--rust); white-space: nowrap; }
   @media (max-width: 480px) {
-    .package-option { flex-wrap: wrap; }
+    .package-display { flex-wrap: wrap; }
     .package-meta { flex-basis: 100%; }
   }
+
+  /* Package edit (pencil) — sits outside the card, to its right */
+  .package-edit-btn {
+    flex: 0 0 auto; align-self: center;
+    width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+    border: none; background: transparent; padding: 0;
+    color: var(--sub); opacity: 0.6; cursor: pointer;
+    transition: opacity .15s ease, color .15s ease;
+  }
+  .package-edit-btn svg { width: 15px; height: 15px; }
+  .package-edit-btn:hover { opacity: 1; color: var(--accent); }
+  .package-row.editing .package-edit-btn { display: none; }
+
+  .package-edit-fields {
+    display: none; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-top: 10px;
+  }
+  .package-row.editing .package-edit-fields { display: grid; }
+  .package-edit-fields label { display: flex; flex-direction: column; gap: 3px; font-size: 10.5px; color: var(--sub); font-weight: 500; }
+  .package-edit-fields input {
+    border: 1px solid var(--border); background: var(--card); border-radius: 6px;
+    padding: 6px 8px; font-size: 12.5px; font-family: 'IBM Plex Mono', monospace; color: var(--ink);
+  }
+  .package-edit-fields input.pkg-edit-name { font-family: inherit; }
+  .package-edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+  .package-edit-actions button { font-family: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
+  .pkg-edit-save { border: 1px solid var(--accent); background: var(--accent); color: #fff; }
+  .pkg-edit-save:hover { background: #A5732F; }
+  .pkg-edit-cancel { border: 1px solid var(--border); background: var(--bg); color: var(--sub); }
+  .pkg-edit-cancel:hover { border-color: var(--sub); color: var(--ink); }
   .package-clear-wrap { text-align: right; margin-top: 2px; }
   .package-clear {
     font-size: 10.5px; color: var(--sub); opacity: 0.55; cursor: pointer;
@@ -236,7 +286,7 @@
     border: 2px solid #fff; cursor: pointer;
   }
   .hourly-duration .val { font-family: 'IBM Plex Mono', monospace; color: #fff; font-size: 12.5px; min-width: 46px; text-align: right; }
-  .hourly-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.15); }
+  .hourly-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
   .hourly-total-row .label { font-size: 12px; color: var(--panel-sub); }
   .hourly-total-row .value { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; color: #fff; }
  
@@ -244,8 +294,74 @@
   .chart-card-eyebrow { font-size: 11px; color: var(--sub); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
   .chart-wrap { flex: 1; min-height: 340px; position: relative; }
  
+  .fee-preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .fee-slider-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .fee-slider-wrap input[type="range"] {
+    width: 100%; height: 6px; border-radius: 999px; background: var(--border); outline: none;
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+  }
+  .fee-slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); cursor: pointer;
+  }
+  .fee-slider-wrap input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--accent);
+    border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); cursor: pointer;
+  }
+  .fee-slider-readout { display: flex; justify-content: space-between; align-items: baseline; }
+  .fee-slider-readout span:first-child { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--sub); }
+  .fee-slider-readout span:last-child { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 15px; color: var(--rust); }
+  .fee-breakdown-panel { display: flex; flex-direction: column; gap: 8px; }
+  .fee-breakdown-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .fee-breakdown-km { font-size: 12.5px; color: var(--ink); font-weight: 500; flex: 0 0 auto; width: 60px; }
+  .fee-breakdown-input-wrap { flex: 1 1 auto; max-width: 140px; }
+  .fee-breakdown-input-wrap input { font-family: 'IBM Plex Mono', monospace; }
+  .fee-breakdown-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  .fee-breakdown-actions button { font-family: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
+
+  .address-field { position: relative; }
+  .address-field #customerAddress { font-family: 'Inter', sans-serif; }
+  .address-suggestions {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 40;
+    box-shadow: 0 14px 30px rgba(33,28,21,0.14);
+  }
+  .address-suggestions.show { display: block; }
+  .address-suggestion-item {
+    padding: 8px 10px;
+    font-size: 12.5px;
+    color: var(--ink);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+  }
+  .address-suggestion-item:last-child { border-bottom: none; }
+  .address-suggestion-item:hover { background: rgba(184,130,61,0.1); }
+  .distance-status {
+    display: block;
+    font-size: 11px;
+    color: var(--sub);
+    margin-top: 6px;
+    min-height: 14px;
+  }
+  .distance-status.ok { color: var(--sage); }
+  .distance-status.err { color: var(--rust); }
+  .distance-status.loading { color: var(--accent); }
+  .distance-status:empty { margin-top: 0; min-height: 0; }
+
   ::-webkit-scrollbar { width: 10px; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #D9AE72; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  * { scrollbar-color: #D9AE72 transparent; scrollbar-width: thin; }
  
   .icon-accent { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
   .icon-panel { width: 14px; height: 14px; color: var(--panel-sub); flex-shrink: 0; }
@@ -290,15 +406,17 @@
               <input type="date" id="eventDate" class="text-input"></label>
           </div>
           <label class="field"><span class="field-label">Event type</span>
-            <select id="eventType" class="text-input">
+            <select id="eventType" class="text-input select-input">
               <option value="">Select one</option>
               <option>Wedding</option>
               <option>Corporate</option>
-              <option>Birthday</option>
+              <option>Party</option>
               <option>Market</option>
               <option>Other</option>
             </select>
           </label>
+          <label class="field" id="eventTypeOtherWrap" style="display:none;"><span class="field-label">Please specify</span>
+            <input type="text" id="eventTypeOther" class="text-input" placeholder="e.g. Baby shower"></label>
           <label class="field"><span class="field-label">Package / booking price</span>
             <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10"></div></label>
           <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
@@ -314,73 +432,124 @@
         </div>
         <div class="card-body">
           <div class="package-list" id="packageList">
-            <button type="button" class="package-option" data-package="babycino" data-price="300" data-coffees="25" data-guests="15" data-beanprice="32" data-milkprice="1.72">
-              <span class="package-name">Babycino</span>
-              <span class="package-meta">~15 guests · 25 coffees</span>
-              <span class="package-price">$300</span>
-            </button>
-            <button type="button" class="package-option" data-package="piccolo" data-price="500" data-coffees="50" data-guests="30" data-beanprice="32" data-milkprice="1.72">
-              <span class="package-name">Piccolo</span>
-              <span class="package-meta">~30 guests · 50 coffees</span>
-              <span class="package-price">$500</span>
-            </button>
-            <button type="button" class="package-option" data-package="latte" data-price="950" data-coffees="100" data-guests="65" data-beanprice="32" data-milkprice="1.72">
-              <span class="package-name">The Latte</span>
-              <span class="package-meta">~65 guests · 100 coffees</span>
-              <span class="package-price">$950</span>
-            </button>
-            <button type="button" class="package-option" data-package="grande" data-price="1400" data-coffees="150" data-guests="100" data-beanprice="32" data-milkprice="1.72">
-              <span class="package-name">The Grande</span>
-              <span class="package-meta">~100 guests · 150 coffees</span>
-              <span class="package-price">$1,400</span>
-            </button>
-            <button type="button" class="package-option" data-package="barista" data-price="1700" data-coffees="200" data-guests="125" data-beanprice="32" data-milkprice="1.72">
-              <span class="package-name">The Barista</span>
-              <span class="package-meta">~125 guests · 200 coffees</span>
-              <span class="package-price">$1,700</span>
-            </button>
+            <div class="package-row">
+              <div class="package-option" data-package="babycino" data-price="350" data-coffees="25" data-guests="15" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select Babycino package">
+                <div class="package-display">
+                  <span class="package-name">Babycino</span>
+                  <span class="package-meta">~15 guests &middot; 25 coffees</span>
+                  <span class="package-price">$350</span>
+                </div>
+                <div class="package-edit-fields">
+                  <label>Name<input type="text" class="pkg-edit-name" value="Babycino"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="350" step="1"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="25" step="1"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="15" step="1"></label>
+                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
+                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <div class="package-edit-actions">
+                    <button type="button" class="pkg-edit-cancel">Cancel</button>
+                    <button type="button" class="pkg-edit-save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="package-edit-btn" aria-label="Edit Babycino package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            </div>
+            <div class="package-row">
+              <div class="package-option" data-package="piccolo" data-price="550" data-coffees="50" data-guests="30" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select Piccolo package">
+                <div class="package-display">
+                  <span class="package-name">Piccolo</span>
+                  <span class="package-meta">~30 guests &middot; 50 coffees</span>
+                  <span class="package-price">$550</span>
+                </div>
+                <div class="package-edit-fields">
+                  <label>Name<input type="text" class="pkg-edit-name" value="Piccolo"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="550" step="1"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="50" step="1"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="30" step="1"></label>
+                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
+                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <div class="package-edit-actions">
+                    <button type="button" class="pkg-edit-cancel">Cancel</button>
+                    <button type="button" class="pkg-edit-save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="package-edit-btn" aria-label="Edit Piccolo package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            </div>
+            <div class="package-row">
+              <div class="package-option" data-package="latte" data-price="950" data-coffees="100" data-guests="65" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select The Latte package">
+                <div class="package-display">
+                  <span class="package-name">The Latte</span>
+                  <span class="package-meta">~65 guests &middot; 100 coffees</span>
+                  <span class="package-price">$950</span>
+                </div>
+                <div class="package-edit-fields">
+                  <label>Name<input type="text" class="pkg-edit-name" value="The Latte"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="950" step="1"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="100" step="1"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="65" step="1"></label>
+                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
+                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <div class="package-edit-actions">
+                    <button type="button" class="pkg-edit-cancel">Cancel</button>
+                    <button type="button" class="pkg-edit-save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="package-edit-btn" aria-label="Edit The Latte package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            </div>
+            <div class="package-row">
+              <div class="package-option" data-package="grande" data-price="1300" data-coffees="150" data-guests="100" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select The Grande package">
+                <div class="package-display">
+                  <span class="package-name">The Grande</span>
+                  <span class="package-meta">~100 guests &middot; 150 coffees</span>
+                  <span class="package-price">$1,300</span>
+                </div>
+                <div class="package-edit-fields">
+                  <label>Name<input type="text" class="pkg-edit-name" value="The Grande"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1300" step="1"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="150" step="1"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="100" step="1"></label>
+                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
+                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <div class="package-edit-actions">
+                    <button type="button" class="pkg-edit-cancel">Cancel</button>
+                    <button type="button" class="pkg-edit-save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="package-edit-btn" aria-label="Edit The Grande package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            </div>
+            <div class="package-row">
+              <div class="package-option" data-package="barista" data-price="1500" data-coffees="200" data-guests="125" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select The Barista package">
+                <div class="package-display">
+                  <span class="package-name">The Barista</span>
+                  <span class="package-meta">~125 guests &middot; 200 coffees</span>
+                  <span class="package-price">$1,500</span>
+                </div>
+                <div class="package-edit-fields">
+                  <label>Name<input type="text" class="pkg-edit-name" value="The Barista"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1500" step="1"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="200" step="1"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="125" step="1"></label>
+                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
+                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <div class="package-edit-actions">
+                    <button type="button" class="pkg-edit-cancel">Cancel</button>
+                    <button type="button" class="pkg-edit-save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="package-edit-btn" aria-label="Edit The Barista package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            </div>
           </div>
           <div class="package-clear-wrap"><span class="package-clear" id="clearPackage">clear selection</span></div>
         </div>
       </div>
     </div>
  
-    <!-- SERVICE -->
-    <div class="card">
-      <div class="card-head">
-        <div class="card-head-left">
-          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>
-          <span class="card-title">Service</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="field-grid">
-          <label class="field"><span class="field-label">Bean price</span>
-            <div class="field-box"><span>$</span><input type="number" id="beanPrice" value="32" step="0.01"><span>/kg</span></div></label>
-          <label class="field"><span class="field-label">Dose per coffee</span>
-            <div class="field-box"><input type="number" id="dose" value="18" step="1"><span>g</span></div></label>
-          <label class="field"><span class="field-label">Milk price</span>
-            <div class="field-box"><span>$</span><input type="number" id="milkPrice" value="1.72" step="0.01"><span>/L</span></div></label>
-          <label class="field"><span class="field-label">Milk per coffee</span>
-            <div class="field-box"><input type="number" id="milkMl" value="200" step="1"><span>ml</span></div></label>
-          <label class="field"><span class="field-label">Milk wastage</span>
-            <div class="field-box"><input type="number" id="milkWastage" value="15" step="1"><span>%</span></div></label>
-          <label class="field"><span class="field-label">Cup + lid</span>
-            <div class="field-box"><span>$</span><input type="number" id="cupLid" value="0.22" step="0.01"><span>/ea</span></div></label>
-          <label class="field"><span class="field-label">Sugar/stirrers/napkins</span>
-            <div class="field-box"><span>$</span><input type="number" id="sundries" value="0.08" step="0.01"><span>/ea</span></div></label>
-          <label class="field"><span class="field-label">Coffee cap for event</span>
-            <div class="field-box"><input type="number" id="coffeeCap" value="100" step="1"><span>cups</span></div></label>
-        </div>
-        <div class="divider-row">
-          <span class="label">Cost per coffee</span>
-          <span class="value" id="out-costPerCoffee">$0.00</span>
-        </div>
-      </div>
-    </div>
- 
     <!-- STOCK & PACKING CHECKLIST -->
-    <div class="card">
+    <div class="card" id="card-stock">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
@@ -397,71 +566,104 @@
         <p style="font-size:11.5px;color:var(--sub);margin:10px 0 0;">Based on the <span id="stock-coffee-count">0</span>-coffee cap set above. Pack a little extra as a buffer.</p>
       </div>
     </div>
+
+    <!-- SERVICE -->
+    <div class="card" id="card-service">
+      <div class="card-head">
+        <div class="card-head-left">
+          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>
+          <span class="card-title">Service</span>
+        </div>
+        <div class="toggle on" id="toggle-service"><div class="knob"></div></div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid" id="service-fields">
+          <label class="field"><span class="field-label">Bean price</span>
+            <div class="field-box"><span>$</span><input type="number" id="beanPrice" value="32" step="0.01"><span>/kg</span></div></label>
+          <label class="field"><span class="field-label">Dose per coffee</span>
+            <div class="field-box"><input type="number" id="dose" value="18" step="1"><span>g</span></div></label>
+          <label class="field"><span class="field-label">Milk price</span>
+            <div class="field-box"><span>$</span><input type="number" id="milkPrice" value="1.72" step="0.01"><span>/L</span></div></label>
+          <label class="field"><span class="field-label">Milk per coffee</span>
+            <div class="field-box"><input type="number" id="milkMl" value="150" step="1"><span>ml</span></div></label>
+          <label class="field"><span class="field-label">Milk wastage</span>
+            <div class="field-box"><input type="number" id="milkWastage" value="15" step="1"><span>%</span></div></label>
+          <label class="field"><span class="field-label">Cup + lid</span>
+            <div class="field-box"><span>$</span><input type="number" id="cupLid" value="0.22" step="0.01"><span>/ea</span></div></label>
+          <label class="field"><span class="field-label">Sugar/stirrers/napkins</span>
+            <div class="field-box"><span>$</span><input type="number" id="sundries" value="0.08" step="0.01"><span>/ea</span></div></label>
+          <label class="field"><span class="field-label">Coffee cap for event</span>
+            <div class="field-box"><input type="number" id="coffeeCap" value="100" step="1"><span>cups</span></div></label>
+        </div>
+        <div class="divider-row">
+          <span class="label">Cost per coffee</span>
+          <span class="value" id="out-costPerCoffee">$0.00</span>
+        </div>
+      </div>
+    </div>
  
-    <!-- TRAVEL & GENERATOR -->
+    <!-- TRAVEL -->
     <div class="card" id="card-travel">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-          <span class="card-title">Travel &amp; Generator</span>
+          <span class="card-title">Travel</span>
         </div>
         <div class="toggle on" id="toggle-travel"><div class="knob"></div></div>
       </div>
       <div class="card-body">
         <div class="field-grid">
-          <label class="field"><span class="field-label">Travel distance (round trip)</span>
-            <div class="field-box"><input type="number" id="travelKm" value="40" step="1"><span>km</span></div></label>
-          <label class="field"><span class="field-label">ATO business travel rate</span>
-            <div class="field-box"><span>$</span><input type="number" id="travelRate" value="0.88" step="0.01"><span>/km</span></div></label>
+          <label class="field address-field">
+            <span class="field-label">Customer address</span>
+            <div class="field-box"><input type="text" id="customerAddress" placeholder="Start typing the event address…" autocomplete="off"></div>
+            <div class="address-suggestions" id="addressSuggestions"></div>
+          </label>
+          <label class="field">
+            <span class="field-label">Distance to venue (one-way)</span>
+            <div class="field-box"><input type="number" id="travelChargeKm" value="20" step="1"><span>km</span></div>
+            <span class="distance-status" id="distanceStatus"></span>
+          </label>
         </div>
-        <div class="inline-toggle" id="toggle-generator-wrap">
-          <div class="toggle" id="toggle-generator"><div class="knob"></div></div>
-          <span>Bringing the GENPOWER generator</span>
+        <input type="hidden" id="eventSuburb" value="">
+
+        <div class="field-grid-3">
+          <label class="field"><span class="field-label">Included distance</span>
+            <div class="field-box"><input type="number" id="includedKm" value="15" step="1"><span>km</span></div></label>
+          <label class="field"><span class="field-label">Rate beyond included</span>
+            <div class="field-box"><span>$</span><input type="number" id="travelSurchargeRate" value="1.50" step="0.01"><span>/km</span></div></label>
+          <label class="field"><span class="field-label">Custom-quote threshold</span>
+            <div class="field-box"><input type="number" id="quoteThresholdKm" value="80" step="1"><span>km</span></div></label>
         </div>
-        <div class="field-grid-3" id="generator-fields" style="display:none;">
-          <label class="field"><span class="field-label">Run time</span>
-            <div class="field-box"><input type="number" id="genHours" value="3" step="0.5"><span>hrs</span></div></label>
-          <label class="field"><span class="field-label">Fuel use</span>
-            <div class="field-box"><input type="number" id="genLph" value="1.0" step="0.1"><span>L/hr</span></div></label>
-          <label class="field"><span class="field-label">Fuel price</span>
-            <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="2.2" step="0.01"><span>/L</span></div></label>
-        </div>
- 
-        <div class="mini-divider"></div>
- 
-        <div class="inline-toggle" id="toggle-travelcharge-wrap">
-          <div class="toggle" id="toggle-travelcharge"><div class="knob"></div></div>
-          <span>Add distance surcharge to quote</span>
-        </div>
- 
-        <div id="travelcharge-fields" style="display:none;">
-          <div class="field-grid" style="margin-top:14px;">
-            <label class="field"><span class="field-label">Event suburb</span>
-              <input type="text" id="eventSuburb" class="text-input" placeholder="e.g. Manly"></label>
-            <label class="field"><span class="field-label">Distance to venue (one-way)</span>
-              <div class="field-box"><input type="number" id="travelChargeKm" value="20" step="1"><span>km</span></div></label>
+
+        <div>
+          <div class="fee-preview-head">
+            <span class="field-label">Distance / fee preview</span>
+            <button type="button" class="package-edit-btn" id="feePreviewEditBtn" aria-label="Edit distance and fee breakdown"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
           </div>
- 
-          <div class="field-grid" style="margin-top:14px;">
-            <label class="field"><span class="field-label">25&ndash;50 km surcharge</span>
-              <div class="field-box"><span>$</span><input type="number" id="tier2" value="40" step="1"></div></label>
-            <label class="field"><span class="field-label">50&ndash;75 km surcharge</span>
-              <div class="field-box"><span>$</span><input type="number" id="tier3" value="80" step="1"></div></label>
-            <label class="field"><span class="field-label">75&ndash;100 km surcharge</span>
-              <div class="field-box"><span>$</span><input type="number" id="tier4" value="140" step="1"></div></label>
-            <label class="field"><span class="field-label">+ per 25km beyond 100km</span>
-              <div class="field-box"><span>$</span><input type="number" id="tier5" value="60" step="1"></div></label>
+          <div class="fee-slider-wrap" id="feeSliderWrap">
+            <input type="range" id="feePreviewSlider" min="10" max="100" step="1" value="20">
+            <div class="fee-slider-readout">
+              <span id="feePreviewDistance">20 km</span>
+              <span id="feePreviewFee">$7.50</span>
+            </div>
           </div>
- 
-          <div class="divider-row" style="margin-top:14px;">
-            <span class="label">Distance surcharge</span>
-            <span class="value" id="out-travelSurcharge">$0</span>
+          <div class="fee-breakdown-panel" id="feeBreakdownPanel" style="display:none;">
+            <div class="fee-breakdown-list" id="feeBreakdownList"></div>
+            <div class="fee-breakdown-actions">
+              <button type="button" class="pkg-edit-cancel" id="feeBreakdownCancel">Cancel</button>
+              <button type="button" class="pkg-edit-save" id="feeBreakdownSave">Save</button>
+            </div>
           </div>
-          <p style="font-size:11.5px;color:var(--sub);margin:6px 0 0;" id="travelSurchargeNote">0&ndash;25 km is included at no extra charge.</p>
         </div>
+
+        <div class="divider-row">
+          <span class="label">Distance surcharge</span>
+          <span class="value" id="out-travelSurcharge">$0</span>
+        </div>
+        <p style="font-size:11.5px;color:var(--sub);margin:0;" id="travelSurchargeNote">Travel within 15km of Edensor Park NSW 2176 is included. Additional travel is charged at $1.50 per km thereafter. Bookings over 80km away will be quoted individually.</p>
       </div>
     </div>
- 
+
     <!-- OVERHEADS -->
     <div class="card off" id="card-overheads">
       <div class="card-head">
@@ -482,9 +684,24 @@
           <label class="field"><span class="field-label">Card/EFTPOS fees</span>
             <div class="field-box"><input type="number" id="cardFeePct" value="1.7" step="0.1"><span>%</span></div></label>
         </div>
+
+        <div class="mini-divider"></div>
+
+        <div class="inline-toggle" id="toggle-generator-wrap">
+          <div class="toggle" id="toggle-generator"><div class="knob"></div></div>
+          <span>Bringing the GENPOWER generator</span>
+        </div>
+        <div class="field-grid-3" id="generator-fields" style="display:none;">
+          <label class="field"><span class="field-label">Run time</span>
+            <div class="field-box"><input type="number" id="genHours" value="3" step="0.5"><span>hrs</span></div></label>
+          <label class="field"><span class="field-label">Fuel use</span>
+            <div class="field-box"><input type="number" id="genLph" value="1.0" step="0.1"><span>L/hr</span></div></label>
+          <label class="field"><span class="field-label">Fuel price</span>
+            <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="2.2" step="0.01"><span>/L</span></div></label>
+        </div>
       </div>
     </div>
- 
+
     <!-- CUSTOM COSTS -->
     <div class="card off" id="card-custom">
       <div class="card-head">
@@ -550,7 +767,7 @@
         </div>
         <div class="hourly-body" id="hourlyBody" style="display:none;">
           <div class="hourly-duration">
-            <input type="range" id="hourlySlider" min="1" max="10" step="0.5" value="3">
+            <input type="range" id="hourlySlider" min="1" max="5" step="0.5" value="3">
             <span class="val" id="hourlySliderValue">3 hrs</span>
           </div>
           <div class="hourly-total-row">
@@ -581,13 +798,13 @@
           <span class="label">Total quoted price</span>
           <span class="value" id="cq-total">$0.00</span>
         </div>
-        <div class="divider-row">
-          <span class="label">Price per coffee</span>
-          <span class="value" id="cq-per-coffee">$0.00</span>
+        <div class="divider-row" id="cq-travel-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
+          <span class="label">Travel fee</span>
+          <span class="value" id="cq-travel-fee" style="font-size:14px;"></span>
         </div>
-        <div class="divider-row">
-          <span class="label">Est. price per guest</span>
-          <span class="value" id="cq-per-guest">$0.00</span>
+        <div class="divider-row" id="cq-event-type-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
+          <span class="label">Event type</span>
+          <span class="value" id="cq-event-type" style="font-size:14px;"></span>
         </div>
         <p style="font-size:11px;color:var(--sub);margin:2px 0 0;">What the customer sees — the quoted total, not your internal costs.</p>
       </div>
@@ -616,7 +833,7 @@ let generatorOn = false;
 let overheadsOn = false;
 let customOn = false;
 let hourlyOn = false;
-let travelChargeOn = false;
+let serviceOn = true;
  
 function currency(n) {
   if (!isFinite(n)) n = 0;
@@ -687,15 +904,45 @@ setupToggle("toggle-generator", () => generatorOn, (v) => (generatorOn = v), (v)
 setupToggle("toggle-hourly", () => hourlyOn, (v) => (hourlyOn = v), (v) => {
   document.getElementById("hourlyBody").style.display = v ? "block" : "none";
 });
-setupToggle("toggle-travelcharge", () => travelChargeOn, (v) => (travelChargeOn = v), (v) => {
-  document.getElementById("travelcharge-fields").style.display = v ? "block" : "none";
+setupToggle("toggle-service", () => serviceOn, (v) => (serviceOn = v), (v) => {
+  document.getElementById("service-fields").style.display = v ? "grid" : "none";
 });
  
 document.getElementById("eventSuburb").addEventListener("input", () => { save(); });
 document.getElementById("clientName").addEventListener("input", () => { save(); });
 document.getElementById("eventDate").addEventListener("input", () => { save(); });
-document.getElementById("eventType").addEventListener("change", () => { save(); });
- 
+
+const eventTypeSelect = document.getElementById("eventType");
+const eventTypeOtherWrap = document.getElementById("eventTypeOtherWrap");
+const eventTypeOtherInput = document.getElementById("eventTypeOther");
+
+function updateEventTypeQuoteDisplay() {
+  let val = eventTypeSelect.value;
+  if (val === "Other") val = eventTypeOtherInput.value.trim();
+  const row = document.getElementById("cq-event-type-row");
+  const span = document.getElementById("cq-event-type");
+  if (val) {
+    row.style.display = "flex";
+    span.textContent = val;
+  } else {
+    row.style.display = "none";
+  }
+}
+
+function syncEventTypeOther(opts) {
+  const isOther = eventTypeSelect.value === "Other";
+  eventTypeOtherWrap.style.display = isOther ? "flex" : "none";
+  if (isOther) {
+    if (opts && opts.focus) eventTypeOtherInput.focus();
+  } else {
+    eventTypeOtherInput.value = "";
+  }
+  updateEventTypeQuoteDisplay();
+}
+
+eventTypeSelect.addEventListener("change", () => { syncEventTypeOther({ focus: true }); save(); });
+eventTypeOtherInput.addEventListener("input", () => { updateEventTypeQuoteDisplay(); save(); });
+
 document.querySelectorAll('input[type="number"]').forEach((inp) => {
   inp.addEventListener("input", () => { recalc(); save(); });
 });
@@ -712,8 +959,9 @@ hourlySlider.addEventListener("input", () => {
  
 // ----- Package selector -----
 let selectedPackage = null;
+let packageOverrides = {}; // persisted pencil-edits, keyed by package id
 const packageButtons = document.querySelectorAll(".package-option");
- 
+
 function selectPackage(btn, { skipFieldUpdate } = {}) {
   packageButtons.forEach((b) => b.classList.remove("active"));
   btn.classList.add("active");
@@ -729,19 +977,239 @@ function selectPackage(btn, { skipFieldUpdate } = {}) {
     save();
   }
 }
- 
+
 function clearPackageSelection() {
   packageButtons.forEach((b) => b.classList.remove("active"));
   selectedPackage = null;
   save();
 }
- 
+
+function applyPackageDataToDOM(btn, data) {
+  if (data.price != null) btn.setAttribute("data-price", data.price);
+  if (data.coffees != null) btn.setAttribute("data-coffees", data.coffees);
+  if (data.guests != null) btn.setAttribute("data-guests", data.guests);
+  if (data.beanprice != null) btn.setAttribute("data-beanprice", data.beanprice);
+  if (data.milkprice != null) btn.setAttribute("data-milkprice", data.milkprice);
+  if (data.name) btn.querySelector(".package-name").textContent = data.name;
+
+  btn.querySelector(".package-meta").textContent =
+    "~" + btn.getAttribute("data-guests") + " guests · " + btn.getAttribute("data-coffees") + " coffees";
+  btn.querySelector(".package-price").textContent =
+    "$" + Number(btn.getAttribute("data-price")).toLocaleString("en-AU");
+
+  const fields = btn.querySelector(".package-edit-fields");
+  if (fields) {
+    fields.querySelector(".pkg-edit-name").value = btn.querySelector(".package-name").textContent;
+    fields.querySelector(".pkg-edit-price").value = btn.getAttribute("data-price");
+    fields.querySelector(".pkg-edit-coffees").value = btn.getAttribute("data-coffees");
+    fields.querySelector(".pkg-edit-guests").value = btn.getAttribute("data-guests");
+    fields.querySelector(".pkg-edit-bean").value = btn.getAttribute("data-beanprice");
+    fields.querySelector(".pkg-edit-milk").value = btn.getAttribute("data-milkprice");
+  }
+}
+
 packageButtons.forEach((btn) => {
-  btn.addEventListener("click", () => selectPackage(btn));
+  const pkgId = btn.getAttribute("data-package");
+  const row = btn.closest(".package-row");
+  const editBtn = row ? row.querySelector(".package-edit-btn") : null;
+  const fields = btn.querySelector(".package-edit-fields");
+  const saveBtn = btn.querySelector(".pkg-edit-save");
+  const cancelBtn = btn.querySelector(".pkg-edit-cancel");
+
+  btn.addEventListener("click", () => {
+    if (row.classList.contains("editing")) return;
+    selectPackage(btn);
+  });
+
+  btn.addEventListener("keydown", (e) => {
+    if (row.classList.contains("editing")) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectPackage(btn);
+    }
+  });
+
+  if (editBtn) {
+    editBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      row.classList.add("editing");
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      row.classList.remove("editing");
+    });
+  }
+
+  if (saveBtn && fields) {
+    saveBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const data = {
+        name: fields.querySelector(".pkg-edit-name").value.trim() || btn.querySelector(".package-name").textContent,
+        price: parseFloat(fields.querySelector(".pkg-edit-price").value) || 0,
+        coffees: parseInt(fields.querySelector(".pkg-edit-coffees").value, 10) || 0,
+        guests: parseInt(fields.querySelector(".pkg-edit-guests").value, 10) || 0,
+        beanprice: parseFloat(fields.querySelector(".pkg-edit-bean").value) || 0,
+        milkprice: parseFloat(fields.querySelector(".pkg-edit-milk").value) || 0,
+      };
+      applyPackageDataToDOM(btn, data);
+      packageOverrides[pkgId] = data;
+      row.classList.remove("editing");
+
+      if (selectedPackage === pkgId) {
+        document.getElementById("bookingPrice").value = data.price;
+        document.getElementById("coffeeCap").value = data.coffees;
+        document.getElementById("beanPrice").value = data.beanprice;
+        document.getElementById("milkPrice").value = data.milkprice;
+      }
+      recalc();
+      save();
+    });
+  }
 });
- 
+
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
- 
+
+// ===================================================
+// TRAVEL DISTANCE AUTO-CALCULATOR
+// Free, no API key: geocodes the typed address with
+// OpenStreetMap Nominatim, then asks OSRM for the driving
+// distance from the wagon's home base. Populates the
+// "Distance to venue (one-way)" field automatically —
+// still fully editable if the lookup fails or you want to
+// override it.
+// ===================================================
+(function () {
+  const ORIGIN_ADDRESS = "23 Gwandalan Road, Edensor Park NSW, Australia";
+  const ORIGIN_CACHE_KEY = "blendAndBrewOriginCoords";
+
+  const addressInput = document.getElementById("customerAddress");
+  const suggestionsBox = document.getElementById("addressSuggestions");
+  const statusEl = document.getElementById("distanceStatus");
+  const kmInput = document.getElementById("travelChargeKm");
+  const suburbHidden = document.getElementById("eventSuburb");
+  if (!addressInput) return;
+
+  let debounceTimer;
+  let originCoords = null;
+
+  function setStatus(text, cls) {
+    statusEl.textContent = text;
+    statusEl.className = "distance-status" + (cls ? " " + cls : "");
+  }
+
+  function parseSuburb(addr) {
+    addr = addr || {};
+    return addr.suburb || addr.city || addr.town || addr.village || addr.municipality || "";
+  }
+
+  function formatAddress(place) {
+    const a = place.address || {};
+    const road = a.road || "";
+    const suburb = parseSuburb(a);
+    const state = (a.state || "").replace("New South Wales", "NSW");
+    const postcode = a.postcode || "";
+    const formatted = [road, suburb, state, postcode].filter(Boolean).join(", ");
+    return formatted || place.display_name || "";
+  }
+
+  async function getOriginCoords() {
+    if (originCoords) return originCoords;
+    try {
+      const cached = JSON.parse(localStorage.getItem(ORIGIN_CACHE_KEY) || "null");
+      if (cached && cached.lat && cached.lon) { originCoords = cached; return originCoords; }
+    } catch (e) {}
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=au&q=${encodeURIComponent(ORIGIN_ADDRESS)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error("Could not locate home base address.");
+    originCoords = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    try { localStorage.setItem(ORIGIN_CACHE_KEY, JSON.stringify(originCoords)); } catch (e) {}
+    return originCoords;
+  }
+
+  async function routeDistanceKm(destLat, destLon) {
+    const origin = await getOriginCoords();
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destLon},${destLat}?overview=false&alternatives=false&steps=false`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.routes || !data.routes.length) throw new Error("No route found.");
+    return data.routes[0].distance / 1000; // metres -> km
+  }
+
+  async function selectAddress(place) {
+    suggestionsBox.classList.remove("show");
+    suggestionsBox.innerHTML = "";
+    addressInput.value = formatAddress(place);
+
+    if (suburbHidden) suburbHidden.value = parseSuburb(place.address);
+
+    setStatus("Calculating driving distance…", "loading");
+
+    try {
+      const km = await routeDistanceKm(parseFloat(place.lat), parseFloat(place.lon));
+      const rounded = Math.round(km * 10) / 10;
+      kmInput.value = rounded;
+      setStatus(`✓ ${rounded} km driving distance from Edensor Park (auto-calculated).`, "ok");
+    } catch (err) {
+      console.error("Distance calc error:", err);
+      setStatus("Couldn't auto-calculate distance — please enter the km manually.", "err");
+    }
+    recalc();
+    save();
+  }
+
+  addressInput.addEventListener("input", function () {
+    const query = this.value.trim();
+    clearTimeout(debounceTimer);
+    if (query.length < 4) {
+      suggestionsBox.classList.remove("show");
+      suggestionsBox.innerHTML = "";
+      return;
+    }
+    setStatus("Searching…", "loading");
+    debounceTimer = setTimeout(async () => {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&countrycodes=au&q=${encodeURIComponent(query)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        suggestionsBox.innerHTML = "";
+        if (!Array.isArray(data) || !data.length) {
+          const empty = document.createElement("div");
+          empty.className = "address-suggestion-item";
+          empty.style.cursor = "default";
+          empty.style.color = "var(--sub)";
+          empty.textContent = "No results";
+          suggestionsBox.appendChild(empty);
+          suggestionsBox.classList.add("show");
+          setStatus("", "");
+          return;
+        }
+        data.forEach((place) => {
+          const div = document.createElement("div");
+          div.className = "address-suggestion-item";
+          div.textContent = formatAddress(place);
+          div.addEventListener("click", () => selectAddress(place));
+          suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.classList.add("show");
+        setStatus("", "");
+      } catch (err) {
+        console.error("Address autocomplete error:", err);
+        setStatus("Address lookup failed — check your connection.", "err");
+      }
+    }, 350);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#customerAddress") && !e.target.closest("#addressSuggestions")) {
+      suggestionsBox.classList.remove("show");
+    }
+  });
+})();
+
 let chart;
 function initChart() {
   const ctx = document.getElementById("costChart").getContext("2d");
@@ -765,16 +1233,120 @@ function initChart() {
   });
 }
  
+function computeSurchargeForKm(km) {
+  const included = num("includedKm");
+  const rate = num("travelSurchargeRate");
+  const threshold = num("quoteThresholdKm");
+  if (km > threshold) return null; // beyond threshold — quoted individually
+  if (km <= included) return 0;
+  return (km - included) * rate;
+}
+
 function computeTravelSurcharge() {
   const km = num("travelChargeKm");
-  const t2 = num("tier2"), t3 = num("tier3"), t4 = num("tier4"), t5 = num("tier5");
-  if (km <= 25) return { surcharge: 0, bracket: "0–25 km — included, no surcharge." };
-  if (km <= 50) return { surcharge: t2, bracket: "25–50 km bracket." };
-  if (km <= 75) return { surcharge: t3, bracket: "50–75 km bracket." };
-  if (km <= 100) return { surcharge: t4, bracket: "75–100 km bracket." };
-  const extraBlocks = Math.ceil((km - 100) / 25);
-  return { surcharge: t4 + extraBlocks * t5, bracket: "100km+ bracket (base + " + extraBlocks + " × 25km)." };
+  const included = num("includedKm");
+  const threshold = num("quoteThresholdKm");
+  const fee = computeSurchargeForKm(km);
+  if (fee === null) {
+    return { surcharge: 0, bracket: "Over " + threshold + "km — quoted individually.", customQuote: true };
+  }
+  if (km <= included) {
+    return { surcharge: 0, bracket: "0–" + included + " km — included, no surcharge." };
+  }
+  return { surcharge: fee, bracket: included + "–" + threshold + " km bracket." };
 }
+
+// ----- Distance / fee preview slider + editable breakdown -----
+const FEE_STOPS = [10, 15, 20, 30, 40, 50, 75, 80, 100];
+let feeStopOverrides = {};
+
+function getStopFee(km) {
+  const key = String(km);
+  if (Object.prototype.hasOwnProperty.call(feeStopOverrides, key) &&
+      feeStopOverrides[key] !== null && feeStopOverrides[key] !== "" && !isNaN(feeStopOverrides[key])) {
+    return parseFloat(feeStopOverrides[key]);
+  }
+  return computeSurchargeForKm(km);
+}
+
+function updateFeePreview() {
+  const slider = document.getElementById("feePreviewSlider");
+  const km = parseInt(slider.value, 10);
+  const fee = getStopFee(km);
+  document.getElementById("feePreviewDistance").textContent = km + " km";
+  document.getElementById("feePreviewFee").textContent =
+    fee === null ? "Custom quote" : (fee === 0 ? "Included" : currency(fee));
+}
+
+function syncFeeSliderToKm() {
+  const km = Math.round(num("travelChargeKm"));
+  const slider = document.getElementById("feePreviewSlider");
+  const clamped = Math.min(100, Math.max(10, km));
+  slider.value = clamped;
+  updateFeePreview();
+}
+
+function renderFeeBreakdownList() {
+  const list = document.getElementById("feeBreakdownList");
+  list.innerHTML = "";
+  FEE_STOPS.forEach((km) => {
+    const computed = computeSurchargeForKm(km);
+    const key = String(km);
+    const overrideVal = Object.prototype.hasOwnProperty.call(feeStopOverrides, key) ? feeStopOverrides[key] : "";
+    const row = document.createElement("div");
+    row.className = "fee-breakdown-row";
+    row.innerHTML =
+      '<span class="fee-breakdown-km">' + km + ' km</span>' +
+      '<div class="field-box fee-breakdown-input-wrap"><span>$</span><input type="number" step="0.01" class="fee-breakdown-input" data-km="' + km + '" placeholder="' + (computed === null ? "Custom" : computed.toFixed(2)) + '" value="' + overrideVal + '"></div>';
+    list.appendChild(row);
+  });
+}
+
+document.getElementById("feePreviewSlider").addEventListener("input", () => {
+  const km = parseInt(document.getElementById("feePreviewSlider").value, 10);
+  document.getElementById("travelChargeKm").value = km;
+  updateFeePreview();
+  recalc();
+  save();
+});
+
+document.getElementById("travelChargeKm").addEventListener("input", syncFeeSliderToKm);
+
+document.getElementById("feePreviewEditBtn").addEventListener("click", () => {
+  const panel = document.getElementById("feeBreakdownPanel");
+  const sliderWrap = document.getElementById("feeSliderWrap");
+  const isOpen = panel.style.display !== "none";
+  if (isOpen) {
+    panel.style.display = "none";
+    sliderWrap.style.display = "flex";
+  } else {
+    renderFeeBreakdownList();
+    panel.style.display = "flex";
+    sliderWrap.style.display = "none";
+  }
+});
+
+document.getElementById("feeBreakdownCancel").addEventListener("click", () => {
+  document.getElementById("feeBreakdownPanel").style.display = "none";
+  document.getElementById("feeSliderWrap").style.display = "flex";
+});
+
+document.getElementById("feeBreakdownSave").addEventListener("click", () => {
+  document.querySelectorAll(".fee-breakdown-input").forEach((inp) => {
+    const km = inp.getAttribute("data-km");
+    const val = inp.value.trim();
+    if (val === "") {
+      delete feeStopOverrides[km];
+    } else {
+      feeStopOverrides[km] = parseFloat(val);
+    }
+  });
+  document.getElementById("feeBreakdownPanel").style.display = "none";
+  document.getElementById("feeSliderWrap").style.display = "flex";
+  updateFeePreview();
+  recalc();
+  save();
+});
  
 function recalc() {
   const coffees = Math.max(0, num("coffeeCap"));
@@ -786,19 +1358,18 @@ function recalc() {
   const consumablesTotal = beansCost + milkCost + cupsCost + sundriesCost;
   const costPerCoffee = coffees > 0 ? consumablesTotal / coffees : 0;
  
-  const travelCost = travelOn ? num("travelKm") * num("travelRate") : 0;
-  const generatorCost = travelOn && generatorOn ? num("genHours") * num("genLph") * num("fuelPrice") : 0;
+  const generatorCost = overheadsOn && generatorOn ? num("genHours") * num("genLph") * num("fuelPrice") : 0;
   const bookingPrice = num("bookingPrice");
  
   const travelChargeCalc = computeTravelSurcharge();
-  const travelSurchargeAmount = travelChargeOn ? travelChargeCalc.surcharge : 0;
+  const travelSurchargeAmount = travelOn ? travelChargeCalc.surcharge : 0;
   const totalRevenue = bookingPrice + travelSurchargeAmount;
  
   const cardFeeCost = overheadsOn ? totalRevenue * (num("cardFeePct") / 100) : 0;
   const overheadsTotal = overheadsOn ? num("insurance") + num("servicing") + num("permits") : 0;
   const customTotal = customOn ? customFields.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0) : 0;
  
-  const totalCosts = consumablesTotal + travelCost + generatorCost + cardFeeCost + overheadsTotal + customTotal;
+  const totalCosts = consumablesTotal + generatorCost + cardFeeCost + overheadsTotal + customTotal;
   const grossProfit = totalRevenue - totalCosts;
   const marginPct = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
  
@@ -817,15 +1388,21 @@ function recalc() {
  
   document.getElementById("out-travelSurcharge").textContent = currency(travelChargeCalc.surcharge);
   document.getElementById("travelSurchargeNote").textContent = travelChargeCalc.bracket +
-    (travelChargeOn ? " Added to quote revenue." : " Toggle on to include in revenue.");
- 
-  const selectedBtn = selectedPackage ? document.querySelector(`.package-option[data-package="${selectedPackage}"]`) : null;
-  const guestsAttr = selectedBtn ? parseFloat(selectedBtn.getAttribute("data-guests")) : NaN;
-  const guestsEstimate = isFinite(guestsAttr) && guestsAttr > 0 ? guestsAttr : (coffees > 0 ? Math.round(coffees / 1.6) : 0);
+    (travelOn ? " Added to quote revenue." : " Toggle Travel on to include in revenue.");
  
   document.getElementById("cq-total").textContent = currency(totalRevenue);
-  document.getElementById("cq-per-coffee").textContent = coffees > 0 ? currency(totalRevenue / coffees) : currency(0);
-  document.getElementById("cq-per-guest").textContent = guestsEstimate > 0 ? currency(totalRevenue / guestsEstimate) : currency(0);
+ 
+  const cqTravelRow = document.getElementById("cq-travel-row");
+  const cqTravelFeeEl = document.getElementById("cq-travel-fee");
+  if (travelOn && travelChargeCalc.customQuote) {
+    cqTravelRow.style.display = "flex";
+    cqTravelFeeEl.textContent = "Custom quote";
+  } else if (travelOn && travelSurchargeAmount > 0) {
+    cqTravelRow.style.display = "flex";
+    cqTravelFeeEl.textContent = currency(travelSurchargeAmount);
+  } else {
+    cqTravelRow.style.display = "none";
+  }
  
   document.getElementById("stock-coffee-count").textContent = coffees;
   document.getElementById("stock-beans").textContent = ((num("dose") * coffees) / 1000).toFixed(1) + " kg";
@@ -856,7 +1433,6 @@ function recalc() {
     ["Beans", beansCost],
     ["Milk", milkCost],
     ["Cups & sundries", cupsCost + sundriesCost],
-    ["Travel", travelCost],
     ["Generator/fuel", generatorCost],
     ["Card fees", cardFeeCost],
     ["Overheads", overheadsTotal],
@@ -868,12 +1444,14 @@ function recalc() {
     chart.data.datasets[0].data = breakdown.map((d) => d[1]);
     chart.update();
   }
+
+  updateFeePreview();
 }
  
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap",
-    "travelKm","travelRate","genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice",
-    "eventSuburb","travelChargeKm","tier2","tier3","tier4","tier5","clientName","eventDate","eventType"];
+    "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice",
+    "eventSuburb","travelChargeKm","includedKm","travelSurchargeRate","quoteThresholdKm","clientName","eventDate","eventType","eventTypeOther","customerAddress"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
@@ -881,7 +1459,9 @@ function collectState() {
     splitPct: splitRange.value,
     selectedPackage,
     hourlyOn, hourlyHours: hourlySlider.value,
-    travelChargeOn,
+    packageOverrides,
+    serviceOn,
+    feeStopOverrides,
   };
 }
  
@@ -912,13 +1492,20 @@ function load() {
       });
     }
     if (Array.isArray(s.customFields)) customFields = s.customFields;
+    if (s.packageOverrides && typeof s.packageOverrides === "object") {
+      packageOverrides = s.packageOverrides;
+      Object.keys(packageOverrides).forEach((pkgId) => {
+        const pkgBtn = document.querySelector(`.package-option[data-package="${pkgId}"]`);
+        if (pkgBtn) applyPackageDataToDOM(pkgBtn, packageOverrides[pkgId]);
+      });
+    }
     if (typeof s.travelOn === "boolean") travelOn = s.travelOn;
     if (typeof s.generatorOn === "boolean") generatorOn = s.generatorOn;
     if (typeof s.overheadsOn === "boolean") overheadsOn = s.overheadsOn;
     if (typeof s.customOn === "boolean") customOn = s.customOn;
     if (typeof s.hourlyOn === "boolean") hourlyOn = s.hourlyOn;
     if (s.hourlyHours) hourlySlider.value = s.hourlyHours;
-    if (typeof s.travelChargeOn === "boolean") travelChargeOn = s.travelChargeOn;
+    if (typeof s.serviceOn === "boolean") serviceOn = s.serviceOn;
     if (s.splitPct) splitRange.value = Math.round(parseInt(s.splitPct, 10) / 5) * 5;
  
     document.getElementById("toggle-travel").classList.toggle("on", travelOn);
@@ -932,13 +1519,16 @@ function load() {
     document.getElementById("toggle-hourly").classList.toggle("on", hourlyOn);
     document.getElementById("hourlyBody").style.display = hourlyOn ? "block" : "none";
     document.getElementById("hourlySliderValue").textContent = parseFloat(hourlySlider.value) + " hrs";
-    document.getElementById("toggle-travelcharge").classList.toggle("on", travelChargeOn);
-    document.getElementById("travelcharge-fields").style.display = travelChargeOn ? "block" : "none";
+    document.getElementById("toggle-service").classList.toggle("on", serviceOn);
+    document.getElementById("service-fields").style.display = serviceOn ? "grid" : "none";
  
     if (s.selectedPackage) {
       const match = document.querySelector(`.package-option[data-package="${s.selectedPackage}"]`);
       if (match) selectPackage(match, { skipFieldUpdate: true });
     }
+
+    if (s.feeStopOverrides && typeof s.feeStopOverrides === "object") feeStopOverrides = s.feeStopOverrides;
+    syncFeeSliderToKm();
   } catch (e) {}
 }
  
@@ -994,7 +1584,11 @@ function generateQuotePDF() {
   y += 28;
  
   const clientName = document.getElementById("clientName").value.trim() || "—";
-  const eventType = document.getElementById("eventType").value || "—";
+  let eventType = document.getElementById("eventType").value || "—";
+  if (eventType === "Other") {
+    const customEventType = document.getElementById("eventTypeOther").value.trim();
+    if (customEventType) eventType = customEventType;
+  }
   const eventDateRaw = document.getElementById("eventDate").value;
   const eventDateStr = eventDateRaw
     ? new Date(eventDateRaw + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
@@ -1035,7 +1629,7 @@ function generateQuotePDF() {
   y += 25;
  
   const travelSurchargeCalc = computeTravelSurcharge();
-  if (travelChargeOn && travelSurchargeCalc.surcharge > 0) {
+  if (travelOn && travelSurchargeCalc.surcharge > 0) {
     const suburb = document.getElementById("eventSuburb").value.trim();
     const km = parseFloat(document.getElementById("travelChargeKm").value) || 0;
     const label = "Distance surcharge" + (suburb ? " — " + suburb : "") + " (" + km + "km)";
@@ -1051,7 +1645,7 @@ function generateQuotePDF() {
   doc.line(marginX, y, pageWidth - marginX, y);
   y += 26;
  
-  const total = bookingPrice + (travelChargeOn ? travelSurchargeCalc.surcharge : 0);
+  const total = bookingPrice + (travelOn ? travelSurchargeCalc.surcharge : 0);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(15);
   doc.text("Total", marginX, y);
@@ -1095,6 +1689,7 @@ document.getElementById("generate-quote-btn").addEventListener("click", generate
 initChart();
 load();
 renderCustomFields();
+syncEventTypeOther();
 recalc();
 document.getElementById("save-status").textContent = "";
  
