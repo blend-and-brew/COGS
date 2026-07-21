@@ -320,7 +320,7 @@
   .fee-breakdown-actions button { font-family: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
 
   .address-field { position: relative; }
-  .address-field #customerAddress { font-family: 'Inter', sans-serif; }
+  .address-field #customerAddress { font-family: 'Inter', sans-serif; font-size: 14.5px; }
   .address-suggestions {
     display: none;
     position: absolute;
@@ -363,6 +363,16 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
   * { scrollbar-color: #D9AE72 transparent; scrollbar-width: thin; }
  
+  .copy-quote-btn {
+    border: 1px solid var(--accent); color: var(--accent); background: transparent;
+    border-radius: 6px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: inherit; margin-top: 8px; transition: background .15s ease, color .15s ease;
+  }
+  .copy-quote-btn svg { width: 14px; height: 14px; }
+  .copy-quote-btn:hover { background: var(--accent); color: #fff; }
+  .copy-quote-btn.copied { border-color: var(--sage); color: var(--sage); }
+  .copy-quote-btn.copied:hover { background: var(--sage); color: #fff; }
   .icon-accent { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
   .icon-panel { width: 14px; height: 14px; color: var(--panel-sub); flex-shrink: 0; }
   .icon-sub { width: 14px; height: 14px; color: var(--sub); flex-shrink: 0; }
@@ -406,19 +416,20 @@
               <input type="date" id="eventDate" class="text-input"></label>
           </div>
           <label class="field"><span class="field-label">Event type</span>
-            <select id="eventType" class="text-input select-input">
-              <option value="">Select one</option>
-              <option>Wedding</option>
-              <option>Corporate</option>
-              <option>Party</option>
-              <option>Market</option>
-              <option>Other</option>
-            </select>
+            <input type="text" id="eventType" class="text-input" list="eventTypePresets" placeholder="Select a preset or type your own" autocomplete="off">
+            <datalist id="eventTypePresets">
+              <option value="Wedding">
+              <option value="Corporate">
+              <option value="Party">
+              <option value="Market">
+            </datalist>
           </label>
-          <label class="field" id="eventTypeOtherWrap" style="display:none;"><span class="field-label">Please specify</span>
-            <input type="text" id="eventTypeOther" class="text-input" placeholder="e.g. Baby shower"></label>
-          <label class="field"><span class="field-label">Package / booking price</span>
-            <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10"></div></label>
+          <div class="field-grid">
+            <label class="field"><span class="field-label">Package / booking price</span>
+              <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
+            <label class="field"><span class="field-label">Event duration</span>
+              <div class="field-box"><input type="number" id="eventDuration" value="3" step="0.5" min="0.5"><span>hrs</span></div></label>
+          </div>
           <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
         </div>
       </div>
@@ -433,7 +444,7 @@
         <div class="card-body">
           <div class="package-list" id="packageList">
             <div class="package-row">
-              <div class="package-option" data-package="babycino" data-price="350" data-coffees="25" data-guests="15" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select Babycino package">
+              <div class="package-option" data-package="babycino" data-price="350" data-coffees="25" data-guests="15" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Babycino package">
                 <div class="package-display">
                   <span class="package-name">Babycino</span>
                   <span class="package-meta">~15 guests &middot; 25 coffees</span>
@@ -441,11 +452,10 @@
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="Babycino"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="350" step="1"></label>
-                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="25" step="1"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="15" step="1"></label>
-                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
-                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="350" step="1" min="0"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="25" step="1" min="0"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="15" step="1" min="0"></label>
+                  <label>Hours<input type="number" class="pkg-edit-hours" value="1" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
                     <button type="button" class="pkg-edit-save">Save</button>
@@ -455,7 +465,7 @@
               <button type="button" class="package-edit-btn" aria-label="Edit Babycino package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="piccolo" data-price="550" data-coffees="50" data-guests="30" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select Piccolo package">
+              <div class="package-option" data-package="piccolo" data-price="550" data-coffees="50" data-guests="30" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Piccolo package">
                 <div class="package-display">
                   <span class="package-name">Piccolo</span>
                   <span class="package-meta">~30 guests &middot; 50 coffees</span>
@@ -463,11 +473,10 @@
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="Piccolo"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="550" step="1"></label>
-                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="50" step="1"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="30" step="1"></label>
-                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
-                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="550" step="1" min="0"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="50" step="1" min="0"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="30" step="1" min="0"></label>
+                  <label>Hours<input type="number" class="pkg-edit-hours" value="1" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
                     <button type="button" class="pkg-edit-save">Save</button>
@@ -477,7 +486,7 @@
               <button type="button" class="package-edit-btn" aria-label="Edit Piccolo package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="latte" data-price="950" data-coffees="100" data-guests="65" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select The Latte package">
+              <div class="package-option" data-package="latte" data-price="950" data-coffees="100" data-guests="65" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Latte package">
                 <div class="package-display">
                   <span class="package-name">The Latte</span>
                   <span class="package-meta">~65 guests &middot; 100 coffees</span>
@@ -485,11 +494,10 @@
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Latte"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="950" step="1"></label>
-                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="100" step="1"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="65" step="1"></label>
-                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
-                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="950" step="1" min="0"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="100" step="1" min="0"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="65" step="1" min="0"></label>
+                  <label>Hours<input type="number" class="pkg-edit-hours" value="2" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
                     <button type="button" class="pkg-edit-save">Save</button>
@@ -499,7 +507,7 @@
               <button type="button" class="package-edit-btn" aria-label="Edit The Latte package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="grande" data-price="1300" data-coffees="150" data-guests="100" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select The Grande package">
+              <div class="package-option" data-package="grande" data-price="1300" data-coffees="150" data-guests="100" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Grande package">
                 <div class="package-display">
                   <span class="package-name">The Grande</span>
                   <span class="package-meta">~100 guests &middot; 150 coffees</span>
@@ -507,11 +515,10 @@
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Grande"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1300" step="1"></label>
-                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="150" step="1"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="100" step="1"></label>
-                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
-                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1300" step="1" min="0"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="150" step="1" min="0"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="100" step="1" min="0"></label>
+                  <label>Hours<input type="number" class="pkg-edit-hours" value="2" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
                     <button type="button" class="pkg-edit-save">Save</button>
@@ -521,7 +528,7 @@
               <button type="button" class="package-edit-btn" aria-label="Edit The Grande package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="barista" data-price="1500" data-coffees="200" data-guests="125" data-beanprice="32" data-milkprice="1.72" role="button" tabindex="0" aria-label="Select The Barista package">
+              <div class="package-option" data-package="barista" data-price="1500" data-coffees="200" data-guests="125" data-beanprice="32" data-milkprice="1.72" data-hours="3" role="button" tabindex="0" aria-label="Select The Barista package">
                 <div class="package-display">
                   <span class="package-name">The Barista</span>
                   <span class="package-meta">~125 guests &middot; 200 coffees</span>
@@ -529,11 +536,10 @@
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Barista"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1500" step="1"></label>
-                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="200" step="1"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="125" step="1"></label>
-                  <label>Bean $/kg<input type="number" class="pkg-edit-bean" value="32" step="0.01"></label>
-                  <label>Milk $/L<input type="number" class="pkg-edit-milk" value="1.72" step="0.01"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1500" step="1" min="0"></label>
+                  <label>Coffees<input type="number" class="pkg-edit-coffees" value="200" step="1" min="0"></label>
+                  <label>Guests<input type="number" class="pkg-edit-guests" value="125" step="1" min="0"></label>
+                  <label>Hours<input type="number" class="pkg-edit-hours" value="3" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
                     <button type="button" class="pkg-edit-save">Save</button>
@@ -574,26 +580,26 @@
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>
           <span class="card-title">Service</span>
         </div>
-        <div class="toggle on" id="toggle-service"><div class="knob"></div></div>
+        <div class="toggle" id="toggle-service"><div class="knob"></div></div>
       </div>
       <div class="card-body">
-        <div class="field-grid" id="service-fields">
+        <div class="field-grid" id="service-fields" style="display:none;">
           <label class="field"><span class="field-label">Bean price</span>
-            <div class="field-box"><span>$</span><input type="number" id="beanPrice" value="32" step="0.01"><span>/kg</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="beanPrice" value="32" step="0.01" min="0"><span>/kg</span></div></label>
           <label class="field"><span class="field-label">Dose per coffee</span>
-            <div class="field-box"><input type="number" id="dose" value="18" step="1"><span>g</span></div></label>
+            <div class="field-box"><input type="number" id="dose" value="18" step="1" min="0"><span>g</span></div></label>
           <label class="field"><span class="field-label">Milk price</span>
-            <div class="field-box"><span>$</span><input type="number" id="milkPrice" value="1.72" step="0.01"><span>/L</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="milkPrice" value="1.72" step="0.01" min="0"><span>/L</span></div></label>
           <label class="field"><span class="field-label">Milk per coffee</span>
-            <div class="field-box"><input type="number" id="milkMl" value="150" step="1"><span>ml</span></div></label>
+            <div class="field-box"><input type="number" id="milkMl" value="150" step="1" min="0"><span>ml</span></div></label>
           <label class="field"><span class="field-label">Milk wastage</span>
-            <div class="field-box"><input type="number" id="milkWastage" value="15" step="1"><span>%</span></div></label>
+            <div class="field-box"><input type="number" id="milkWastage" value="15" step="1" min="0"><span>%</span></div></label>
           <label class="field"><span class="field-label">Cup + lid</span>
-            <div class="field-box"><span>$</span><input type="number" id="cupLid" value="0.22" step="0.01"><span>/ea</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="cupLid" value="0.22" step="0.01" min="0"><span>/ea</span></div></label>
           <label class="field"><span class="field-label">Sugar/stirrers/napkins</span>
-            <div class="field-box"><span>$</span><input type="number" id="sundries" value="0.08" step="0.01"><span>/ea</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="sundries" value="0.08" step="0.01" min="0"><span>/ea</span></div></label>
           <label class="field"><span class="field-label">Coffee cap for event</span>
-            <div class="field-box"><input type="number" id="coffeeCap" value="100" step="1"><span>cups</span></div></label>
+            <div class="field-box"><input type="number" id="coffeeCap" value="100" step="1" min="0"><span>cups</span></div></label>
         </div>
         <div class="divider-row">
           <span class="label">Cost per coffee</span>
@@ -620,7 +626,7 @@
           </label>
           <label class="field">
             <span class="field-label">Distance to venue (one-way)</span>
-            <div class="field-box"><input type="number" id="travelChargeKm" value="20" step="1"><span>km</span></div>
+            <div class="field-box"><input type="number" id="travelChargeKm" value="20" step="1" min="0"><span>km</span></div>
             <span class="distance-status" id="distanceStatus"></span>
           </label>
         </div>
@@ -628,12 +634,17 @@
 
         <div class="field-grid-3">
           <label class="field"><span class="field-label">Included distance</span>
-            <div class="field-box"><input type="number" id="includedKm" value="15" step="1"><span>km</span></div></label>
+            <div class="field-box"><input type="number" id="includedKm" value="15" step="1" min="0"><span>km</span></div></label>
           <label class="field"><span class="field-label">Rate beyond included</span>
-            <div class="field-box"><span>$</span><input type="number" id="travelSurchargeRate" value="1.50" step="0.01"><span>/km</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="travelSurchargeRate" value="1.50" step="0.01" min="0"><span>/km</span></div></label>
           <label class="field"><span class="field-label">Custom-quote threshold</span>
-            <div class="field-box"><input type="number" id="quoteThresholdKm" value="80" step="1"><span>km</span></div></label>
+            <div class="field-box"><input type="number" id="quoteThresholdKm" value="80" step="1" min="0"><span>km</span></div></label>
         </div>
+
+        <label class="field" id="customTravelQuoteWrap" style="display:none;">
+          <span class="field-label">Custom travel quote price</span>
+          <div class="field-box"><span>$</span><input type="number" id="customTravelQuote" value="0" step="1" min="0"><span>flat fee</span></div>
+        </label>
 
         <div>
           <div class="fee-preview-head">
@@ -676,13 +687,13 @@
       <div class="card-body">
         <div class="field-grid">
           <label class="field"><span class="field-label">Insurance (per event)</span>
-            <div class="field-box"><span>$</span><input type="number" id="insurance" value="15" step="1"></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="insurance" value="15" step="1" min="0"></div></label>
           <label class="field"><span class="field-label">Servicing/depreciation</span>
-            <div class="field-box"><span>$</span><input type="number" id="servicing" value="20" step="1"></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="servicing" value="20" step="1" min="0"></div></label>
           <label class="field"><span class="field-label">Permits/council fees</span>
-            <div class="field-box"><span>$</span><input type="number" id="permits" value="10" step="1"></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="permits" value="10" step="1" min="0"></div></label>
           <label class="field"><span class="field-label">Card/EFTPOS fees</span>
-            <div class="field-box"><input type="number" id="cardFeePct" value="1.7" step="0.1"><span>%</span></div></label>
+            <div class="field-box"><input type="number" id="cardFeePct" value="1.7" step="0.1" min="0"><span>%</span></div></label>
         </div>
 
         <div class="mini-divider"></div>
@@ -693,11 +704,11 @@
         </div>
         <div class="field-grid-3" id="generator-fields" style="display:none;">
           <label class="field"><span class="field-label">Run time</span>
-            <div class="field-box"><input type="number" id="genHours" value="3" step="0.5"><span>hrs</span></div></label>
+            <div class="field-box"><input type="number" id="genHours" value="3" step="0.5" min="0"><span>hrs</span></div></label>
           <label class="field"><span class="field-label">Fuel use</span>
-            <div class="field-box"><input type="number" id="genLph" value="1.0" step="0.1"><span>L/hr</span></div></label>
+            <div class="field-box"><input type="number" id="genLph" value="1.0" step="0.1" min="0"><span>L/hr</span></div></label>
           <label class="field"><span class="field-label">Fuel price</span>
-            <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="2.2" step="0.01"><span>/L</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="1.80" step="0.01" min="0"><span>/L</span></div></label>
         </div>
       </div>
     </div>
@@ -767,8 +778,11 @@
         </div>
         <div class="hourly-body" id="hourlyBody" style="display:none;">
           <div class="hourly-duration">
-            <input type="range" id="hourlySlider" min="1" max="5" step="0.5" value="3">
-            <span class="val" id="hourlySliderValue">3 hrs</span>
+            <input type="range" id="hourlySlider" min="1" max="5" step="1" value="3">
+            <span class="val" id="hourlySliderVal">3 hrs</span>
+          </div>
+          <div class="hourly-duration-display" style="font-size:12px;color:var(--panel-sub);margin-bottom:10px;">
+            Based on <span id="hourlyDurationDisplay">3</span> hr event (set in Booking Quote)
           </div>
           <div class="hourly-total-row">
             <span class="label">Total profit / hr</span>
@@ -807,6 +821,10 @@
           <span class="value" id="cq-event-type" style="font-size:14px;"></span>
         </div>
         <p style="font-size:11px;color:var(--sub);margin:2px 0 0;">What the customer sees — the quoted total, not your internal costs.</p>
+        <button type="button" class="copy-quote-btn" id="copy-quote-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="copy-btn-label">Copy quote text</span>
+        </button>
       </div>
     </div>
  
@@ -833,13 +851,13 @@ let generatorOn = false;
 let overheadsOn = false;
 let customOn = false;
 let hourlyOn = false;
-let serviceOn = true;
+let serviceOn = false;
  
 function currency(n) {
   if (!isFinite(n)) n = 0;
   return n.toLocaleString("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 2 });
 }
-function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function num(id) { const v = parseFloat(document.getElementById(id).value) || 0; return v < 0 ? 0 : v; }
  
 function renderCustomFields() {
   const container = document.getElementById("custom-fields-container");
@@ -849,18 +867,19 @@ function renderCustomFields() {
     row.className = "custom-row";
     row.innerHTML = `
       <input type="text" placeholder="Description" value="${f.label.replace(/"/g, '&quot;')}" data-id="${f.id}" data-field="label">
-      <input type="number" placeholder="0" value="${f.amount || ""}" data-id="${f.id}" data-field="amount">
+      <input type="number" placeholder="0" value="${f.amount || ""}" data-id="${f.id}" data-field="amount" min="0">
       <button data-id="${f.id}" class="remove-custom"><svg class="icon-rust" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
     `;
     container.appendChild(row);
   });
   container.querySelectorAll("input").forEach((inp) => {
     inp.addEventListener("input", (e) => {
+      if (e.target.type === "number" && e.target.value !== "" && parseFloat(e.target.value) < 0) e.target.value = 0;
       const id = e.target.getAttribute("data-id");
       const field = e.target.getAttribute("data-field");
       const item = customFields.find((x) => x.id === id);
       if (!item) return;
-      item[field] = field === "amount" ? (parseFloat(e.target.value) || 0) : e.target.value;
+      item[field] = field === "amount" ? Math.max(0, parseFloat(e.target.value) || 0) : e.target.value;
       recalc();
       save();
     });
@@ -907,18 +926,39 @@ setupToggle("toggle-hourly", () => hourlyOn, (v) => (hourlyOn = v), (v) => {
 setupToggle("toggle-service", () => serviceOn, (v) => (serviceOn = v), (v) => {
   document.getElementById("service-fields").style.display = v ? "grid" : "none";
 });
+
+// ----- Hourly breakdown duration slider (mirrors Event duration, 1-5 hrs, whole-hour steps) -----
+const hourlySlider = document.getElementById("hourlySlider");
+const hourlySliderVal = document.getElementById("hourlySliderVal");
+let syncingHourlySlider = false;
+
+function syncHourlySliderFromDuration(hours) {
+  if (!hourlySlider) return;
+  syncingHourlySlider = true;
+  const clamped = Math.min(5, Math.max(1, Math.round(hours)));
+  hourlySlider.value = clamped;
+  hourlySliderVal.textContent = clamped + " hrs";
+  syncingHourlySlider = false;
+}
+
+if (hourlySlider) {
+  hourlySlider.addEventListener("input", () => {
+    if (syncingHourlySlider) return;
+    hourlySliderVal.textContent = hourlySlider.value + " hrs";
+    document.getElementById("eventDuration").value = hourlySlider.value;
+    recalc();
+    save();
+  });
+}
  
 document.getElementById("eventSuburb").addEventListener("input", () => { save(); });
 document.getElementById("clientName").addEventListener("input", () => { save(); });
 document.getElementById("eventDate").addEventListener("input", () => { save(); });
 
-const eventTypeSelect = document.getElementById("eventType");
-const eventTypeOtherWrap = document.getElementById("eventTypeOtherWrap");
-const eventTypeOtherInput = document.getElementById("eventTypeOther");
+const eventTypeInput = document.getElementById("eventType");
 
 function updateEventTypeQuoteDisplay() {
-  let val = eventTypeSelect.value;
-  if (val === "Other") val = eventTypeOtherInput.value.trim();
+  const val = eventTypeInput.value.trim();
   const row = document.getElementById("cq-event-type-row");
   const span = document.getElementById("cq-event-type");
   if (val) {
@@ -929,33 +969,18 @@ function updateEventTypeQuoteDisplay() {
   }
 }
 
-function syncEventTypeOther(opts) {
-  const isOther = eventTypeSelect.value === "Other";
-  eventTypeOtherWrap.style.display = isOther ? "flex" : "none";
-  if (isOther) {
-    if (opts && opts.focus) eventTypeOtherInput.focus();
-  } else {
-    eventTypeOtherInput.value = "";
-  }
-  updateEventTypeQuoteDisplay();
-}
-
-eventTypeSelect.addEventListener("change", () => { syncEventTypeOther({ focus: true }); save(); });
-eventTypeOtherInput.addEventListener("input", () => { updateEventTypeQuoteDisplay(); save(); });
+eventTypeInput.addEventListener("input", () => { updateEventTypeQuoteDisplay(); save(); });
 
 document.querySelectorAll('input[type="number"]').forEach((inp) => {
-  inp.addEventListener("input", () => { recalc(); save(); });
+  inp.addEventListener("input", () => {
+    if (inp.value !== "" && parseFloat(inp.value) < 0) inp.value = 0;
+    recalc();
+    save();
+  });
 });
  
 const splitRange = document.getElementById("splitRange");
 splitRange.addEventListener("input", () => { recalc(); save(); });
- 
-const hourlySlider = document.getElementById("hourlySlider");
-hourlySlider.addEventListener("input", () => {
-  document.getElementById("hourlySliderValue").textContent = parseFloat(hourlySlider.value) + " hrs";
-  recalc();
-  save();
-});
  
 // ----- Package selector -----
 let selectedPackage = null;
@@ -973,6 +998,8 @@ function selectPackage(btn, { skipFieldUpdate } = {}) {
     if (beanPriceAttr) document.getElementById("beanPrice").value = beanPriceAttr;
     const milkPriceAttr = btn.getAttribute("data-milkprice");
     if (milkPriceAttr) document.getElementById("milkPrice").value = milkPriceAttr;
+    const hoursAttr = btn.getAttribute("data-hours");
+    if (hoursAttr) document.getElementById("eventDuration").value = hoursAttr;
     recalc();
     save();
   }
@@ -990,6 +1017,7 @@ function applyPackageDataToDOM(btn, data) {
   if (data.guests != null) btn.setAttribute("data-guests", data.guests);
   if (data.beanprice != null) btn.setAttribute("data-beanprice", data.beanprice);
   if (data.milkprice != null) btn.setAttribute("data-milkprice", data.milkprice);
+  if (data.hours != null) btn.setAttribute("data-hours", data.hours);
   if (data.name) btn.querySelector(".package-name").textContent = data.name;
 
   btn.querySelector(".package-meta").textContent =
@@ -1003,8 +1031,8 @@ function applyPackageDataToDOM(btn, data) {
     fields.querySelector(".pkg-edit-price").value = btn.getAttribute("data-price");
     fields.querySelector(".pkg-edit-coffees").value = btn.getAttribute("data-coffees");
     fields.querySelector(".pkg-edit-guests").value = btn.getAttribute("data-guests");
-    fields.querySelector(".pkg-edit-bean").value = btn.getAttribute("data-beanprice");
-    fields.querySelector(".pkg-edit-milk").value = btn.getAttribute("data-milkprice");
+    const hoursField = fields.querySelector(".pkg-edit-hours");
+    if (hoursField) hoursField.value = btn.getAttribute("data-hours") || "";
   }
 }
 
@@ -1048,11 +1076,10 @@ packageButtons.forEach((btn) => {
       e.stopPropagation();
       const data = {
         name: fields.querySelector(".pkg-edit-name").value.trim() || btn.querySelector(".package-name").textContent,
-        price: parseFloat(fields.querySelector(".pkg-edit-price").value) || 0,
-        coffees: parseInt(fields.querySelector(".pkg-edit-coffees").value, 10) || 0,
-        guests: parseInt(fields.querySelector(".pkg-edit-guests").value, 10) || 0,
-        beanprice: parseFloat(fields.querySelector(".pkg-edit-bean").value) || 0,
-        milkprice: parseFloat(fields.querySelector(".pkg-edit-milk").value) || 0,
+        price: Math.max(0, parseFloat(fields.querySelector(".pkg-edit-price").value) || 0),
+        coffees: Math.max(0, parseInt(fields.querySelector(".pkg-edit-coffees").value, 10) || 0),
+        guests: Math.max(0, parseInt(fields.querySelector(".pkg-edit-guests").value, 10) || 0),
+        hours: Math.max(0, parseFloat(fields.querySelector(".pkg-edit-hours").value) || 0),
       };
       applyPackageDataToDOM(btn, data);
       packageOverrides[pkgId] = data;
@@ -1061,8 +1088,7 @@ packageButtons.forEach((btn) => {
       if (selectedPackage === pkgId) {
         document.getElementById("bookingPrice").value = data.price;
         document.getElementById("coffeeCap").value = data.coffees;
-        document.getElementById("beanPrice").value = data.beanprice;
-        document.getElementById("milkPrice").value = data.milkprice;
+        document.getElementById("eventDuration").value = data.hours;
       }
       recalc();
       save();
@@ -1248,7 +1274,8 @@ function computeTravelSurcharge() {
   const threshold = num("quoteThresholdKm");
   const fee = computeSurchargeForKm(km);
   if (fee === null) {
-    return { surcharge: 0, bracket: "Over " + threshold + "km — quoted individually.", customQuote: true };
+    const customPrice = num("customTravelQuote");
+    return { surcharge: customPrice, bracket: "Over " + threshold + "km — custom travel quote applied.", customQuote: true };
   }
   if (km <= included) {
     return { surcharge: 0, bracket: "0–" + included + " km — included, no surcharge." };
@@ -1297,7 +1324,7 @@ function renderFeeBreakdownList() {
     row.className = "fee-breakdown-row";
     row.innerHTML =
       '<span class="fee-breakdown-km">' + km + ' km</span>' +
-      '<div class="field-box fee-breakdown-input-wrap"><span>$</span><input type="number" step="0.01" class="fee-breakdown-input" data-km="' + km + '" placeholder="' + (computed === null ? "Custom" : computed.toFixed(2)) + '" value="' + overrideVal + '"></div>';
+      '<div class="field-box fee-breakdown-input-wrap"><span>$</span><input type="number" step="0.01" class="fee-breakdown-input" data-km="' + km + '" placeholder="' + (computed === null ? "Custom" : computed.toFixed(2)) + '" value="' + overrideVal + '" min="0"></div>';
     list.appendChild(row);
   });
 }
@@ -1338,7 +1365,7 @@ document.getElementById("feeBreakdownSave").addEventListener("click", () => {
     if (val === "") {
       delete feeStopOverrides[km];
     } else {
-      feeStopOverrides[km] = parseFloat(val);
+      feeStopOverrides[km] = Math.max(0, parseFloat(val) || 0);
     }
   });
   document.getElementById("feeBreakdownPanel").style.display = "none";
@@ -1390,13 +1417,15 @@ function recalc() {
   document.getElementById("travelSurchargeNote").textContent = travelChargeCalc.bracket +
     (travelOn ? " Added to quote revenue." : " Toggle Travel on to include in revenue.");
  
+  document.getElementById("customTravelQuoteWrap").style.display = travelChargeCalc.customQuote ? "flex" : "none";
+ 
   document.getElementById("cq-total").textContent = currency(totalRevenue);
  
   const cqTravelRow = document.getElementById("cq-travel-row");
   const cqTravelFeeEl = document.getElementById("cq-travel-fee");
   if (travelOn && travelChargeCalc.customQuote) {
     cqTravelRow.style.display = "flex";
-    cqTravelFeeEl.textContent = "Custom quote";
+    cqTravelFeeEl.textContent = travelSurchargeAmount > 0 ? currency(travelSurchargeAmount) + " (custom quote)" : "Custom quote — enter price";
   } else if (travelOn && travelSurchargeAmount > 0) {
     cqTravelRow.style.display = "flex";
     cqTravelFeeEl.textContent = currency(travelSurchargeAmount);
@@ -1420,10 +1449,13 @@ function recalc() {
   const rangeEl = splitRange;
   rangeEl.style.background = `linear-gradient(to right, var(--partner1) 0%, var(--partner1) ${pct1}%, var(--partner2) ${pct1}%, var(--partner2) 100%)`;
  
-  const hours = Math.max(0.5, parseFloat(hourlySlider.value) || 1);
+  const hours = Math.max(0.5, num("eventDuration") || 3);
   const hourly1 = split1 / hours;
   const hourly2 = split2 / hours;
   document.getElementById("hourly-total-amt").textContent = currency(grossProfit / hours);
+  const hourlyDurationEl = document.getElementById("hourlyDurationDisplay");
+  if (hourlyDurationEl) hourlyDurationEl.textContent = hours;
+  syncHourlySliderFromDuration(hours);
   document.getElementById("stat-partner1-hourly-label").textContent = "Marianna /hr";
   document.getElementById("stat-partner2-hourly-label").textContent = "Simon /hr";
   document.getElementById("stat-partner1-hourly-amt").textContent = currency(hourly1);
@@ -1450,15 +1482,15 @@ function recalc() {
  
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap",
-    "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice",
-    "eventSuburb","travelChargeKm","includedKm","travelSurchargeRate","quoteThresholdKm","clientName","eventDate","eventType","eventTypeOther","customerAddress"];
+    "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
+    "eventSuburb","travelChargeKm","includedKm","travelSurchargeRate","quoteThresholdKm","clientName","eventDate","eventType","customerAddress","customTravelQuote"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
     values, customFields, travelOn, generatorOn, overheadsOn, customOn,
     splitPct: splitRange.value,
     selectedPackage,
-    hourlyOn, hourlyHours: hourlySlider.value,
+    hourlyOn,
     packageOverrides,
     serviceOn,
     feeStopOverrides,
@@ -1504,7 +1536,6 @@ function load() {
     if (typeof s.overheadsOn === "boolean") overheadsOn = s.overheadsOn;
     if (typeof s.customOn === "boolean") customOn = s.customOn;
     if (typeof s.hourlyOn === "boolean") hourlyOn = s.hourlyOn;
-    if (s.hourlyHours) hourlySlider.value = s.hourlyHours;
     if (typeof s.serviceOn === "boolean") serviceOn = s.serviceOn;
     if (s.splitPct) splitRange.value = Math.round(parseInt(s.splitPct, 10) / 5) * 5;
  
@@ -1518,7 +1549,6 @@ function load() {
     document.getElementById("generator-fields").style.display = generatorOn ? "grid" : "none";
     document.getElementById("toggle-hourly").classList.toggle("on", hourlyOn);
     document.getElementById("hourlyBody").style.display = hourlyOn ? "block" : "none";
-    document.getElementById("hourlySliderValue").textContent = parseFloat(hourlySlider.value) + " hrs";
     document.getElementById("toggle-service").classList.toggle("on", serviceOn);
     document.getElementById("service-fields").style.display = serviceOn ? "grid" : "none";
  
@@ -1584,19 +1614,18 @@ function generateQuotePDF() {
   y += 28;
  
   const clientName = document.getElementById("clientName").value.trim() || "—";
-  let eventType = document.getElementById("eventType").value || "—";
-  if (eventType === "Other") {
-    const customEventType = document.getElementById("eventTypeOther").value.trim();
-    if (customEventType) eventType = customEventType;
-  }
+  const eventType = document.getElementById("eventType").value.trim() || "—";
   const eventDateRaw = document.getElementById("eventDate").value;
   const eventDateStr = eventDateRaw
     ? new Date(eventDateRaw + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
     : "—";
  
+  const eventDurationVal = parseFloat(document.getElementById("eventDuration").value) || 0;
+  const eventDurationStr = eventDurationVal ? eventDurationVal + " hrs" : "—";
+
   doc.setFontSize(11);
   doc.setTextColor(33, 28, 21);
-  [["Client", clientName], ["Event type", eventType], ["Event date", eventDateStr]].forEach(([label, val]) => {
+  [["Client", clientName], ["Event type", eventType], ["Event date", eventDateStr], ["Duration", eventDurationStr]].forEach(([label, val]) => {
     doc.setFont("helvetica", "bold");
     doc.text(label + ":", marginX, y);
     doc.setFont("helvetica", "normal");
@@ -1632,7 +1661,8 @@ function generateQuotePDF() {
   if (travelOn && travelSurchargeCalc.surcharge > 0) {
     const suburb = document.getElementById("eventSuburb").value.trim();
     const km = parseFloat(document.getElementById("travelChargeKm").value) || 0;
-    const label = "Distance surcharge" + (suburb ? " — " + suburb : "") + " (" + km + "km)";
+    const labelBase = travelSurchargeCalc.customQuote ? "Custom travel quote" : "Distance surcharge";
+    const label = labelBase + (suburb ? " — " + suburb : "") + " (" + km + "km)";
     doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
     doc.text(label, marginX, y);
@@ -1675,7 +1705,7 @@ function generateQuotePDF() {
  
   doc.setFontSize(9.5);
   doc.setTextColor(122, 114, 100);
-  doc.text("This quote is valid for 14 days from the date of issue. A deposit may be required to secure your date.", marginX, y);
+  doc.text("This quote is valid for 14 days from the date of issue. Payment in full is required to secure your booking date and services.", marginX, y);
   y += 14;
   doc.text("Blend & Brew  ·  blendandbrew@hotmail.com.au  ·  Greater Sydney, NSW", marginX, y);
  
@@ -1685,11 +1715,96 @@ function generateQuotePDF() {
 }
  
 document.getElementById("generate-quote-btn").addEventListener("click", generateQuotePDF);
+
+function buildQuoteSummaryText() {
+  const clientName = document.getElementById("clientName").value.trim() || "—";
+  const eventType = document.getElementById("eventType").value.trim() || "—";
+  const eventDateRaw = document.getElementById("eventDate").value;
+  const eventDateStr = eventDateRaw
+    ? new Date(eventDateRaw + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+    : "—";
+  const duration = num("eventDuration");
+  const coffees = num("coffeeCap");
+  const bookingPrice = num("bookingPrice");
+  const packageNameEl = selectedPackage
+    ? document.querySelector(`.package-option[data-package="${selectedPackage}"] .package-name`)
+    : null;
+  const packageName = packageNameEl ? packageNameEl.textContent : "Custom estimate";
+
+  const travelSurchargeCalc = computeTravelSurcharge();
+  const travelSurcharge = travelOn ? travelSurchargeCalc.surcharge : 0;
+  const suburb = document.getElementById("eventSuburb").value.trim();
+  const km = num("travelChargeKm");
+  const total = bookingPrice + travelSurcharge;
+
+  const lines = [];
+  lines.push("BLEND & BREW — EVENT QUOTE");
+  lines.push("");
+  lines.push(`Client: ${clientName}`);
+  lines.push(`Event type: ${eventType}`);
+  lines.push(`Event date: ${eventDateStr}`);
+  lines.push(`Event duration: ${duration} hrs`);
+  lines.push("");
+  lines.push(`Package: ${packageName} (${coffees} coffees)`);
+  lines.push(`Package price: ${currency(bookingPrice)}`);
+  if (travelOn && travelSurchargeCalc.customQuote) {
+    lines.push(`Custom travel quote${suburb ? " — " + suburb : ""} (${km}km): ${travelSurcharge > 0 ? currency(travelSurcharge) : "to be confirmed"}`);
+  } else if (travelOn && travelSurcharge > 0) {
+    lines.push(`Travel surcharge${suburb ? " — " + suburb : ""} (${km}km): ${currency(travelSurcharge)}`);
+  } else if (travelOn) {
+    lines.push(`Travel${suburb ? " — " + suburb : ""} (${km}km): included, no surcharge`);
+  }
+  lines.push("");
+  lines.push(`TOTAL: ${currency(total)}`);
+  lines.push("");
+  lines.push("Includes: two certified baristas, commercial-grade espresso machine and grinder, cups, lids, sugar, stirrers and napkins.");
+  lines.push("Requires 2 x standard power outlets on separate circuits.");
+  lines.push("This quote is valid for 14 days from the date of issue. Payment in full is required to secure your booking date and services.");
+  lines.push("");
+  lines.push("Blend & Brew · blendandbrew@hotmail.com.au · Greater Sydney, NSW");
+  return lines.join("\n");
+}
+
+function copyQuoteText() {
+  const text = buildQuoteSummaryText();
+  const btn = document.getElementById("copy-quote-btn");
+  const label = btn ? btn.querySelector(".copy-btn-label") : null;
+
+  function finish(ok) {
+    if (!btn || !label) return;
+    btn.classList.toggle("copied", ok);
+    label.textContent = ok ? "Copied!" : "Copy failed — try again";
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      label.textContent = "Copy quote text";
+    }, 1800);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => finish(true)).catch(() => finish(false));
+  } else {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      finish(true);
+    } catch (e) {
+      finish(false);
+    }
+  }
+}
+document.getElementById("copy-quote-btn").addEventListener("click", copyQuoteText);
  
 initChart();
 load();
 renderCustomFields();
-syncEventTypeOther();
+updateEventTypeQuoteDisplay();
 recalc();
 document.getElementById("save-status").textContent = "";
  
