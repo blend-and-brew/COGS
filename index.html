@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <style>
   :root {
     --bg: #FAFAF7;
@@ -106,6 +105,7 @@
   #eventTypeRow > .field:first-child { grid-column: 1 / -1; }
   #eventTypeRow.has-other > .field:first-child { grid-column: auto; }
   .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .field-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
   label.field { display: flex; flex-direction: column; gap: 4px; }
   .field-label { font-size: 11.5px; color: var(--sub); font-weight: 500; }
   .field-box {
@@ -135,6 +135,8 @@
     cursor: pointer;
   }
   .select-input:invalid { color: #B7AF9E; }
+  .select-input option { color: var(--ink); }
+  .select-input option[value=""] { color: #B7AF9E; }
  
   .divider-row {
     border-top: 1px dashed var(--border); padding-top: 10px;
@@ -389,14 +391,14 @@
   <div class="header-left">
     <img src="data:image/png;base64,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" alt="Blend & Brew logo">
     <div>
-      <div class="header-eyebrow">Blend &amp; Brew · Sydney NSW</div>
+      <div class="header-eyebrow">Blend &amp; Brew · Greater Sydney NSW</div>
       <div class="header-title">Event Costing &amp; Margin Dashboard</div>
     </div>
   </div>
   <div class="header-right">
     <span class="save-status" id="save-status"></span>
-    <button class="pdf-btn" id="generate-quote-btn"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 11h1"/></svg> Generate Quote PDF</button>
-    <button class="reset-btn" id="reset-btn"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg> Reset</button>
+    <button class="pdf-btn" id="generate-quote-btn"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 11h1"/></svg> Generate Quote</button>
+    <button class="reset-btn" id="reset-btn" title="Clear all saved values and reload the dashboard exactly as it ships in the HTML file"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg> Reset</button>
   </div>
 </div>
  
@@ -641,9 +643,11 @@
         </div>
         <input type="hidden" id="eventSuburb" value="">
 
-        <div class="field-grid-3">
+        <div class="field-grid-4">
           <label class="field"><span class="field-label">Included distance</span>
             <div class="field-box"><input type="number" id="includedKm" value="15" step="1" min="0"><span>km</span></div></label>
+          <label class="field"><span class="field-label">Minimum charge</span>
+            <div class="field-box"><span>$</span><input type="number" id="travelMinFee" value="5" step="0.01" min="0"></div></label>
           <label class="field"><span class="field-label">Rate beyond included</span>
             <div class="field-box"><span>$</span><input type="number" id="travelSurchargeRate" value="1.50" step="0.01" min="0"><span>/km</span></div></label>
           <label class="field"><span class="field-label">Custom-quote threshold</span>
@@ -680,7 +684,7 @@
           <span class="label">Distance surcharge</span>
           <span class="value" id="out-travelSurcharge">$0</span>
         </div>
-        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="travelSurchargeNote">Travel within 15km of Edensor Park NSW 2176 is included. Additional travel is charged at $1.50 per km thereafter. Bookings over 80km away will be quoted individually.</p>
+        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="travelSurchargeNote">Travel within 15km of Edensor Park NSW 2176 is included. Beyond that, a $5 minimum travel charge applies, increasing at $1.50 per km once that exceeds $5. Bookings over 80km away will be quoted individually.</p>
       </div>
     </div>
 
@@ -717,7 +721,7 @@
           <label class="field"><span class="field-label">Fuel use</span>
             <div class="field-box"><input type="number" id="genLph" value="1.0" step="0.1" min="0"><span>L/hr</span></div></label>
           <label class="field"><span class="field-label">Fuel price</span>
-            <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="1.80" step="0.01" min="0"><span>/L</span></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="1.75" step="0.01" min="0"><span>/L</span></div></label>
         </div>
       </div>
     </div>
@@ -1205,6 +1209,7 @@ document.getElementById("clearPackage").addEventListener("click", clearPackageSe
       const km = await routeDistanceKm(parseFloat(place.lat), parseFloat(place.lon));
       const rounded = Math.round(km * 10) / 10;
       kmInput.value = rounded;
+      if (typeof syncFeeSliderToKm === "function") syncFeeSliderToKm();
       setStatus(`✓ ${rounded} km driving distance from Edensor Park (auto-calculated).`, "ok");
     } catch (err) {
       console.error("Distance calc error:", err);
@@ -1290,15 +1295,18 @@ function computeSurchargeForKm(km) {
   const included = num("includedKm");
   const rate = num("travelSurchargeRate");
   const threshold = num("quoteThresholdKm");
+  const minFee = num("travelMinFee");
   if (km > threshold) return null; // beyond threshold — quoted individually
   if (km <= included) return 0;
-  return (km - included) * rate;
+  const distanceFee = (km - included) * rate;
+  return Math.max(minFee, distanceFee);
 }
 
 function computeTravelSurcharge() {
   const km = num("travelChargeKm");
   const included = num("includedKm");
   const threshold = num("quoteThresholdKm");
+  const minFee = num("travelMinFee");
   const fee = computeSurchargeForKm(km);
   if (fee === null) {
     const customPrice = num("customTravelQuote");
@@ -1307,7 +1315,11 @@ function computeTravelSurcharge() {
   if (km <= included) {
     return { surcharge: 0, bracket: "0–" + included + " km — included, no surcharge." };
   }
-  return { surcharge: fee, bracket: included + "–" + threshold + " km bracket." };
+  const minApplied = fee <= minFee + 1e-9;
+  return {
+    surcharge: fee,
+    bracket: included + "–" + threshold + " km bracket" + (minApplied ? " — $" + minFee.toFixed(2) + " minimum charge applies." : "."),
+  };
 }
 
 // ----- Distance / fee preview slider + editable breakdown -----
@@ -1509,7 +1521,7 @@ function recalc() {
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap",
     "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
-    "eventSuburb","travelChargeKm","includedKm","travelSurchargeRate","quoteThresholdKm","clientName","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote"];
+    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
@@ -1590,158 +1602,186 @@ function load() {
 }
  
 document.getElementById("reset-btn").addEventListener("click", () => {
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem("blendAndBrewRightColWidth");
-  location.reload();
-});
- 
-function generateQuotePDF() {
-  if (!window.jspdf) {
-    alert("PDF library failed to load. Check your internet connection and try again.");
-    return;
-  }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const marginX = 48;
-  let y = 56;
- 
-  const logoImg = document.querySelector(".header-left img");
+  const confirmed = window.confirm("Hard reset? This clears all saved values and reloads the dashboard exactly as it ships in the HTML file — this can't be undone.");
+  if (!confirmed) return;
   try {
-    if (logoImg && logoImg.src) doc.addImage(logoImg.src, "PNG", marginX, y - 14, 46, 46);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem("blendAndBrewRightColWidth");
+    localStorage.removeItem("blendAndBrewOriginCoords");
   } catch (e) {}
- 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  doc.setTextColor(33, 28, 21);
-  doc.text("Blend & Brew", marginX + 58, y);
- 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(122, 114, 100);
-  doc.text("Mobile Coffee Wagon  ·  Greater Sydney, NSW", marginX + 58, y + 16);
- 
-  y += 56;
-  doc.setDrawColor(220, 199, 154);
-  doc.setLineWidth(1);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 30;
- 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(15);
-  doc.setTextColor(33, 28, 21);
-  doc.text("Event Quote", marginX, y);
- 
-  const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(122, 114, 100);
-  doc.text("Issued " + issueDate, pageWidth - marginX, y, { align: "right" });
- 
-  y += 28;
- 
+  // Force a genuine reload from source, bypassing the browser's cached copy
+  // of this page (not just the saved form state) so we truly load as-is
+  // from the HTML file rather than any cached render of it.
+  const url = new URL(location.href);
+  url.searchParams.set("_hardreset", Date.now().toString());
+  location.replace(url.toString());
+});
+
+// ===================================================
+// GENERATE QUOTE — opens a print-ready HTML tab
+// populated straight from the dashboard's current
+// figures. No copy/paste, no PDF library: the browser's
+// own "Print > Save as PDF" handles the PDF step if the
+// user wants a file.
+// ===================================================
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+function buildQuoteDocumentHTML() {
+  const logoImg = document.querySelector(".header-left img");
+  const logoSrc = logoImg ? logoImg.src : "";
+
   const clientName = document.getElementById("clientName").value.trim() || "—";
   const eventType = getEventTypeValue() || "—";
   const eventDateRaw = document.getElementById("eventDate").value;
   const eventDateStr = eventDateRaw
     ? new Date(eventDateRaw + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
     : "—";
- 
-  const eventDurationVal = parseFloat(document.getElementById("eventDuration").value) || 0;
-  const eventDurationStr = eventDurationVal ? eventDurationVal + " hrs" : "—";
+  const duration = num("eventDuration");
+  const durationStr = duration ? duration + " hrs" : "—";
+  const coffees = num("coffeeCap");
+  const bookingPrice = num("bookingPrice");
 
-  doc.setFontSize(11);
-  doc.setTextColor(33, 28, 21);
-  [["Client", clientName], ["Event type", eventType], ["Event date", eventDateStr], ["Duration", eventDurationStr]].forEach(([label, val]) => {
-    doc.setFont("helvetica", "bold");
-    doc.text(label + ":", marginX, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(val, marginX + 90, y);
-    y += 18;
-  });
- 
-  y += 14;
-  doc.setDrawColor(231, 226, 214);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 26;
- 
-  const coffees = parseFloat(document.getElementById("coffeeCap").value) || 0;
-  const bookingPrice = parseFloat(document.getElementById("bookingPrice").value) || 0;
   const packageNameEl = selectedPackage
     ? document.querySelector(`.package-option[data-package="${selectedPackage}"] .package-name`)
     : null;
   const packageName = packageNameEl ? packageNameEl.textContent : "Custom estimate";
- 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.text(packageName, marginX, y);
-  doc.text(currency(bookingPrice), pageWidth - marginX, y, { align: "right" });
-  y += 15;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(122, 114, 100);
-  doc.text(coffees + " coffees  ·  two certified baristas included", marginX, y);
-  doc.setTextColor(33, 28, 21);
-  y += 25;
- 
-  const travelSurchargeCalc = computeTravelSurcharge();
-  if (travelOn && travelSurchargeCalc.surcharge > 0) {
-    const suburb = document.getElementById("eventSuburb").value.trim();
-    const km = parseFloat(document.getElementById("travelChargeKm").value) || 0;
-    const labelBase = travelSurchargeCalc.customQuote ? "Custom travel quote" : "Distance surcharge";
-    const label = labelBase + (suburb ? " — " + suburb : "") + " (" + km + "km)";
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text(label, marginX, y);
-    doc.text(currency(travelSurchargeCalc.surcharge), pageWidth - marginX, y, { align: "right" });
-    y += 26;
+
+  const travelCalc = computeTravelSurcharge();
+  const travelSurcharge = travelOn ? travelCalc.surcharge : 0;
+  const suburb = document.getElementById("eventSuburb").value.trim();
+  const km = num("travelChargeKm");
+  const total = bookingPrice + travelSurcharge;
+  const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+
+  let travelRowHtml = "";
+  if (travelOn && travelCalc.customQuote) {
+    const label = "Custom travel quote" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
+    const val = travelSurcharge > 0 ? currency(travelSurcharge) : "To be confirmed";
+    travelRowHtml = `<tr><td>${label}</td><td class="right">${val}</td></tr>`;
+  } else if (travelOn && travelSurcharge > 0) {
+    const label = "Travel surcharge" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
+    travelRowHtml = `<tr><td>${label}</td><td class="right">${currency(travelSurcharge)}</td></tr>`;
+  } else if (travelOn) {
+    const label = "Travel" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
+    travelRowHtml = `<tr><td>${label}</td><td class="right">Included</td></tr>`;
   }
- 
-  doc.setDrawColor(184, 130, 61);
-  doc.setLineWidth(1);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 26;
- 
-  const total = bookingPrice + (travelOn ? travelSurchargeCalc.surcharge : 0);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(15);
-  doc.text("Total", marginX, y);
-  doc.text(currency(total), pageWidth - marginX, y, { align: "right" });
-  y += 40;
- 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("What's included", marginX, y);
-  y += 18;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10.5);
-  [
-    "Two certified baristas, from setup to pack-down",
-    "Commercial-grade espresso machine and grinder",
-    "Cups, lids, sugar, stirrers and napkins",
-    "Requires 2 x standard power outlets on separate circuits",
-  ].forEach((line) => {
-    doc.text("•  " + line, marginX, y);
-    y += 16;
-  });
- 
-  y += 24;
-  doc.setDrawColor(231, 226, 214);
-  doc.line(marginX, y, pageWidth - marginX, y);
-  y += 20;
- 
-  doc.setFontSize(9.5);
-  doc.setTextColor(122, 114, 100);
-  doc.text("This quote is valid for 14 days from the date of issue. Payment in full is required to secure your booking date and services.", marginX, y);
-  y += 14;
-  doc.text("Blend & Brew  ·  blendandbrew@hotmail.com.au  ·  Greater Sydney, NSW", marginX, y);
- 
-  const safeClient = clientName.replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "quote";
-  const safeDate = new Date().toISOString().slice(0, 10);
-  doc.save(`BlendAndBrew_Quote_${safeClient}_${safeDate}.pdf`);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blend & Brew — Quote for ${escapeHtml(clientName)}</title>
+<style>
+  :root {
+    --ink:#211C15; --sub:#7A7264; --accent:#B8823D; --rust:#BD5A34; --border:#E7E2D6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    color: var(--ink); margin: 0; background: #FAFAF7;
+  }
+  .sheet { max-width: 720px; margin: 32px auto; background: #fff; padding: 48px; border: 1px solid var(--border); border-radius: 10px; }
+  .quote-header { display: flex; align-items: center; gap: 16px; border-bottom: 2px solid #DCC79A; padding-bottom: 20px; margin-bottom: 24px; }
+  .quote-header img { height: 52px; width: 52px; object-fit: contain; }
+  .quote-header h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  .quote-header p { font-size: 12.5px; color: var(--sub); margin: 2px 0 0; }
+  .quote-meta-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 22px; }
+  .quote-meta-row h2 { font-size: 16px; margin: 0; }
+  .quote-meta-row span { font-size: 11.5px; color: var(--sub); }
+  table.details { width: 100%; border-collapse: collapse; margin-bottom: 26px; }
+  table.details td { padding: 5px 0; font-size: 13.5px; }
+  table.details td:first-child { color: var(--sub); width: 120px; font-weight: 600; }
+  table.lines { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+  table.lines td { padding: 10px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border); }
+  table.lines td.right { text-align: right; font-family: 'Courier New', monospace; }
+  table.lines tr.pkg-row td { font-weight: 700; font-size: 14.5px; border-bottom: 1px dashed var(--border); }
+  table.lines tr.total-row td { border-top: 2px solid var(--accent); border-bottom: none; font-weight: 700; font-size: 17px; padding-top: 14px; }
+  .pkg-sub { color: var(--sub); font-weight: 400; font-size: 11.5px; display: block; margin-top: 2px; }
+  .included { margin: 26px 0; }
+  .included h3 { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--sub); margin: 0 0 10px; }
+  .included ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.7; }
+  .quote-footer { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 26px; font-size: 10.5px; color: var(--sub); line-height: 1.6; }
+  .no-print { text-align: center; margin: 18px auto; max-width: 720px; }
+  .no-print button {
+    border: 1px solid var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+    padding: 9px 18px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  @page { size: A4; margin: 18mm; }
+  @media print {
+    body { background: #fff; }
+    .sheet { margin: 0; border: none; border-radius: 0; padding: 0; max-width: none; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="no-print"><button onclick="window.print()">Print / Save as PDF</button></div>
+  <div class="sheet">
+    <div class="quote-header">
+      ${logoSrc ? `<img src="${logoSrc}" alt="Blend & Brew logo">` : ""}
+      <div>
+        <h1>Blend &amp; Brew</h1>
+        <p>Mobile Coffee Wagon &middot; Greater Sydney, NSW</p>
+      </div>
+    </div>
+
+    <div class="quote-meta-row">
+      <h2>Event Quote</h2>
+      <span>Issued ${issueDate}</span>
+    </div>
+
+    <table class="details">
+      <tr><td>Client</td><td>${escapeHtml(clientName)}</td></tr>
+      <tr><td>Event type</td><td>${escapeHtml(eventType)}</td></tr>
+      <tr><td>Event date</td><td>${escapeHtml(eventDateStr)}</td></tr>
+      <tr><td>Duration</td><td>${escapeHtml(durationStr)}</td></tr>
+    </table>
+
+    <table class="lines">
+      <tr class="pkg-row">
+        <td>${escapeHtml(packageName)}<span class="pkg-sub">${coffees} coffees &middot; two certified baristas included</span></td>
+        <td class="right">${currency(bookingPrice)}</td>
+      </tr>
+      ${travelRowHtml}
+      <tr class="total-row"><td>Total</td><td class="right">${currency(total)}</td></tr>
+    </table>
+
+    <div class="included">
+      <h3>What's included</h3>
+      <ul>
+        <li>Two certified baristas, from setup to pack-down</li>
+        <li>Commercial-grade espresso machine and grinder</li>
+        <li>Cups, lids, sugar, stirrers and napkins</li>
+        <li>Requires 2 x standard power outlets on separate circuits</li>
+      </ul>
+    </div>
+
+    <div class="quote-footer">
+      This quote is valid for 14 days from the date of issue. Payment in full is required to secure your booking date and services.<br>
+      Blend &amp; Brew &middot; blendandbrew@hotmail.com.au &middot; Greater Sydney, NSW
+    </div>
+  </div>
+</body>
+</html>`;
 }
- 
-document.getElementById("generate-quote-btn").addEventListener("click", generateQuotePDF);
+
+function openQuoteWindow() {
+  const html = buildQuoteDocumentHTML();
+  const win = window.open("", "_blank");
+  if (!win) {
+    alert("Your browser blocked the pop-up. Please allow pop-ups for this site and try again.");
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
+
+document.getElementById("generate-quote-btn").addEventListener("click", openQuoteWindow);
 
 function buildQuoteSummaryText() {
   const clientName = document.getElementById("clientName").value.trim() || "—";
