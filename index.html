@@ -69,7 +69,7 @@
  
   .grid { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .left-col { padding: 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
-  .right-col { padding: 20px; border-top: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #211C15; }
+  .right-col { padding: 20px; border-top: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #211C15; container-type: inline-size; }
   .col-resizer { display: none; }
   @media (min-width: 1024px) {
     .grid { display: grid; grid-template-columns: 1fr 6px var(--right-col-width, 760px); }
@@ -102,8 +102,6 @@
   .icon { width: 18px; height: 18px; flex-shrink: 0; }
  
   .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  #eventTypeRow > .field:first-child { grid-column: 1 / -1; }
-  #eventTypeRow.has-other > .field:first-child { grid-column: auto; }
   .field-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
   .field-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
   label.field { display: flex; flex-direction: column; gap: 4px; }
@@ -185,6 +183,15 @@
   .add-line-btn:hover { border-color: var(--accent); color: var(--accent); }
  
   .booking-card { background: var(--booking-card); border-color: var(--booking-border); }
+  .booking-details-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 0 10px; margin-top: -4px;
+    border-bottom: 1px dashed var(--booking-border);
+    cursor: pointer; user-select: none;
+  }
+  .booking-details-label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
+  .booking-details-body { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+  .booking-details-body.off { display: none; }
   #card-packages, #card-stock { background: var(--packages-card); border-color: var(--packages-border); }
  
   .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
@@ -267,7 +274,7 @@
  
   .mini-divider { border-top: 1px dashed var(--border); margin: 14px 0; }
  
-  .stat-panel { background: var(--panel); border-radius: 10px; padding: 18px; }
+  .stat-panel { background: var(--panel); border-radius: 10px; padding: 18px; min-width: 0; }
   .stat-panel-eyebrow { font-size: 11px; color: var(--panel-sub); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
   .stat-item { border-left: 2px solid var(--accent); padding-left: 10px; }
@@ -299,9 +306,19 @@
   .hourly-total-row .label { font-size: 12px; color: var(--panel-sub); }
   .hourly-total-row .value { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; color: #fff; }
  
-  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; flex: 1; display: flex; flex-direction: column; }
-  .chart-card-eyebrow { font-size: 11px; color: var(--sub); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+  .right-top-row { display: grid; grid-template-columns: 1fr clamp(90px, 22cqi, 220px); gap: 16px; align-items: stretch; }
+  @container (max-width: 595px) {
+    .right-top-row { grid-template-columns: 1fr; }
+    .right-top-row .chart-card.chart-card-compact { padding: 8px; }
+    .right-top-row .chart-card-compact .chart-wrap { height: 114px; min-height: 0; flex: 0 0 auto; }
+  }
+
+  .chart-card { background: var(--panel); border: none; border-radius: 10px; padding: 14px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .chart-card-eyebrow { font-size: 11px; color: var(--panel-sub); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
   .chart-wrap { flex: 1; min-height: 340px; position: relative; }
+  .chart-card-compact { padding: 10px; }
+  .chart-card-compact .chart-card-eyebrow { font-size: 10px; margin-bottom: 6px; }
+  .chart-card-compact .chart-wrap { min-height: 130px; }
  
   .fee-preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .fee-slider-wrap { display: flex; flex-direction: column; gap: 8px; }
@@ -408,62 +425,97 @@
 <div class="grid">
   <div class="left-col">
  
-    <!-- BOOKING + PACKAGES -->
-    <div class="top-row">
-      <div class="card booking-card">
-        <div class="card-head">
-          <div class="card-head-left">
-            <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <span class="card-title">Booking Quote</span>
-          </div>
-          <button type="button" class="icon-clear-btn" id="clearBookingQuote" title="Clear booking quote fields" aria-label="Clear booking quote fields">Clear section</button>
+    <!-- BOOKING -->
+    <div class="card booking-card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span class="card-title">Booking Quote</span>
         </div>
-        <div class="card-body">
-          <div class="field-grid">
-            <label class="field" style="grid-column: 1 / -1;">
-              <span class="field-label">Load booking from Google Sheet</span>
-              <div style="display:flex; gap:8px; align-items:center;">
-                <select id="bookingSheetSelect" class="text-input select-input" style="flex:1;">
-                  <option value="">Select a client…</option>
-                </select>
-                <button type="button" id="refreshBookingsBtn" title="Refresh booking list" aria-label="Refresh booking list" style="flex:0 0 auto;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--sub);cursor:pointer;">
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
-                </button>
-              </div>
-              <span class="distance-status" id="sheetSyncStatus"></span>
-            </label>
-          </div>
-          <div class="field-grid">
-            <label class="field"><span class="field-label">Client name</span>
-              <input type="text" id="clientName" class="text-input" placeholder="e.g. Sarah &amp; James"></label>
-            <label class="field"><span class="field-label">Event date</span>
-              <input type="date" id="eventDate" class="text-input"></label>
-          </div>
-          <div class="field-grid" id="eventTypeRow">
-            <label class="field"><span class="field-label">Event type</span>
-              <select id="eventType" class="text-input select-input" required>
-                <option value="" selected>Select one</option>
-                <option value="Wedding">Wedding</option>
-                <option value="Corporate">Corporate</option>
-                <option value="Party">Party</option>
-                <option value="Market">Market</option>
-                <option value="Other">Other</option>
+        <button type="button" class="icon-clear-btn" id="clearBookingQuote" title="Clear booking quote fields" aria-label="Clear booking quote fields">Clear section</button>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <label class="field" style="grid-column: 1 / -1;"><span class="field-label">Load booking from Google Sheet</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <select id="bookingSheetSelect" class="text-input select-input" style="flex:1;">
+                <option value="">Select a client…</option>
               </select>
-            </label>
-            <label class="field" id="eventTypeOtherWrap" style="display:none;"><span class="field-label">Enter event type</span>
-              <input type="text" id="eventTypeOther" class="text-input" placeholder="Enter event type">
-            </label>
-          </div>
-          <div class="field-grid">
-            <label class="field"><span class="field-label">Package / booking price</span>
-              <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
-            <label class="field"><span class="field-label">Event duration</span>
-              <div class="field-box"><input type="number" id="eventDuration" value="3" step="0.5" min="0.5"><span>hrs</span></div></label>
-          </div>
-          <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
+              <button type="button" id="refreshBookingsBtn" title="Refresh booking list" aria-label="Refresh booking list" style="flex:0 0 auto;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--sub);cursor:pointer;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
+              </button>
+            </div>
+            <span class="distance-status" id="sheetSyncStatus"></span>
+          </label>
+        </div>
+
+        <div class="booking-details-header" id="bookingDetailsHeader">
+          <span class="booking-details-label">Booking Details</span>
+          <div class="toggle on" id="toggle-bookingDetails"><div class="knob"></div></div>
+        </div>
+
+        <div class="booking-details-body" id="bookingDetailsBody">
+        <div class="field-grid">
+          <label class="field"><span class="field-label">Client name</span>
+            <input type="text" id="clientName" class="text-input" placeholder="e.g. Marianna and Simon"></label>
+          <label class="field"><span class="field-label">Organisation (optional)</span>
+            <input type="text" id="clientOrganisation" class="text-input" placeholder="e.g. Acme Pty Ltd"></label>
+        </div>
+        <div class="field-grid">
+          <label class="field"><span class="field-label">Contact email</span>
+            <input type="email" id="clientEmail" class="text-input" placeholder="e.g. name@example.com"></label>
+          <label class="field"><span class="field-label">Contact phone</span>
+            <input type="text" id="clientPhone" class="text-input" placeholder="e.g. 0400 000 000"></label>
+        </div>
+        <div class="field-grid" id="eventTypeRow">
+          <label class="field"><span class="field-label">Event address</span>
+            <input type="text" id="bookingAddress" class="text-input" placeholder="Auto-fills from sheet or Travel section" autocomplete="off"></label>
+          <label class="field"><span class="field-label">Event type</span>
+            <select id="eventType" class="text-input select-input" required>
+              <option value="" disabled selected>Select one</option>
+              <option value="Weddings">Weddings</option>
+              <option value="Corporate Events">Corporate Events</option>
+              <option value="Private Parties">Private Parties</option>
+              <option value="Markets &amp; Festivals">Markets &amp; Festivals</option>
+              <option value="Community Events">Community Events</option>
+              <option value="Sporting Events">Sporting Events</option>
+              <option value="Schools &amp; Education">Schools &amp; Education</option>
+              <option value="Brand Activations">Brand Activations</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="field-box" id="eventTypeOtherBox" style="display:none;">
+              <input type="text" id="eventTypeOther" placeholder="Type the event type" autocomplete="off" style="flex:1;">
+              <button type="button" id="eventTypeBackBtn" title="Choose from the list instead" aria-label="Choose from the list instead" style="background:none;border:none;color:var(--sub);cursor:pointer;display:flex;padding:2px;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+            </div>
+          </label>
+        </div>
+        <div class="field-grid">
+          <label class="field"><span class="field-label">Event date</span>
+            <input type="date" id="eventDate" class="text-input"></label>
+          <label class="field"><span class="field-label">Service hours</span>
+            <div class="field-box"><input type="number" id="eventDuration" value="3" step="0.5" min="0.5"><span>hrs</span></div></label>
+        </div>
+        <div class="field-grid">
+          <label class="field"><span class="field-label">Event start time</span>
+            <input type="time" id="eventStartTime" class="text-input"></label>
+          <label class="field"><span class="field-label">Event end time</span>
+            <input type="time" id="eventEndTime" class="text-input"></label>
+        </div>
+        <div class="field-grid">
+          <label class="field"><span class="field-label">Package / booking price</span>
+            <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
+          <label class="field"><span class="field-label">Booking number</span>
+            <input type="text" id="bookingNumber" class="text-input" placeholder="e.g. BB-04082026"></label>
+        </div>
+        <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
         </div>
       </div>
- 
+    </div>
+
+    <!-- STOCK/PACKAGES -->
+    <div class="top-row">
       <div class="card" id="card-packages">
         <div class="card-head">
           <div class="card-head-left">
@@ -582,26 +634,26 @@
           </div>
         </div>
       </div>
-    </div>
- 
-    <!-- STOCK & PACKING CHECKLIST -->
-    <div class="card" id="card-stock">
-      <div class="card-head">
-        <div class="card-head-left">
-          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-          <span class="card-title">Stock &amp; Packing Checklist</span>
+
+      <!-- STOCK & PACKING CHECKLIST -->
+      <div class="card" id="card-stock">
+        <div class="card-head">
+          <div class="card-head-left">
+            <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <span class="card-title">Stock &amp; Packing Checklist</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="stock-list" id="stockList">
+            <li><span class="stock-label">Coffee beans</span><span class="stock-amt" id="stock-beans">0.0 kg</span></li>
+            <li><span class="stock-label">Milk</span><span class="stock-amt" id="stock-milk">0.0 L</span></li>
+            <li><span class="stock-label">Cups &amp; lids</span><span class="stock-amt" id="stock-cups">0</span></li>
+            <li><span class="stock-label">Sugar / stirrers / napkins</span><span class="stock-amt" id="stock-sundries">0 sets</span></li>
+          </ul>
         </div>
       </div>
-      <div class="card-body">
-        <ul class="stock-list" id="stockList">
-          <li><span class="stock-label">Coffee beans</span><span class="stock-amt" id="stock-beans">0.0 kg</span></li>
-          <li><span class="stock-label">Milk</span><span class="stock-amt" id="stock-milk">0.0 L</span></li>
-          <li><span class="stock-label">Cups &amp; lids</span><span class="stock-amt" id="stock-cups">0</span></li>
-          <li><span class="stock-label">Sugar / stirrers / napkins</span><span class="stock-amt" id="stock-sundries">0 sets</span></li>
-        </ul>
-      </div>
     </div>
-
+ 
     <!-- SERVICE -->
     <div class="card" id="card-service">
       <div class="card-head">
@@ -652,7 +704,7 @@
       <div class="card-body">
         <div class="field-grid">
           <label class="field address-field">
-            <span class="field-label">Customer address</span>
+            <span class="field-label">Address</span>
             <div class="field-box"><input type="text" id="customerAddress" placeholder="Start typing the event address…" autocomplete="off"></div>
             <div class="address-suggestions" id="addressSuggestions"></div>
           </label>
@@ -787,36 +839,43 @@
   <div class="col-resizer" id="colResizer"></div>
  
   <div class="right-col">
-    <div class="stat-panel">
-      <div class="stat-panel-eyebrow">This booking</div>
-      <div class="stat-grid">
-        <div class="stat-item"><div class="label">Revenue</div><div class="value" id="stat-revenue">$0.00</div></div>
-        <div class="stat-item"><div class="label">Cost / coffee</div><div class="value" id="stat-costPerCoffee">$0.00</div></div>
-        <div class="stat-item"><div class="label">Total costs</div><div class="value" id="stat-totalCosts">$0.00</div></div>
-        <div class="stat-item"><div class="label">Gross profit</div><div class="value" id="stat-grossProfit">$0.00</div></div>
-        <div class="stat-item"><div class="label">Margin</div><div class="value" id="stat-margin">0.0%</div></div>
-      </div>
-      <div class="partner-row" style="border-left:3px solid var(--partner1);">
-        <span class="name" id="stat-partner1-label">Marianna · 50%</span>
-        <span class="amt" id="stat-partner1-amt">$0.00</span>
-      </div>
-      <div class="partner-row" style="border-left:3px solid var(--partner2);">
-        <span class="name" id="stat-partner2-label">Simon · 50%</span>
-        <span class="amt" id="stat-partner2-amt">$0.00</span>
+    <div class="right-top-row">
+      <div class="stat-panel">
+        <div class="stat-panel-eyebrow">This booking</div>
+        <div class="stat-grid">
+          <div class="stat-item"><div class="label">Revenue</div><div class="value" id="stat-revenue">$0.00</div></div>
+          <div class="stat-item"><div class="label">Cost / coffee</div><div class="value" id="stat-costPerCoffee">$0.00</div></div>
+          <div class="stat-item"><div class="label">Total costs</div><div class="value" id="stat-totalCosts">$0.00</div></div>
+          <div class="stat-item"><div class="label">Gross profit</div><div class="value" id="stat-grossProfit">$0.00</div></div>
+          <div class="stat-item"><div class="label">Margin</div><div class="value" id="stat-margin">0.0%</div></div>
+        </div>
+        <div class="partner-row" style="border-left:3px solid var(--partner1);">
+          <span class="name" id="stat-partner1-label">Marianna · 50%</span>
+          <span class="amt" id="stat-partner1-amt">$0.00</span>
+        </div>
+        <div class="partner-row" style="border-left:3px solid var(--partner2);">
+          <span class="name" id="stat-partner2-label">Simon · 50%</span>
+          <span class="amt" id="stat-partner2-amt">$0.00</span>
+        </div>
+ 
+        <div class="hourly-block">
+          <div class="hourly-header">
+            <span class="hourly-header-label">Hourly breakdown</span>
+            <div class="toggle" id="toggle-hourly"><div class="knob"></div></div>
+          </div>
+          <div class="hourly-body" id="hourlyBody" style="display:none;">
+            <div class="hourly-duration">
+              <input type="range" id="hourlySlider" min="1" max="5" step="1" value="3">
+              <span class="val" id="hourlySliderVal">3 hrs</span>
+            </div>
+            <p style="font-size:11px;color:var(--panel-sub);margin:0;">Splits the amounts above per hour, using the hours set here.</p>
+          </div>
+        </div>
       </div>
  
-      <div class="hourly-block">
-        <div class="hourly-header">
-          <span class="hourly-header-label">Hourly breakdown</span>
-          <div class="toggle" id="toggle-hourly"><div class="knob"></div></div>
-        </div>
-        <div class="hourly-body" id="hourlyBody" style="display:none;">
-          <div class="hourly-duration">
-            <input type="range" id="hourlySlider" min="1" max="5" step="1" value="3">
-            <span class="val" id="hourlySliderVal">3 hrs</span>
-          </div>
-          <p style="font-size:11px;color:var(--panel-sub);margin:0;">Splits the amounts above per hour, using the hours set here.</p>
-        </div>
+      <div class="chart-card chart-card-compact">
+        <div class="chart-card-eyebrow">Cost breakdown</div>
+        <div class="chart-wrap"><canvas id="costChart"></canvas></div>
       </div>
     </div>
  
@@ -846,11 +905,6 @@
           <span class="copy-btn-label">Copy quote text</span>
         </button>
       </div>
-    </div>
- 
-    <div class="chart-card">
-      <div class="chart-card-eyebrow">Cost breakdown</div>
-      <div class="chart-wrap"><canvas id="costChart"></canvas></div>
     </div>
   </div>
 </div>
@@ -886,7 +940,7 @@ const QUOTE_PAYMENT_BANK_NAME = "[Bank name]";
 // 3. Deploy > New deployment > Web app. Execute as "Me", access "Anyone with the link".
 // 4. Copy the resulting /exec URL and the token below.
 // ===================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzV57szg3_DwwQ6BLCm_y31xlwLwy_nvaFRW7UpEnxAC5tzuKAt4pprkf0BlvstVvgeA/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa7ip7dfTr_y2M13jtTnyPdbiDdQFp1rtqKbfpJHJoHxekbs5dByy6vA7tcJ3Ok_c9ag/exec";
 const APPS_SCRIPT_TOKEN = "blendandbrew45-sheet-token";
 let sheetBookings = [];
 
@@ -931,6 +985,28 @@ function parseSheetDate(raw) {
   return "";
 }
 
+function parseSheetTime(raw) {
+  if (!raw) return "";
+  const s = String(raw).trim();
+  // Full date-time strings (Sheets often exports times this way), e.g. "1899-12-30T14:05:00.000Z"
+  const isoMatch = s.match(/T(\d{2}):(\d{2})/);
+  if (isoMatch) return `${isoMatch[1]}:${isoMatch[2]}`;
+  // 12-hour "h:MM AM/PM" or "h.MM am"
+  const hm12 = s.match(/^(\d{1,2})[:.](\d{2})\s*([AaPp][Mm])$/);
+  if (hm12) {
+    let h = parseInt(hm12[1], 10) % 12;
+    if (/pm/i.test(hm12[3])) h += 12;
+    return `${String(h).padStart(2, "0")}:${hm12[2]}`;
+  }
+  // 24-hour "HH:MM" or "HH:MM:SS"
+  const hm24 = s.match(/^(\d{1,2}):(\d{2})(:\d{2})?$/);
+  if (hm24) return `${String(parseInt(hm24[1], 10)).padStart(2, "0")}:${hm24[2]}`;
+  // Fall back to letting the browser's Date parser have a go
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  return "";
+}
+
 async function loadBookingsFromSheet() {
   const statusEl = document.getElementById("sheetSyncStatus");
   const selectEl = document.getElementById("bookingSheetSelect");
@@ -952,9 +1028,11 @@ async function loadBookingsFromSheet() {
       const name = getBookingField(b, "Name", "Client Name", "Client") || "(no name)";
       const dateRaw = getBookingField(b, "Date", "Event Date");
       const dateLabel = dateRaw ? " — " + parseSheetDate(dateRaw) : "";
+      const bookingNo = getBookingField(b, "Booking Number", "Booking No", "Booking No.", "BookingNo");
+      const bookingNoLabel = bookingNo ? " (" + bookingNo + ")" : "";
       const opt = document.createElement("option");
       opt.value = String(i);
-      opt.textContent = name + dateLabel;
+      opt.textContent = name + dateLabel + bookingNoLabel;
       selectEl.appendChild(opt);
     });
     statusEl.textContent = `✓ Loaded ${sheetBookings.length} booking${sheetBookings.length === 1 ? "" : "s"} from the sheet.`;
@@ -994,15 +1072,43 @@ function findPackageButton(pkgValue) {
   return null;
 }
 
+let lastAppliedBooking = null;
+
+// Emoji markers used in the booking sheet's "Utilities" column to flag what's
+// available on-site. Update this map if Simo starts using different emojis.
+const UTILITY_EMOJI_MAP = [
+  { emoji: "⚡", label: "Electricity available on-site" },
+  { emoji: "💧", label: "Sink & water access available" },
+  { emoji: "🏠", label: "Sheltered / undercover location" },
+];
+
+function getVenueInfoItems() {
+  const utilitiesRaw = getBookingField(
+    lastAppliedBooking || {},
+    "Utilities", "Utilities Provided", "Site Utilities", "Venue Utilities", "Amenities"
+  );
+  if (!utilitiesRaw) return null;
+  const items = UTILITY_EMOJI_MAP.filter((u) => utilitiesRaw.indexOf(u.emoji) !== -1).map((u) => u.label);
+  return items.length ? items : null;
+}
+
 function applyBookingToForm(booking) {
   if (!booking) return;
+  lastAppliedBooking = booking;
   const clientName = getBookingField(booking, "Name", "Client Name", "Client");
+  const organisation = getBookingField(booking, "Organisation", "Organization", "Company");
+  const contactPhone = getBookingField(booking, "Contact Phone", "Phone", "Contact Number", "Mobile");
+  const contactEmail = getBookingField(booking, "Contact Email", "Email");
+  const contactCombined = getBookingField(booking, "Contact");
+  const bookingNumber = getBookingField(booking, "Booking Number", "Booking No", "Booking No.", "BookingNo");
   const eventDateRaw = getBookingField(booking, "Date", "Event Date");
   const eventType = getBookingField(booking, "Event Type", "Type");
   const eventTypeOther = getBookingField(booking, "Event Type Other", "Other Event Type");
+  const startTimeRaw = getBookingField(booking, "Start Time", "Event Start Time", "Start");
+  const endTimeRaw = getBookingField(booking, "End Time", "Event End Time", "Finish Time", "End");
   const bookingPrice = getBookingField(booking, "Booking Price", "Package Price", "Price");
   const duration = getBookingField(booking, "Service Hours", "Event Duration", "Duration");
-  const coffeeCap = getBookingField(booking, "Guests", "Coffee Cap", "Coffees");
+  const coffeeCap = getBookingField(booking, "Servings", "Coffee Cap", "Coffees", "Guests");
   const address = getBookingField(booking, "Location", "Customer Address", "Address");
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
@@ -1016,23 +1122,32 @@ function applyBookingToForm(booking) {
   }
 
   if (clientName) document.getElementById("clientName").value = clientName;
+  if (organisation) document.getElementById("clientOrganisation").value = organisation;
+  if (contactPhone) document.getElementById("clientPhone").value = contactPhone;
+  if (contactEmail) document.getElementById("clientEmail").value = contactEmail;
+  if (!contactPhone && !contactEmail && contactCombined) document.getElementById("clientPhone").value = contactCombined;
+  if (bookingNumber) document.getElementById("bookingNumber").value = bookingNumber;
 
   const parsedDate = parseSheetDate(eventDateRaw);
   if (parsedDate) document.getElementById("eventDate").value = parsedDate;
 
   if (eventType) {
-    const select = document.getElementById("eventType");
-    const match = Array.from(select.options).find(
-      (o) => o.value.toLowerCase() === String(eventType).toLowerCase()
-    );
+    const looksLiteralOther = normalizeEventTypeForMatch(eventType) === "other";
+    const match = looksLiteralOther ? null : matchPredefinedEventType(eventType);
     if (match) {
-      select.value = match.value;
+      eventTypeSelect.value = match;
+      eventTypeOtherInput.value = "";
     } else {
-      select.value = "Other";
-      document.getElementById("eventTypeOther").value = eventTypeOther || eventType;
+      eventTypeSelect.value = "Other";
+      eventTypeOtherInput.value = (looksLiteralOther && eventTypeOther) ? eventTypeOther : eventType;
     }
     syncEventTypeOtherVisibility();
   }
+
+  const startTime = parseSheetTime(startTimeRaw);
+  if (startTime) document.getElementById("eventStartTime").value = startTime;
+  const endTime = parseSheetTime(endTimeRaw);
+  if (endTime) document.getElementById("eventEndTime").value = endTime;
 
   if (bookingPrice !== "") document.getElementById("bookingPrice").value = Math.max(0, parseFloat(bookingPrice) || 0);
   if (duration !== "") {
@@ -1041,6 +1156,7 @@ function applyBookingToForm(booking) {
   }
   if (coffeeCap !== "") document.getElementById("coffeeCap").value = Math.max(0, parseFloat(coffeeCap) || 0);
   if (address) document.getElementById("customerAddress").value = address;
+  syncBookingAddressFromTravel();
   if (suburb) document.getElementById("eventSuburb").value = suburb;
   if (travelKm !== "") {
     document.getElementById("travelChargeKm").value = Math.max(0, parseFloat(travelKm) || 0);
@@ -1065,6 +1181,7 @@ let overheadsOn = false;
 let customOn = false;
 let hourlyOn = false;
 let serviceOn = false;
+let bookingDetailsOn = true;
  
 function currency(n) {
   if (!isFinite(n)) n = 0;
@@ -1116,7 +1233,8 @@ document.getElementById("add-custom-line").addEventListener("click", () => {
  
 function setupToggle(toggleId, getState, setState, onChange, cardId) {
   const el = document.getElementById(toggleId);
-  el.addEventListener("click", () => {
+  el.addEventListener("click", (e) => {
+    e.stopPropagation();
     const next = !getState();
     setState(next);
     el.classList.toggle("on", next);
@@ -1139,6 +1257,12 @@ setupToggle("toggle-hourly", () => hourlyOn, (v) => (hourlyOn = v), (v) => {
 });
 setupToggle("toggle-service", () => serviceOn, (v) => (serviceOn = v), (v) => {
   document.getElementById("service-fields").style.display = v ? "grid" : "none";
+});
+setupToggle("toggle-bookingDetails", () => bookingDetailsOn, (v) => (bookingDetailsOn = v), (v) => {
+  document.getElementById("bookingDetailsBody").classList.toggle("off", !v);
+});
+document.getElementById("bookingDetailsHeader").addEventListener("click", () => {
+  document.getElementById("toggle-bookingDetails").click();
 });
 
 // ----- Hourly breakdown duration slider (mirrors Event duration, 1-5 hrs, whole-hour steps) -----
@@ -1168,18 +1292,33 @@ document.getElementById("eventSuburb").addEventListener("input", () => { save();
 document.getElementById("clientName").addEventListener("input", () => { save(); });
 document.getElementById("eventDate").addEventListener("input", () => { save(); });
 
-const eventTypeInput = document.getElementById("eventType");
-const eventTypeOtherInput = document.getElementById("eventTypeOther");
-
-function getEventTypeValue() {
-  if (eventTypeInput.value === "Other") return eventTypeOtherInput.value.trim();
-  return eventTypeInput.value.trim();
+const PREDEFINED_EVENT_TYPES = [
+  "Weddings", "Corporate Events", "Private Parties", "Markets & Festivals",
+  "Community Events", "Sporting Events", "Schools & Education", "Brand Activations",
+];
+function normalizeEventTypeForMatch(s) {
+  return String(s || "").trim().toLowerCase().replace(/\s+/g, " ").replace(/&/g, "and").replace(/[^a-z0-9 ]/g, "");
+}
+function matchPredefinedEventType(raw) {
+  const target = normalizeEventTypeForMatch(raw);
+  if (!target) return null;
+  return PREDEFINED_EVENT_TYPES.find((opt) => normalizeEventTypeForMatch(opt) === target) || null;
 }
 
+const eventTypeSelect = document.getElementById("eventType");
+const eventTypeOtherBox = document.getElementById("eventTypeOtherBox");
+const eventTypeOtherInput = document.getElementById("eventTypeOther");
+const eventTypeBackBtn = document.getElementById("eventTypeBackBtn");
+
 function syncEventTypeOtherVisibility() {
-  const isOther = eventTypeInput.value === "Other";
-  document.getElementById("eventTypeOtherWrap").style.display = isOther ? "flex" : "none";
-  document.getElementById("eventTypeRow").classList.toggle("has-other", isOther);
+  const isOther = eventTypeSelect.value === "Other";
+  eventTypeSelect.style.display = isOther ? "none" : "block";
+  eventTypeOtherBox.style.display = isOther ? "flex" : "none";
+}
+
+function getEventTypeValue() {
+  if (eventTypeSelect.value === "Other") return eventTypeOtherInput.value.trim();
+  return eventTypeSelect.value.trim();
 }
 
 function updateEventTypeQuoteDisplay() {
@@ -1194,13 +1333,29 @@ function updateEventTypeQuoteDisplay() {
   }
 }
 
-eventTypeInput.addEventListener("change", () => {
+eventTypeSelect.addEventListener("change", () => {
   syncEventTypeOtherVisibility();
-  if (eventTypeInput.value === "Other") eventTypeOtherInput.focus();
+  if (eventTypeSelect.value === "Other") eventTypeOtherInput.focus();
   updateEventTypeQuoteDisplay();
   save();
 });
-eventTypeOtherInput.addEventListener("input", () => { updateEventTypeQuoteDisplay(); save(); });
+
+eventTypeOtherInput.addEventListener("input", () => {
+  updateEventTypeQuoteDisplay();
+  save();
+});
+
+eventTypeBackBtn.addEventListener("click", () => {
+  eventTypeSelect.value = "";
+  eventTypeOtherInput.value = "";
+  syncEventTypeOtherVisibility();
+  updateEventTypeQuoteDisplay();
+  save();
+  eventTypeSelect.focus();
+});
+
+document.getElementById("eventStartTime").addEventListener("change", () => { save(); });
+document.getElementById("eventEndTime").addEventListener("change", () => { save(); });
 
 document.querySelectorAll('input[type="number"]').forEach((inp) => {
   inp.addEventListener("input", () => {
@@ -1244,6 +1399,7 @@ function clearPackageSelection() {
 
 function clearTravelForm() {
   document.getElementById("customerAddress").value = "";
+  syncBookingAddressFromTravel();
   document.getElementById("eventSuburb").value = "";
   const suggestionsBox = document.getElementById("addressSuggestions");
   if (suggestionsBox) suggestionsBox.innerHTML = "";
@@ -1270,17 +1426,20 @@ function clearTravelForm() {
 }
 
 function clearBookingQuoteForm() {
+  lastAppliedBooking = null;
   const sheetSelect = document.getElementById("bookingSheetSelect");
   if (sheetSelect) sheetSelect.value = "";
 
   document.getElementById("clientName").value = "";
+  document.getElementById("clientOrganisation").value = "";
+  document.getElementById("clientPhone").value = "";
+  document.getElementById("clientEmail").value = "";
+  document.getElementById("bookingNumber").value = "";
   document.getElementById("eventDate").value = "";
 
-  const eventType = document.getElementById("eventType");
-  eventType.value = "";
-  const otherWrap = document.getElementById("eventTypeOtherWrap");
-  if (otherWrap) otherWrap.style.display = "none";
-  document.getElementById("eventTypeOther").value = "";
+  eventTypeSelect.value = "";
+  eventTypeOtherInput.value = "";
+  syncEventTypeOtherVisibility();
 
   document.getElementById("bookingPrice").value = 1000;
   document.getElementById("eventDuration").value = 3;
@@ -1384,6 +1543,27 @@ document.getElementById("clearPackage").addEventListener("click", clearPackageSe
 document.getElementById("clearBookingQuote").addEventListener("click", clearBookingQuoteForm);
 document.getElementById("clearTravel").addEventListener("click", clearTravelForm);
 
+// ----- Keep the Booking Quote "Event address" field and the Travel
+// "Address" field mirroring each other, since they represent the same
+// underlying event address. -----
+function syncBookingAddressFromTravel() {
+  const bookingAddr = document.getElementById("bookingAddress");
+  const travelAddr = document.getElementById("customerAddress");
+  if (bookingAddr && travelAddr) bookingAddr.value = travelAddr.value;
+}
+function syncTravelAddressFromBooking() {
+  const bookingAddr = document.getElementById("bookingAddress");
+  const travelAddr = document.getElementById("customerAddress");
+  if (bookingAddr && travelAddr) travelAddr.value = bookingAddr.value;
+}
+const bookingAddressInput = document.getElementById("bookingAddress");
+if (bookingAddressInput) {
+  bookingAddressInput.addEventListener("input", () => {
+    syncTravelAddressFromBooking();
+    save();
+  });
+}
+
 // ===================================================
 // TRAVEL DISTANCE AUTO-CALCULATOR
 // Free, no API key: geocodes the typed address with
@@ -1423,7 +1603,8 @@ document.getElementById("clearTravel").addEventListener("click", clearTravelForm
     const suburb = parseSuburb(a);
     const state = (a.state || "").replace("New South Wales", "NSW");
     const postcode = a.postcode || "";
-    const formatted = [road, suburb, state, postcode].filter(Boolean).join(", ");
+    const locality = [suburb, state, postcode].filter(Boolean).join(" ");
+    const formatted = [road, locality].filter(Boolean).join(", ");
     return formatted || place.display_name || "";
   }
 
@@ -1455,6 +1636,7 @@ document.getElementById("clearTravel").addEventListener("click", clearTravelForm
     suggestionsBox.classList.remove("show");
     suggestionsBox.innerHTML = "";
     addressInput.value = formatAddress(place);
+    syncBookingAddressFromTravel();
 
     if (suburbHidden) suburbHidden.value = parseSuburb(place.address);
 
@@ -1475,6 +1657,7 @@ document.getElementById("clearTravel").addEventListener("click", clearTravelForm
   }
 
   addressInput.addEventListener("input", function () {
+    syncBookingAddressFromTravel();
     const query = this.value.trim();
     clearTimeout(debounceTimer);
     if (query.length < 4) {
@@ -1537,7 +1720,7 @@ function initChart() {
       maintainAspectRatio: false,
       cutout: "55%",
       plugins: {
-        legend: { position: "bottom", labels: { font: { size: 12, family: "Inter" }, color: "#211C15", boxWidth: 12, padding: 12 } },
+        legend: { position: "bottom", labels: { font: { size: 10.5, family: "Inter" }, color: "#C9BFA8", boxWidth: 9, padding: 8 } },
         tooltip: {
           callbacks: { label: (ctx) => ctx.label + ": " + currency(ctx.raw) },
         },
@@ -1774,7 +1957,7 @@ function recalc() {
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap",
     "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
-    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote"];
+    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
@@ -1786,6 +1969,7 @@ function collectState() {
     packageOverrides,
     serviceOn,
     feeStopOverrides,
+    bookingDetailsOn,
   };
 }
  
@@ -1814,6 +1998,22 @@ function load() {
         const el = document.getElementById(id);
         if (el) el.value = s.values[id];
       });
+      const rawEventType = s.values.eventType || "";
+      const looksLiteralOther = normalizeEventTypeForMatch(rawEventType) === "other";
+      const match = looksLiteralOther ? null : matchPredefinedEventType(rawEventType);
+      if (match) {
+        eventTypeSelect.value = match;
+        eventTypeOtherInput.value = "";
+      } else if (looksLiteralOther) {
+        eventTypeSelect.value = "Other";
+        // eventTypeOtherInput.value already restored from s.values.eventTypeOther above
+      } else if (rawEventType) {
+        // Doesn't match a predefined option — treat as a custom "Other" entry
+        eventTypeSelect.value = "Other";
+        eventTypeOtherInput.value = rawEventType;
+      } else {
+        eventTypeSelect.value = "";
+      }
       syncEventTypeOtherVisibility();
     }
     if (Array.isArray(s.customFields)) customFields = s.customFields;
@@ -1834,6 +2034,7 @@ function load() {
       hourlySliderVal.textContent = hourlySlider.value + " hrs";
     }
     if (typeof s.serviceOn === "boolean") serviceOn = s.serviceOn;
+    if (typeof s.bookingDetailsOn === "boolean") bookingDetailsOn = s.bookingDetailsOn;
     if (s.splitPct) splitRange.value = Math.round(parseInt(s.splitPct, 10) / 5) * 5;
  
     document.getElementById("toggle-travel").classList.toggle("on", travelOn);
@@ -1848,6 +2049,8 @@ function load() {
     document.getElementById("hourlyBody").style.display = hourlyOn ? "block" : "none";
     document.getElementById("toggle-service").classList.toggle("on", serviceOn);
     document.getElementById("service-fields").style.display = serviceOn ? "grid" : "none";
+    document.getElementById("toggle-bookingDetails").classList.toggle("on", bookingDetailsOn);
+    document.getElementById("bookingDetailsBody").classList.toggle("off", !bookingDetailsOn);
  
     if (s.selectedPackage) {
       const match = document.querySelector(`.package-option[data-package="${s.selectedPackage}"]`);
@@ -1888,13 +2091,31 @@ function escapeHtml(str) {
   }[c]));
 }
 
+function formatQuoteEventDate(dateStr) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr + "T00:00:00");
+  const weekday = d.toLocaleDateString("en-AU", { weekday: "long" });
+  const day = d.getDate();
+  const month = d.toLocaleDateString("en-AU", { month: "long" });
+  const year = d.getFullYear();
+  return `${weekday}, ${day} ${month} ${year}`;
+}
+
 function buildQuoteDocumentHTML() {
   const clientName = document.getElementById("clientName").value.trim() || "—";
+  const organisation = document.getElementById("clientOrganisation").value.trim();
+  const clientPhone = document.getElementById("clientPhone").value.trim();
+  const clientEmail = document.getElementById("clientEmail").value.trim();
+  const contact = [clientPhone, clientEmail].filter(Boolean).join(" · ");
+  const bookingNumber = document.getElementById("bookingNumber").value.trim();
+  // The Reference line on the quote should show the sheet's booking number
+  // (e.g. BB-04082026) whenever one's loaded — falling back to the client's
+  // name if a booking number hasn't been entered/loaded yet.
+  const referenceValue = bookingNumber || clientName;
+  const preparedAddress = document.getElementById("customerAddress").value.trim();
   const eventType = getEventTypeValue() || "—";
   const eventDateRaw = document.getElementById("eventDate").value;
-  const eventDateStr = eventDateRaw
-    ? new Date(eventDateRaw + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
-    : "—";
+  const eventDateStr = formatQuoteEventDate(eventDateRaw);
   const duration = num("eventDuration");
   const durationStr = duration ? duration + " hrs" : "—";
   const coffees = num("coffeeCap");
@@ -1924,6 +2145,11 @@ function buildQuoteDocumentHTML() {
     const label = "Travel" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
     travelRowHtml = `<tr><td>${label}</td><td class="right">Included</td></tr>`;
   }
+
+  const venueUtilityItems = getVenueInfoItems();
+  const venueInfoItemsHtml = venueUtilityItems
+    ? venueUtilityItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("\n          ")
+    : `<li>Venue utilities to be confirmed with the client</li>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1966,51 +2192,59 @@ function buildQuoteDocumentHTML() {
   .wood-band-head { padding: 26px 40px; }
   .wood-band-head::before { background: linear-gradient(100deg, rgba(18,12,6,0.62) 0%, rgba(18,12,6,0.30) 45%, rgba(18,12,6,0.08) 100%); }
   .wood-band-head-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .wood-band-head img.square-logo { height: 56px; width: 56px; object-fit: contain; display: block; flex-shrink: 0; }
+  .wood-band-head img.square-logo { height: 67px; width: 67px; object-fit: contain; display: block; flex-shrink: 0; }
   .wood-band-head-tagline { text-align: right; }
   .wood-band-head-tagline .eyebrow { font-family: 'Inter', sans-serif; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #E9DFC7; opacity: 0.85; margin: 0 0 3px; }
   .wood-band-head-tagline .doc-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: #fff; margin: 0; letter-spacing: -0.005em; }
 
-  .wood-band-foot { padding: 34px 40px 28px; text-align: center; }
+  .wood-band-foot { padding: 18px 40px 14px; text-align: center; }
   .wood-band-foot::before { background: rgba(15,10,5,0.58); }
   .wood-band-foot-inner { position: relative; z-index: 1; }
   .wood-band-foot img.linear-logo { height: 26px; width: auto; display: inline-block; opacity: 0.96; }
-  .wood-band-foot .foot-meta { margin-top: 14px; font-size: 10.5px; letter-spacing: 0.02em; color: #D9CDAE; line-height: 1.9; }
+  .wood-band-foot .foot-meta { margin-top: 8px; font-size: 10.5px; letter-spacing: 0.02em; color: #D9CDAE; line-height: 1.9; }
   .wood-band-foot .foot-meta strong { color: #F0E6CC; font-weight: 600; }
 
   /* ---- Body ---- */
   .body-pad { padding: 38px 44px 8px; }
 
-  .quote-meta-row { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 16px; margin-bottom: 26px; border-bottom: 1px dashed var(--line); }
+  .quote-meta-row { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; margin-bottom: 26px; border-bottom: 1px dashed var(--line); }
   .quote-meta-row .quote-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 21px; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
   .quote-meta-row .quote-for { font-size: 12.5px; color: var(--sub); margin: 4px 0 0; }
+  .prepared-for { margin-top: 4px; }
+  .prepared-for .quote-for { margin: 0; }
+  .prepared-for .prepared-line { font-size: 12px; color: var(--sub); margin: 3px 0 0; line-height: 1.5; }
   .quote-meta-row .issued { font-size: 11px; color: var(--sub); text-align: right; white-space: nowrap; }
 
-  .detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+  .detail-grid { display: grid; grid-template-columns: 1.35fr 1.35fr 1.3fr; gap: 16px; margin-bottom: 30px; }
+  .detail-pair { display: flex; gap: 8px; }
+  .detail-pair .detail-item { flex: 1; }
   .detail-item { border-left: 2px solid var(--gold); padding-left: 10px; }
   .detail-item .d-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 3px; }
   .detail-item .d-value { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 
   table.lines { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-  table.lines td { padding: 13px 0; font-size: 13.5px; border-bottom: 1px dashed var(--line); vertical-align: top; }
+  table.lines td { padding: 20px 0; font-size: 13.5px; border-bottom: 1px dashed var(--line); vertical-align: top; }
   table.lines td.right { text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; white-space: nowrap; padding-left: 16px; }
   table.lines tr.pkg-row td { font-weight: 600; font-size: 14.5px; }
   table.lines tr.pkg-row td.right { color: var(--rust); font-size: 15px; }
-  table.lines tr.total-row td { border-top: 2px solid var(--gold); border-bottom: none; font-weight: 700; padding-top: 18px; }
+  table.lines tr.total-row td { border-top: 2px solid var(--gold); border-bottom: none; font-weight: 700; padding-top: 24px; }
   table.lines tr.total-row td:first-child { font-family: 'Syne', sans-serif; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
   table.lines tr.total-row td.right { font-size: 21px; color: var(--rust); }
-  .pkg-sub { color: var(--sub); font-weight: 400; font-size: 11.5px; display: block; margin-top: 3px; }
+  .pkg-sub { color: var(--sub); font-weight: 400; font-size: 11.5px; display: block; margin-top: 6px; }
 
-  .included { margin: 8px 0 28px; background: #F4EEDF; border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
-  .included h3 { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 10px; }
-  .included ul { margin: 0; padding-left: 16px; font-size: 12.5px; line-height: 1.75; color: var(--ink); }
-  .included li::marker { color: var(--gold); }
+  .dark-card { background: #F3E9D2; border: 1px solid #DCC79A; border-radius: 10px; padding: 18px 20px; }
+  .dark-card h3 { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 10px; }
+  .dark-card ul { margin: 0; padding-left: 16px; font-size: 12.5px; line-height: 1.8; color: var(--ink); }
+  .dark-card li::marker { color: var(--gold); }
+  .dark-card li.note-line { list-style: none; margin: 10px 0 0 -16px; padding-top: 10px; border-top: 1px dashed #DCC79A; font-size: 11.5px; color: var(--sub); font-style: italic; }
 
-  .validity-note { font-size: 11px; color: var(--sub); font-style: italic; line-height: 1.6; margin: 0 0 30px; }
+  .two-col-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; margin: 8px 0 20px; }
+  @media (max-width: 560px) { .two-col-cards { grid-template-columns: 1fr; } }
 
-  .payment-card { margin: 0 0 28px; background: var(--paper); border: 1.5px solid var(--gold); border-radius: 10px; padding: 18px 20px; }
-  .payment-card h3 { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 12px; }
-  .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; }
+  .validity-note { font-size: 11px; color: var(--sub); font-style: italic; line-height: 1.6; margin: 0 0 6px; }
+
+  .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .payment-col { display: flex; flex-direction: column; gap: 12px; }
   .payment-item .p-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 2px; }
   .payment-item .p-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--ink); }
 
@@ -2048,16 +2282,23 @@ function buildQuoteDocumentHTML() {
       <div class="quote-meta-row">
         <div>
           <p class="quote-title">Event Quote</p>
-          <p class="quote-for">Prepared for ${escapeHtml(clientName)}</p>
+          <div class="prepared-for">
+            <p class="quote-for">Prepared for ${escapeHtml(clientName)}</p>
+            ${organisation ? `<p class="prepared-line">${escapeHtml(organisation)}</p>` : ""}
+            ${preparedAddress ? `<p class="prepared-line">${escapeHtml(preparedAddress)}</p>` : ""}
+            ${contact ? `<p class="prepared-line">${escapeHtml(contact)}</p>` : ""}
+          </div>
         </div>
         <div class="issued">Issued<br>${issueDate}</div>
       </div>
 
       <div class="detail-grid">
-        <div class="detail-item"><div class="d-label">Event type</div><div class="d-value">${escapeHtml(eventType)}</div></div>
         <div class="detail-item"><div class="d-label">Event date</div><div class="d-value">${escapeHtml(eventDateStr)}</div></div>
-        <div class="detail-item"><div class="d-label">Duration</div><div class="d-value">${escapeHtml(durationStr)}</div></div>
-        <div class="detail-item"><div class="d-label">Guests served</div><div class="d-value">${coffees} coffees</div></div>
+        <div class="detail-item"><div class="d-label">Event type</div><div class="d-value">${escapeHtml(eventType)}</div></div>
+        <div class="detail-pair">
+          <div class="detail-item"><div class="d-label">Duration</div><div class="d-value">${escapeHtml(durationStr)}</div></div>
+          <div class="detail-item"><div class="d-label">Guests served</div><div class="d-value">${coffees} coffees</div></div>
+        </div>
       </div>
 
       <table class="lines">
@@ -2069,24 +2310,27 @@ function buildQuoteDocumentHTML() {
         <tr class="total-row"><td>Total</td><td class="right">${currency(total)}</td></tr>
       </table>
 
-      <div class="included">
-        <h3>What's included</h3>
-        <ul>
-          <li>Two certified baristas, from setup to pack-down</li>
-          <li>Commercial-grade espresso machine and grinder</li>
-          <li>Cups, lids, sugar, stirrers and napkins</li>
-          <li>Requires 2 x standard power outlets on separate circuits</li>
-        </ul>
-      </div>
+      <div class="two-col-cards">
+        <div class="dark-card venue-info">
+          <h3>Venue information</h3>
+          <ul>
+            ${venueInfoItemsHtml}
+            <li class="note-line">Requires 2 x standard power outlets on separate circuits.</li>
+          </ul>
+        </div>
 
-      <div class="payment-card">
-        <h3>Payment details</h3>
-        <div class="payment-grid">
-          <div class="payment-item"><div class="p-label">Account name</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NAME}</div></div>
-          <div class="payment-item"><div class="p-label">Bank</div><div class="p-value">${QUOTE_PAYMENT_BANK_NAME}</div></div>
-          <div class="payment-item"><div class="p-label">BSB</div><div class="p-value">${QUOTE_PAYMENT_BSB}</div></div>
-          <div class="payment-item"><div class="p-label">Account number</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NUMBER}</div></div>
-          <div class="payment-item" style="grid-column:1 / -1;"><div class="p-label">Reference</div><div class="p-value">${escapeHtml(clientName)}</div></div>
+        <div class="dark-card payment-card">
+          <h3>Payment details</h3>
+          <div class="payment-grid">
+            <div class="payment-col">
+              <div class="payment-item"><div class="p-label">Account name</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NAME}</div></div>
+              <div class="payment-item"><div class="p-label">Reference</div><div class="p-value">${escapeHtml(referenceValue)}</div></div>
+            </div>
+            <div class="payment-col">
+              <div class="payment-item"><div class="p-label">BSB</div><div class="p-value">${QUOTE_PAYMENT_BSB}</div></div>
+              <div class="payment-item"><div class="p-label">Account number</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NUMBER}</div></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2124,11 +2368,16 @@ document.getElementById("generate-quote-btn").addEventListener("click", openQuot
 
 function buildQuoteSummaryText() {
   const clientName = document.getElementById("clientName").value.trim() || "—";
+  const organisation = document.getElementById("clientOrganisation").value.trim();
+  const clientPhone = document.getElementById("clientPhone").value.trim();
+  const clientEmail = document.getElementById("clientEmail").value.trim();
+  const contact = [clientPhone, clientEmail].filter(Boolean).join(" · ");
+  const bookingNumber = document.getElementById("bookingNumber").value.trim();
+  const referenceValue = bookingNumber || clientName;
+  const preparedAddress = document.getElementById("customerAddress").value.trim();
   const eventType = getEventTypeValue() || "—";
   const eventDateRaw = document.getElementById("eventDate").value;
-  const eventDateStr = eventDateRaw
-    ? new Date(eventDateRaw + "T00:00:00").toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
-    : "—";
+  const eventDateStr = formatQuoteEventDate(eventDateRaw);
   const duration = num("eventDuration");
   const coffees = num("coffeeCap");
   const bookingPrice = num("bookingPrice");
@@ -2147,6 +2396,9 @@ function buildQuoteSummaryText() {
   lines.push("BLEND & BREW — EVENT QUOTE");
   lines.push("");
   lines.push(`Client: ${clientName}`);
+  if (organisation) lines.push(`Organisation: ${organisation}`);
+  if (preparedAddress) lines.push(`Address: ${preparedAddress}`);
+  if (contact) lines.push(`Contact: ${contact}`);
   lines.push(`Event type: ${eventType}`);
   lines.push(`Event date: ${eventDateStr}`);
   lines.push(`Event duration: ${duration} hrs`);
@@ -2163,15 +2415,20 @@ function buildQuoteSummaryText() {
   lines.push("");
   lines.push(`TOTAL: ${currency(total)}`);
   lines.push("");
-  lines.push("Includes: two certified baristas, commercial-grade espresso machine and grinder, cups, lids, sugar, stirrers and napkins.");
-  lines.push("Requires 2 x standard power outlets on separate circuits.");
+  lines.push("VENUE INFORMATION");
+  const venueUtilityItems = getVenueInfoItems();
+  if (venueUtilityItems) {
+    venueUtilityItems.forEach((item) => lines.push(`- ${item}`));
+  } else {
+    lines.push("- Venue utilities to be confirmed with the client");
+  }
+  lines.push("- Requires 2 x standard power outlets on separate circuits.");
   lines.push("");
   lines.push("PAYMENT DETAILS");
   lines.push(`Account name: ${QUOTE_PAYMENT_ACCOUNT_NAME}`);
-  lines.push(`Bank: ${QUOTE_PAYMENT_BANK_NAME}`);
+  lines.push(`Reference: ${referenceValue}`);
   lines.push(`BSB: ${QUOTE_PAYMENT_BSB}`);
   lines.push(`Account number: ${QUOTE_PAYMENT_ACCOUNT_NUMBER}`);
-  lines.push(`Reference: ${clientName}`);
   lines.push("");
   lines.push("This quote is valid for 14 days from the date of issue. Payment in full is required to secure your booking date and services.");
   lines.push("");
@@ -2224,6 +2481,7 @@ document.getElementById("refreshBookingsBtn").addEventListener("click", loadBook
  
 initChart();
 load();
+syncBookingAddressFromTravel();
 renderCustomFields();
 updateEventTypeQuoteDisplay();
 recalc();
