@@ -120,6 +120,28 @@
     border-radius: 6px; font-size: 14.5px; color: var(--ink); font-family: 'Inter', sans-serif; width: 100%;
   }
   input::placeholder, textarea::placeholder { color: #B7AF9E; opacity: 1; font-family: 'Inter', sans-serif; }
+  /* Grey out the placeholder-style digits in date/time inputs until a real
+     value has been entered (colon/slash separators stay full-strength ink). */
+  input[type="date"]::-webkit-datetime-edit-text,
+  input[type="time"]::-webkit-datetime-edit-text {
+    color: var(--ink);
+  }
+  input[type="date"]::-webkit-datetime-edit-day-field,
+  input[type="date"]::-webkit-datetime-edit-month-field,
+  input[type="date"]::-webkit-datetime-edit-year-field,
+  input[type="time"]::-webkit-datetime-edit-hour-field,
+  input[type="time"]::-webkit-datetime-edit-minute-field,
+  input[type="time"]::-webkit-datetime-edit-ampm-field {
+    color: #B7AF9E;
+  }
+  input[type="date"].has-value::-webkit-datetime-edit-day-field,
+  input[type="date"].has-value::-webkit-datetime-edit-month-field,
+  input[type="date"].has-value::-webkit-datetime-edit-year-field,
+  input[type="time"].has-value::-webkit-datetime-edit-hour-field,
+  input[type="time"].has-value::-webkit-datetime-edit-minute-field,
+  input[type="time"].has-value::-webkit-datetime-edit-ampm-field {
+    color: var(--ink);
+  }
   select.text-input { font-size: 14.5px; font-family: 'Inter', sans-serif; }
   .select-input {
     appearance: none;
@@ -190,7 +212,7 @@
     cursor: pointer; user-select: none;
   }
   .booking-details-label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
-  .booking-details-body { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+  .booking-details-body { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
   .booking-details-body.off { display: none; }
   #card-packages, #card-stock { background: var(--packages-card); border-color: var(--packages-border); }
  
@@ -266,11 +288,20 @@
  
   .stock-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
   .stock-list li {
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
     border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; background: var(--bg);
   }
-  .stock-label { font-size: 13px; color: var(--ink); }
-  .stock-amt { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; color: var(--rust); }
+  .stock-label { font-size: 13px; color: var(--ink); flex: 1 1 auto; }
+  .stock-amt-wrap { display: flex; align-items: baseline; gap: 10px; flex: 0 0 auto; }
+  .stock-amt { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; color: var(--rust); white-space: nowrap; }
+  .stock-amt-buffer { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; color: var(--sage); white-space: nowrap; padding-left: 10px; border-left: 1px dashed var(--border); }
+  .stock-buffer-footer {
+    display: flex; align-items: center; justify-content: flex-end; flex-wrap: nowrap;
+    gap: 6px; margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--border);
+  }
+  .stock-buffer-footer-label { font-size: 12px; color: var(--sub); margin-right: auto; }
+  .stock-buffer-pct-box { padding: 3px 6px !important; flex: 0 0 auto; }
+  .stock-buffer-pct-box input { width: 56px; flex: 0 0 56px; min-width: 56px; text-align: right; }
  
   .mini-divider { border-top: 1px dashed var(--border); margin: 14px 0; }
  
@@ -310,7 +341,7 @@
   @container (max-width: 595px) {
     .right-top-row { grid-template-columns: 1fr; }
     .right-top-row .chart-card.chart-card-compact { padding: 8px; }
-    .right-top-row .chart-card-compact .chart-wrap { height: 114px; min-height: 0; flex: 0 0 auto; }
+    .right-top-row .chart-card-compact .chart-wrap { height: 150px; min-height: 0; flex: 0 0 auto; }
   }
 
   .chart-card { background: var(--panel); border: none; border-radius: 10px; padding: 14px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
@@ -457,19 +488,19 @@
         <div class="booking-details-body" id="bookingDetailsBody">
         <div class="field-grid">
           <label class="field"><span class="field-label">Client name</span>
-            <input type="text" id="clientName" class="text-input" placeholder="e.g. Marianna and Simon"></label>
+            <input type="text" id="clientName" class="text-input" placeholder="First Last"></label>
           <label class="field"><span class="field-label">Organisation (optional)</span>
-            <input type="text" id="clientOrganisation" class="text-input" placeholder="e.g. Acme Pty Ltd"></label>
+            <input type="text" id="clientOrganisation" class="text-input" placeholder="Pty Ltd"></label>
         </div>
         <div class="field-grid">
           <label class="field"><span class="field-label">Contact email</span>
-            <input type="email" id="clientEmail" class="text-input" placeholder="e.g. name@example.com"></label>
+            <input type="email" id="clientEmail" class="text-input" placeholder="email@address.com"></label>
           <label class="field"><span class="field-label">Contact phone</span>
-            <input type="text" id="clientPhone" class="text-input" placeholder="e.g. 0400 000 000"></label>
+            <input type="text" id="clientPhone" class="text-input" placeholder="0400 000 000"></label>
         </div>
         <div class="field-grid" id="eventTypeRow">
           <label class="field"><span class="field-label">Event address</span>
-            <input type="text" id="bookingAddress" class="text-input" placeholder="Auto-fills from sheet or Travel section" autocomplete="off"></label>
+            <input type="text" id="bookingAddress" class="text-input" placeholder="Auto-fills from Booking Sheet or Travel section" autocomplete="off"></label>
           <label class="field"><span class="field-label">Event type</span>
             <select id="eventType" class="text-input select-input" required>
               <option value="" disabled selected>Select one</option>
@@ -495,7 +526,7 @@
           <label class="field"><span class="field-label">Event date</span>
             <input type="date" id="eventDate" class="text-input"></label>
           <label class="field"><span class="field-label">Service hours</span>
-            <div class="field-box"><input type="number" id="eventDuration" value="3" step="0.5" min="0.5"><span>hrs</span></div></label>
+            <div class="field-box"><input type="number" id="eventDuration" value="" placeholder="0" step="0.5" min="0.5"><span>hrs</span></div></label>
         </div>
         <div class="field-grid">
           <label class="field"><span class="field-label">Event start time</span>
@@ -507,7 +538,7 @@
           <label class="field"><span class="field-label">Package / booking price</span>
             <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
           <label class="field"><span class="field-label">Booking number</span>
-            <input type="text" id="bookingNumber" class="text-input" placeholder="e.g. BB-04082026"></label>
+            <input type="text" id="bookingNumber" class="text-input" placeholder="BB-DDMMYY"></label>
         </div>
         <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
         </div>
@@ -645,11 +676,39 @@
         </div>
         <div class="card-body">
           <ul class="stock-list" id="stockList">
-            <li><span class="stock-label">Coffee beans</span><span class="stock-amt" id="stock-beans">0.0 kg</span></li>
-            <li><span class="stock-label">Milk</span><span class="stock-amt" id="stock-milk">0.0 L</span></li>
-            <li><span class="stock-label">Cups &amp; lids</span><span class="stock-amt" id="stock-cups">0</span></li>
-            <li><span class="stock-label">Sugar / stirrers / napkins</span><span class="stock-amt" id="stock-sundries">0 sets</span></li>
+            <li><span class="stock-label">Coffee beans</span>
+              <span class="stock-amt-wrap">
+                <span class="stock-amt" id="stock-beans">0.0 kg</span>
+                <span class="stock-amt-buffer" id="stock-beans-buffer" style="display:none;">0.0 kg</span>
+              </span>
+            </li>
+            <li><span class="stock-label">Milk</span>
+              <span class="stock-amt-wrap">
+                <span class="stock-amt" id="stock-milk">0.0 L</span>
+                <span class="stock-amt-buffer" id="stock-milk-buffer" style="display:none;">0.0 L</span>
+              </span>
+            </li>
+            <li><span class="stock-label">Cups &amp; lids</span>
+              <span class="stock-amt-wrap">
+                <span class="stock-amt" id="stock-cups">0</span>
+                <span class="stock-amt-buffer" id="stock-cups-buffer" style="display:none;">0</span>
+              </span>
+            </li>
+            <li><span class="stock-label">Sugar / stirrers / napkins</span>
+              <span class="stock-amt-wrap">
+                <span class="stock-amt" id="stock-sundries">0 sets</span>
+                <span class="stock-amt-buffer" id="stock-sundries-buffer" style="display:none;">0 sets</span>
+              </span>
+            </li>
           </ul>
+          <div class="stock-buffer-footer">
+            <span class="stock-buffer-footer-label">Packing buffer</span>
+            <div class="field-box stock-buffer-pct-box" id="stockBufferPctBox" style="display:none;">
+              <input type="number" id="stockBufferPct" value="20" step="1" min="0">
+              <span>%</span>
+            </div>
+            <div class="toggle" id="toggle-stockBuffer" title="Pack extra stock as a buffer" aria-label="Toggle packing buffer"><div class="knob"></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -986,21 +1045,38 @@ function parseSheetDate(raw) {
 }
 
 function parseSheetTime(raw) {
-  if (!raw) return "";
+  if (raw === "" || raw === null || raw === undefined) return "";
+  // Google Sheets sometimes hands back a Time-formatted cell as a plain
+  // number: a fraction of a day (e.g. 0.75 === 18:00).
+  if (typeof raw === "number" && raw >= 0 && raw < 2) {
+    const totalMinutes = Math.round((raw % 1) * 24 * 60);
+    const h = Math.floor(totalMinutes / 60) % 24;
+    const m = totalMinutes % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  }
   const s = String(raw).trim();
+  if (!s) return "";
   // Full date-time strings (Sheets often exports times this way), e.g. "1899-12-30T14:05:00.000Z"
   const isoMatch = s.match(/T(\d{2}):(\d{2})/);
   if (isoMatch) return `${isoMatch[1]}:${isoMatch[2]}`;
-  // 12-hour "h:MM AM/PM" or "h.MM am"
-  const hm12 = s.match(/^(\d{1,2})[:.](\d{2})\s*([AaPp][Mm])$/);
+  // 12-hour "h:MM AM/PM", "h.MM am", or with periods like "6:00 p.m."
+  const hm12 = s.match(/^(\d{1,2})[:.](\d{2})\s*([AaPp]\.?[Mm]\.?)$/);
   if (hm12) {
     let h = parseInt(hm12[1], 10) % 12;
-    if (/pm/i.test(hm12[3])) h += 12;
+    if (/p/i.test(hm12[3])) h += 12;
     return `${String(h).padStart(2, "0")}:${hm12[2]}`;
   }
-  // 24-hour "HH:MM" or "HH:MM:SS"
+  // 24-hour "HH:MM" or "HH:MM:SS" (also matches single-digit hours like "9:00")
   const hm24 = s.match(/^(\d{1,2}):(\d{2})(:\d{2})?$/);
   if (hm24) return `${String(parseInt(hm24[1], 10)).padStart(2, "0")}:${hm24[2]}`;
+  // Plain numeric string day-fraction, e.g. "0.75"
+  if (/^0?\.\d+$/.test(s)) {
+    const frac = parseFloat(s);
+    const totalMinutes = Math.round(frac * 24 * 60);
+    const h = Math.floor(totalMinutes / 60) % 24;
+    const m = totalMinutes % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  }
   // Fall back to letting the browser's Date parser have a go
   const d = new Date(s);
   if (!isNaN(d.getTime())) return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -1130,6 +1206,7 @@ function applyBookingToForm(booking) {
 
   const parsedDate = parseSheetDate(eventDateRaw);
   if (parsedDate) document.getElementById("eventDate").value = parsedDate;
+  syncDateTimeValueClass("eventDate");
 
   if (eventType) {
     const looksLiteralOther = normalizeEventTypeForMatch(eventType) === "other";
@@ -1145,9 +1222,13 @@ function applyBookingToForm(booking) {
   }
 
   const startTime = parseSheetTime(startTimeRaw);
-  if (startTime) document.getElementById("eventStartTime").value = startTime;
+  if (startTimeRaw && !startTime) console.warn("Could not parse start time from sheet:", startTimeRaw);
+  document.getElementById("eventStartTime").value = startTime;
   const endTime = parseSheetTime(endTimeRaw);
-  if (endTime) document.getElementById("eventEndTime").value = endTime;
+  if (endTimeRaw && !endTime) console.warn("Could not parse end time from sheet:", endTimeRaw);
+  document.getElementById("eventEndTime").value = endTime;
+  syncDateTimeValueClass("eventStartTime");
+  syncDateTimeValueClass("eventEndTime");
 
   if (bookingPrice !== "") document.getElementById("bookingPrice").value = Math.max(0, parseFloat(bookingPrice) || 0);
   if (duration !== "") {
@@ -1182,12 +1263,21 @@ let customOn = false;
 let hourlyOn = false;
 let serviceOn = false;
 let bookingDetailsOn = true;
+let stockBufferOn = false;
  
 function currency(n) {
   if (!isFinite(n)) n = 0;
   return n.toLocaleString("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 2 });
 }
 function num(id) { const v = parseFloat(document.getElementById(id).value) || 0; return v < 0 ? 0 : v; }
+
+function syncDateTimeValueClass(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle("has-value", !!el.value);
+}
+function syncAllDateTimeValueClasses() {
+  ["eventDate", "eventStartTime", "eventEndTime"].forEach(syncDateTimeValueClass);
+}
  
 function renderCustomFields() {
   const container = document.getElementById("custom-fields-container");
@@ -1248,6 +1338,10 @@ function setupToggle(toggleId, getState, setState, onChange, cardId) {
 setupToggle("toggle-travel", () => travelOn, (v) => (travelOn = v), null, "card-travel");
 setupToggle("toggle-overheads", () => overheadsOn, (v) => (overheadsOn = v), null, "card-overheads");
 setupToggle("toggle-custom", () => customOn, (v) => (customOn = v), null, "card-custom");
+setupToggle("toggle-stockBuffer", () => stockBufferOn, (v) => (stockBufferOn = v), (v) => {
+  document.getElementById("stockBufferPctBox").style.display = v ? "flex" : "none";
+  document.querySelectorAll(".stock-amt-buffer").forEach((el) => { el.style.display = v ? "inline" : "none"; });
+});
 setupToggle("toggle-generator", () => generatorOn, (v) => (generatorOn = v), (v) => {
   document.getElementById("generator-fields").style.display = v ? "grid" : "none";
 });
@@ -1290,7 +1384,7 @@ if (hourlySlider) {
  
 document.getElementById("eventSuburb").addEventListener("input", () => { save(); });
 document.getElementById("clientName").addEventListener("input", () => { save(); });
-document.getElementById("eventDate").addEventListener("input", () => { save(); });
+document.getElementById("eventDate").addEventListener("input", () => { syncDateTimeValueClass("eventDate"); save(); });
 
 const PREDEFINED_EVENT_TYPES = [
   "Weddings", "Corporate Events", "Private Parties", "Markets & Festivals",
@@ -1354,8 +1448,8 @@ eventTypeBackBtn.addEventListener("click", () => {
   eventTypeSelect.focus();
 });
 
-document.getElementById("eventStartTime").addEventListener("change", () => { save(); });
-document.getElementById("eventEndTime").addEventListener("change", () => { save(); });
+document.getElementById("eventStartTime").addEventListener("change", () => { syncDateTimeValueClass("eventStartTime"); save(); });
+document.getElementById("eventEndTime").addEventListener("change", () => { syncDateTimeValueClass("eventEndTime"); save(); });
 
 document.querySelectorAll('input[type="number"]').forEach((inp) => {
   inp.addEventListener("input", () => {
@@ -1394,6 +1488,8 @@ function selectPackage(btn, { skipFieldUpdate } = {}) {
 function clearPackageSelection() {
   packageButtons.forEach((b) => b.classList.remove("active"));
   selectedPackage = null;
+  document.getElementById("eventDuration").value = "";
+  recalc();
   save();
 }
 
@@ -1436,13 +1532,16 @@ function clearBookingQuoteForm() {
   document.getElementById("clientEmail").value = "";
   document.getElementById("bookingNumber").value = "";
   document.getElementById("eventDate").value = "";
+  document.getElementById("eventStartTime").value = "";
+  document.getElementById("eventEndTime").value = "";
+  syncAllDateTimeValueClasses();
 
   eventTypeSelect.value = "";
   eventTypeOtherInput.value = "";
   syncEventTypeOtherVisibility();
 
   document.getElementById("bookingPrice").value = 1000;
-  document.getElementById("eventDuration").value = 3;
+  document.getElementById("eventDuration").value = "";
 
   const statusEl = document.getElementById("sheetSyncStatus");
   if (statusEl) {
@@ -1720,13 +1819,45 @@ function initChart() {
       maintainAspectRatio: false,
       cutout: "55%",
       plugins: {
-        legend: { position: "bottom", labels: { font: { size: 10.5, family: "Inter" }, color: "#C9BFA8", boxWidth: 9, padding: 8 } },
+        legend: { position: "bottom", align: "center", labels: { font: { size: 10.5, family: "Inter" }, color: "#C9BFA8", boxWidth: 9, padding: 8 } },
         tooltip: {
           callbacks: { label: (ctx) => ctx.label + ": " + currency(ctx.raw) },
         },
       },
     },
   });
+  updateChartLegendAlign();
+}
+
+// When the "This booking" stat panel and the Cost breakdown chart stack
+// vertically (chart card below the stat panel), position the chart's
+// legend/key on the left. When they sit side by side, position the legend
+// underneath the chart instead. We check the cards' actual on-screen
+// positions (rather than a width threshold) so this exactly matches the
+// real CSS breakpoint with no flicker right at the switch point.
+function isChartCardStackedBelowStatPanel() {
+  const statPanel = document.querySelector(".stat-panel");
+  const chartCard = document.querySelector(".right-top-row .chart-card");
+  if (!statPanel || !chartCard) return false;
+  const statRect = statPanel.getBoundingClientRect();
+  const chartRect = chartCard.getBoundingClientRect();
+  return chartRect.top >= statRect.bottom - 1;
+}
+
+function updateChartLegendAlign() {
+  if (!chart) return;
+  const isStacked = isChartCardStackedBelowStatPanel();
+  const nextPosition = isStacked ? "left" : "bottom";
+  const legend = chart.options.plugins.legend;
+  const nextBoxWidth = isStacked ? 8 : 9;
+  const nextPadding = isStacked ? 6 : 8;
+  if (legend.position !== nextPosition || legend.labels.boxWidth !== nextBoxWidth || legend.labels.padding !== nextPadding) {
+    legend.position = nextPosition;
+    legend.align = "center";
+    legend.labels.boxWidth = nextBoxWidth;
+    legend.labels.padding = nextPadding;
+    chart.update();
+  }
 }
  
 function computeSurchargeForKm(km) {
@@ -1854,11 +1985,21 @@ document.getElementById("feeBreakdownSave").addEventListener("click", () => {
  
 function recalc() {
   const coffees = Math.max(0, num("coffeeCap"));
-  const beansCost = (num("dose") * coffees / 1000) * num("beanPrice");
-  const milkLitres = (num("milkMl") * coffees / 1000) * (1 + num("milkWastage") / 100);
+
+  // Packing buffer: when enabled, cost the stock for the buffered coffee
+  // count (e.g. +20%) instead of the exact quoted number, since that's what
+  // you're actually buying and spending money on. Revenue and "coffees
+  // served" (cost/coffee denominator) stay tied to the real booking size.
+  const stockBufferPct = Math.max(0, num("stockBufferPct"));
+  const bufferMult = stockBufferOn ? 1 + stockBufferPct / 100 : 1;
+  const costCoffees = coffees * bufferMult;
+
+  const beansCost = (num("dose") * costCoffees / 1000) * num("beanPrice");
+  const exactMilkLitres = (num("milkMl") * coffees / 1000) * (1 + num("milkWastage") / 100);
+  const milkLitres = (num("milkMl") * costCoffees / 1000) * (1 + num("milkWastage") / 100);
   const milkCost = milkLitres * num("milkPrice");
-  const cupsCost = num("cupLid") * coffees;
-  const sundriesCost = num("sundries") * coffees;
+  const cupsCost = num("cupLid") * costCoffees;
+  const sundriesCost = num("sundries") * costCoffees;
   const consumablesTotal = beansCost + milkCost + cupsCost + sundriesCost;
   const costPerCoffee = coffees > 0 ? consumablesTotal / coffees : 0;
  
@@ -1910,10 +2051,19 @@ function recalc() {
     cqTravelRow.style.display = "none";
   }
  
-  document.getElementById("stock-beans").textContent = ((num("dose") * coffees) / 1000).toFixed(1) + " kg";
-  document.getElementById("stock-milk").textContent = milkLitres.toFixed(1) + " L";
+  const beansKgExact = (num("dose") * coffees) / 1000;
+  document.getElementById("stock-beans").textContent = beansKgExact.toFixed(1) + " kg";
+  document.getElementById("stock-milk").textContent = exactMilkLitres.toFixed(1) + " L";
   document.getElementById("stock-cups").textContent = coffees.toLocaleString("en-AU");
   document.getElementById("stock-sundries").textContent = coffees.toLocaleString("en-AU") + " sets";
+
+  if (stockBufferOn) {
+    const bufferedCoffees = Math.ceil(costCoffees);
+    document.getElementById("stock-beans-buffer").textContent = (beansKgExact * bufferMult).toFixed(1) + " kg";
+    document.getElementById("stock-milk-buffer").textContent = milkLitres.toFixed(1) + " L";
+    document.getElementById("stock-cups-buffer").textContent = bufferedCoffees.toLocaleString("en-AU");
+    document.getElementById("stock-sundries-buffer").textContent = bufferedCoffees.toLocaleString("en-AU") + " sets";
+  }
  
   document.getElementById("split-name1").textContent = "Marianna · " + pct1 + "%";
   document.getElementById("split-name2").textContent = "Simon · " + pct2 + "%";
@@ -1957,7 +2107,7 @@ function recalc() {
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap",
     "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
-    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote"];
+    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote","stockBufferPct"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
@@ -1970,6 +2120,7 @@ function collectState() {
     serviceOn,
     feeStopOverrides,
     bookingDetailsOn,
+    stockBufferOn,
   };
 }
  
@@ -2035,6 +2186,7 @@ function load() {
     }
     if (typeof s.serviceOn === "boolean") serviceOn = s.serviceOn;
     if (typeof s.bookingDetailsOn === "boolean") bookingDetailsOn = s.bookingDetailsOn;
+    if (typeof s.stockBufferOn === "boolean") stockBufferOn = s.stockBufferOn;
     if (s.splitPct) splitRange.value = Math.round(parseInt(s.splitPct, 10) / 5) * 5;
  
     document.getElementById("toggle-travel").classList.toggle("on", travelOn);
@@ -2051,6 +2203,9 @@ function load() {
     document.getElementById("service-fields").style.display = serviceOn ? "grid" : "none";
     document.getElementById("toggle-bookingDetails").classList.toggle("on", bookingDetailsOn);
     document.getElementById("bookingDetailsBody").classList.toggle("off", !bookingDetailsOn);
+    document.getElementById("toggle-stockBuffer").classList.toggle("on", stockBufferOn);
+    document.getElementById("stockBufferPctBox").style.display = stockBufferOn ? "flex" : "none";
+    document.querySelectorAll(".stock-amt-buffer").forEach((el) => { el.style.display = stockBufferOn ? "inline" : "none"; });
  
     if (s.selectedPackage) {
       const match = document.querySelector(`.package-option[data-package="${s.selectedPackage}"]`);
@@ -2201,8 +2356,9 @@ function buildQuoteDocumentHTML() {
   .wood-band-foot::before { background: rgba(15,10,5,0.58); }
   .wood-band-foot-inner { position: relative; z-index: 1; }
   .wood-band-foot img.linear-logo { height: 26px; width: auto; display: inline-block; opacity: 0.96; }
-  .wood-band-foot .foot-meta { margin-top: 8px; font-size: 10.5px; letter-spacing: 0.02em; color: #D9CDAE; line-height: 1.9; }
+  .wood-band-foot .foot-meta { margin-top: 8px; font-size: 10.5px; letter-spacing: 0.02em; color: #D9CDAE; line-height: 1.4; }
   .wood-band-foot .foot-meta strong { color: #F0E6CC; font-weight: 600; }
+  .wood-band-foot .foot-meta .foot-abn { margin-bottom: 2px; }
 
   /* ---- Body ---- */
   .body-pad { padding: 38px 44px 8px; }
@@ -2238,15 +2394,16 @@ function buildQuoteDocumentHTML() {
   .dark-card li::marker { color: var(--gold); }
   .dark-card li.note-line { list-style: none; margin: 10px 0 0 -16px; padding-top: 10px; border-top: 1px dashed #DCC79A; font-size: 11.5px; color: var(--sub); font-style: italic; }
 
-  .two-col-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; margin: 8px 0 20px; }
+  .two-col-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; margin: 8px 0 20px; }
+  .two-col-cards .dark-card { height: 100%; box-sizing: border-box; }
   @media (max-width: 560px) { .two-col-cards { grid-template-columns: 1fr; } }
 
   .validity-note { font-size: 11px; color: var(--sub); font-style: italic; line-height: 1.6; margin: 0 0 6px; }
 
-  .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .payment-col { display: flex; flex-direction: column; gap: 12px; }
-  .payment-item .p-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 2px; }
-  .payment-item .p-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .payment-grid { display: grid; grid-template-columns: auto 1fr; column-gap: 16px; row-gap: 10px; }
+  .payment-item { display: contents; }
+  .payment-item .p-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); align-self: center; }
+  .payment-item .p-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--ink); text-align: right; align-self: center; }
 
   .no-print { text-align: center; margin: 18px auto; max-width: 720px; }
   .no-print button {
@@ -2315,26 +2472,21 @@ function buildQuoteDocumentHTML() {
           <h3>Venue information</h3>
           <ul>
             ${venueInfoItemsHtml}
-            <li class="note-line">Requires 2 x standard power outlets on separate circuits.</li>
           </ul>
         </div>
 
         <div class="dark-card payment-card">
           <h3>Payment details</h3>
           <div class="payment-grid">
-            <div class="payment-col">
-              <div class="payment-item"><div class="p-label">Account name</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NAME}</div></div>
-              <div class="payment-item"><div class="p-label">Reference</div><div class="p-value">${escapeHtml(referenceValue)}</div></div>
-            </div>
-            <div class="payment-col">
-              <div class="payment-item"><div class="p-label">BSB</div><div class="p-value">${QUOTE_PAYMENT_BSB}</div></div>
-              <div class="payment-item"><div class="p-label">Account number</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NUMBER}</div></div>
-            </div>
+            <div class="payment-item"><div class="p-label">Account name</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NAME}</div></div>
+            <div class="payment-item"><div class="p-label">BSB</div><div class="p-value">${QUOTE_PAYMENT_BSB}</div></div>
+            <div class="payment-item"><div class="p-label">Account number</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NUMBER}</div></div>
+            <div class="payment-item"><div class="p-label">Reference</div><div class="p-value">${escapeHtml(referenceValue)}</div></div>
           </div>
         </div>
       </div>
 
-      <p class="validity-note">This quote is valid for 14 days from the date of issue. Payment in full is required to secure your booking date and services.</p>
+      <p class="validity-note">Payment in full is required to secure your booking date and services.</p>
 
     </div>
 
@@ -2342,7 +2494,8 @@ function buildQuoteDocumentHTML() {
       <div class="wood-band-foot-inner">
         <img class="linear-logo" src="${QUOTE_LINEAR_LOGO}" alt="Blend & Brew">
         <div class="foot-meta">
-          <strong>ABN ${QUOTE_ABN}</strong> &middot; blendandbrew@hotmail.com.au &middot; Greater Sydney, NSW
+          <div class="foot-abn"><strong>ABN ${QUOTE_ABN}</strong></div>
+          <div>blendandbrew@hotmail.com.au &middot; Greater Sydney, NSW</div>
         </div>
       </div>
     </div>
@@ -2481,6 +2634,7 @@ document.getElementById("refreshBookingsBtn").addEventListener("click", loadBook
  
 initChart();
 load();
+syncAllDateTimeValueClasses();
 syncBookingAddressFromTravel();
 renderCustomFields();
 updateEventTypeQuoteDisplay();
@@ -2532,6 +2686,7 @@ document.getElementById("save-status").textContent = "";
     const current = parseInt(getComputedStyle(gridEl).getPropertyValue("--right-col-width"), 10);
     if (current) localStorage.setItem(WIDTH_KEY, current);
     if (chart) chart.resize();
+    updateChartLegendAlign();
   }
  
   function onPointerDown(e) {
@@ -2549,8 +2704,17 @@ document.getElementById("save-status").textContent = "";
   window.addEventListener("mouseup", onPointerUp);
   window.addEventListener("touchend", onPointerUp);
  
-  window.addEventListener("resize", () => { if (chart) chart.resize(); });
+  window.addEventListener("resize", () => { if (chart) chart.resize(); updateChartLegendAlign(); });
 })();
+
+// Catches the container-query breakpoint even when it's not triggered by a
+// window resize (e.g. dragging the column resizer).
+if (typeof ResizeObserver !== "undefined") {
+  const rightColEl = document.querySelector(".right-col");
+  if (rightColEl) {
+    new ResizeObserver(() => updateChartLegendAlign()).observe(rightColEl);
+  }
+}
 </script>
 </body>
 </html>
