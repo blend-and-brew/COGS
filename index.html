@@ -207,8 +207,8 @@
   .booking-card { background: var(--booking-card); border-color: var(--booking-border); }
   .booking-details-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 4px 0 10px; margin-top: -4px;
-    border-bottom: 1px dashed var(--booking-border);
+    padding: 10px 0 4px; margin-top: 6px;
+    border-top: 1px dashed var(--booking-border);
     cursor: pointer; user-select: none;
   }
   .booking-details-label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
@@ -569,17 +569,16 @@
         <div class="card-body">
           <div class="package-list" id="packageList">
             <div class="package-row">
-              <div class="package-option" data-package="babycino" data-price="350" data-coffees="25" data-guests="15" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Babycino package">
+              <div class="package-option" data-package="babycino" data-price="350" data-coffees="25" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Babycino package">
                 <div class="package-display">
                   <span class="package-name">Babycino</span>
-                  <span class="package-meta">~15 guests &middot; 25 coffees</span>
+                  <span class="package-meta">25 coffees / 1 hrs of service</span>
                   <span class="package-price">$350</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="Babycino"></label>
                   <label>Price ($)<input type="number" class="pkg-edit-price" value="350" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="25" step="1" min="0"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="15" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="1" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
@@ -590,17 +589,16 @@
               <button type="button" class="package-edit-btn" aria-label="Edit Babycino package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="piccolo" data-price="550" data-coffees="50" data-guests="30" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Piccolo package">
+              <div class="package-option" data-package="piccolo" data-price="550" data-coffees="50" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Piccolo package">
                 <div class="package-display">
                   <span class="package-name">Piccolo</span>
-                  <span class="package-meta">~30 guests &middot; 50 coffees</span>
+                  <span class="package-meta">50 coffees / 1 hrs of service</span>
                   <span class="package-price">$550</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="Piccolo"></label>
                   <label>Price ($)<input type="number" class="pkg-edit-price" value="550" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="50" step="1" min="0"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="30" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="1" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
@@ -611,17 +609,16 @@
               <button type="button" class="package-edit-btn" aria-label="Edit Piccolo package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="latte" data-price="950" data-coffees="100" data-guests="65" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Latte package">
+              <div class="package-option" data-package="latte" data-price="950" data-coffees="100" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Latte package">
                 <div class="package-display">
                   <span class="package-name">The Latte</span>
-                  <span class="package-meta">~65 guests &middot; 100 coffees</span>
+                  <span class="package-meta">100 coffees / 2 hrs of service</span>
                   <span class="package-price">$950</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Latte"></label>
                   <label>Price ($)<input type="number" class="pkg-edit-price" value="950" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="100" step="1" min="0"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="65" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="2" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
@@ -632,17 +629,16 @@
               <button type="button" class="package-edit-btn" aria-label="Edit The Latte package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="grande" data-price="1300" data-coffees="150" data-guests="100" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Grande package">
+              <div class="package-option" data-package="grande" data-price="1300" data-coffees="150" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Grande package">
                 <div class="package-display">
                   <span class="package-name">The Grande</span>
-                  <span class="package-meta">~100 guests &middot; 150 coffees</span>
+                  <span class="package-meta">150 coffees / 2 hrs of service</span>
                   <span class="package-price">$1,300</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Grande"></label>
                   <label>Price ($)<input type="number" class="pkg-edit-price" value="1300" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="150" step="1" min="0"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="100" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="2" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
@@ -653,17 +649,16 @@
               <button type="button" class="package-edit-btn" aria-label="Edit The Grande package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="barista" data-price="1500" data-coffees="200" data-guests="125" data-beanprice="32" data-milkprice="1.72" data-hours="3" role="button" tabindex="0" aria-label="Select The Barista package">
+              <div class="package-option" data-package="barista" data-price="1500" data-coffees="200" data-beanprice="32" data-milkprice="1.72" data-hours="3" role="button" tabindex="0" aria-label="Select The Barista package">
                 <div class="package-display">
                   <span class="package-name">The Barista</span>
-                  <span class="package-meta">~125 guests &middot; 200 coffees</span>
+                  <span class="package-meta">200 coffees / 3 hrs of service</span>
                   <span class="package-price">$1,500</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Barista"></label>
                   <label>Price ($)<input type="number" class="pkg-edit-price" value="1500" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="200" step="1" min="0"></label>
-                  <label>Guests<input type="number" class="pkg-edit-guests" value="125" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="3" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
                     <button type="button" class="pkg-edit-cancel">Cancel</button>
@@ -778,6 +773,30 @@
           <span class="label">Cost per coffee</span>
           <span class="value" id="out-costPerCoffee">$0.00</span>
         </div>
+      </div>
+    </div>
+
+    <!-- EXTRA HOURS -->
+    <div class="card" id="card-extraHours">
+      <div class="card-head">
+        <div class="card-head-left">
+          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="card-title">Extra Service Hours</span>
+        </div>
+        <div class="toggle on" id="toggle-extraHours"><div class="knob"></div></div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <label class="field"><span class="field-label">Hours included in package</span>
+            <div class="field-box"><input type="number" id="packageIncludedHours" value="0" step="0.5" min="0"><span>hrs</span></div></label>
+          <label class="field"><span class="field-label">Extra hour rate</span>
+            <div class="field-box"><span>$</span><input type="number" id="extraHourRate" value="80" step="1" min="0"><span>/hr</span></div></label>
+        </div>
+        <div class="divider-row">
+          <span class="label">Extra hours charge</span>
+          <span class="value" id="out-extraHoursCharge">$0</span>
+        </div>
+        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Selecting a package fills in its included hours above. If Service hours (in Booking Quote) is higher, the difference is charged at the extra hour rate.</p>
       </div>
     </div>
  
@@ -982,6 +1001,10 @@
           <span class="label">Total quoted price</span>
           <span class="value" id="cq-total">$0.00</span>
         </div>
+        <div class="divider-row" id="cq-extraHours-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
+          <span class="label">Extra hours fee</span>
+          <span class="value" id="cq-extraHours-fee" style="font-size:14px;"></span>
+        </div>
         <div class="divider-row" id="cq-travel-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
           <span class="label">Travel fee</span>
           <span class="value" id="cq-travel-fee" style="font-size:14px;"></span>
@@ -994,6 +1017,10 @@
         <button type="button" class="copy-quote-btn" id="copy-quote-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           <span class="copy-btn-label">Copy quote text</span>
+        </button>
+        <button type="button" class="copy-quote-btn" id="copy-payment-link-btn" style="margin-top:6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="copy-btn-label">Copy payment link</span>
         </button>
       </div>
     </div>
@@ -1032,7 +1059,7 @@ const QUOTE_PAYMENT_BANK_NAME = "[Bank name]";
 // 3. Deploy > New deployment > Web app. Execute as "Me", access "Anyone with the link".
 // 4. Copy the resulting /exec URL and the token below.
 // ===================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWOeoMRtws5Mcj2sfhwq8UktTonx01dfiu0pxs_wyZlejTT5groMnjudVmB3LC6626Cg/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzLtYXcLnGB_2zorsVVHVOjoJvJpht1SPS6hZ616Stb9ZCVIry6lV-HBCbRkLKZhowwg/exec";
 const APPS_SCRIPT_TOKEN = "blendandbrew45-sheet-token";
 let sheetBookings = [];
 
@@ -1290,6 +1317,7 @@ const defaultCustomFields = [
  
 let customFields = JSON.parse(JSON.stringify(defaultCustomFields));
 let travelOn = true;
+let extraHoursOn = true;
 let generatorOn = false;
 let overheadsOn = false;
 let customOn = false;
@@ -1369,6 +1397,7 @@ function setupToggle(toggleId, getState, setState, onChange, cardId) {
 }
  
 setupToggle("toggle-travel", () => travelOn, (v) => (travelOn = v), null, "card-travel");
+setupToggle("toggle-extraHours", () => extraHoursOn, (v) => (extraHoursOn = v), null, "card-extraHours");
 setupToggle("toggle-overheads", () => overheadsOn, (v) => (overheadsOn = v), null, "card-overheads");
 setupToggle("toggle-custom", () => customOn, (v) => (customOn = v), null, "card-custom");
 setupToggle("toggle-stockBuffer", () => stockBufferOn, (v) => (stockBufferOn = v), (v) => {
@@ -1514,7 +1543,10 @@ function selectPackage(btn, { skipFieldUpdate } = {}) {
       const milkPriceAttr = btn.getAttribute("data-milkprice");
       if (milkPriceAttr) document.getElementById("milkPrice").value = milkPriceAttr;
       const hoursAttr = btn.getAttribute("data-hours");
-      if (hoursAttr) document.getElementById("eventDuration").value = hoursAttr;
+      if (hoursAttr) {
+        document.getElementById("eventDuration").value = hoursAttr;
+        document.getElementById("packageIncludedHours").value = hoursAttr;
+      }
     }
     // Custom is selected as-is — it reflects whatever is already in the
     // Service fields, so there's nothing to copy across.
@@ -1527,6 +1559,7 @@ function clearPackageSelection() {
   packageButtons.forEach((b) => b.classList.remove("active"));
   selectedPackage = null;
   document.getElementById("eventDuration").value = "";
+  document.getElementById("packageIncludedHours").value = 0;
   recalc();
   save();
 }
@@ -1639,14 +1672,13 @@ function clearBookingQuoteForm() {
 function applyPackageDataToDOM(btn, data) {
   if (data.price != null) btn.setAttribute("data-price", data.price);
   if (data.coffees != null) btn.setAttribute("data-coffees", data.coffees);
-  if (data.guests != null) btn.setAttribute("data-guests", data.guests);
   if (data.beanprice != null) btn.setAttribute("data-beanprice", data.beanprice);
   if (data.milkprice != null) btn.setAttribute("data-milkprice", data.milkprice);
   if (data.hours != null) btn.setAttribute("data-hours", data.hours);
   if (data.name) btn.querySelector(".package-name").textContent = data.name;
 
   btn.querySelector(".package-meta").textContent =
-    "~" + btn.getAttribute("data-guests") + " guests · " + btn.getAttribute("data-coffees") + " coffees";
+    btn.getAttribute("data-coffees") + " coffees / " + btn.getAttribute("data-hours") + " hrs of service";
   btn.querySelector(".package-price").textContent =
     "$" + Number(btn.getAttribute("data-price")).toLocaleString("en-AU");
 
@@ -1655,7 +1687,6 @@ function applyPackageDataToDOM(btn, data) {
     fields.querySelector(".pkg-edit-name").value = btn.querySelector(".package-name").textContent;
     fields.querySelector(".pkg-edit-price").value = btn.getAttribute("data-price");
     fields.querySelector(".pkg-edit-coffees").value = btn.getAttribute("data-coffees");
-    fields.querySelector(".pkg-edit-guests").value = btn.getAttribute("data-guests");
     const hoursField = fields.querySelector(".pkg-edit-hours");
     if (hoursField) hoursField.value = btn.getAttribute("data-hours") || "";
   }
@@ -1703,7 +1734,6 @@ packageButtons.forEach((btn) => {
         name: fields.querySelector(".pkg-edit-name").value.trim() || btn.querySelector(".package-name").textContent,
         price: Math.max(0, parseFloat(fields.querySelector(".pkg-edit-price").value) || 0),
         coffees: Math.max(0, parseInt(fields.querySelector(".pkg-edit-coffees").value, 10) || 0),
-        guests: Math.max(0, parseInt(fields.querySelector(".pkg-edit-guests").value, 10) || 0),
         hours: Math.max(0, parseFloat(fields.querySelector(".pkg-edit-hours").value) || 0),
       };
       applyPackageDataToDOM(btn, data);
@@ -1974,6 +2004,15 @@ function computeTravelSurcharge() {
   };
 }
 
+function computeExtraHoursCharge() {
+  const hoursNeeded = num("eventDuration");
+  const includedHours = num("packageIncludedHours");
+  const rate = num("extraHourRate");
+  const extraHours = Math.max(0, hoursNeeded - includedHours);
+  const charge = extraHours * rate;
+  return { extraHours, rate, charge };
+}
+
 // ----- Distance / fee preview slider + editable breakdown -----
 const FEE_STOPS = [10, 15, 20, 30, 40, 50, 75, 80, 100];
 let feeStopOverrides = {};
@@ -2099,7 +2138,9 @@ function recalc() {
  
   const travelChargeCalc = computeTravelSurcharge();
   const travelSurchargeAmount = travelOn ? travelChargeCalc.surcharge : 0;
-  const totalRevenue = bookingPrice + travelSurchargeAmount;
+  const extraHoursCalc = computeExtraHoursCharge();
+  const extraHoursAmount = extraHoursOn ? extraHoursCalc.charge : 0;
+  const totalRevenue = bookingPrice + travelSurchargeAmount + extraHoursAmount;
  
   const cardFeeCost = overheadsOn ? totalRevenue * (num("cardFeePct") / 100) : 0;
   const overheadsTotal = overheadsOn ? num("insurance") + num("servicing") + num("permits") : 0;
@@ -2127,8 +2168,27 @@ function recalc() {
   document.getElementById("out-travelSurcharge").textContent = currency(travelChargeCalc.surcharge);
   document.getElementById("travelSurchargeNote").textContent = travelChargeCalc.bracket +
     (travelOn ? " Added to quote revenue." : " Toggle Travel on to include in revenue.");
+
+  document.getElementById("out-extraHoursCharge").textContent = currency(extraHoursCalc.charge);
+  const extraHoursNoteEl = document.getElementById("extraHoursNote");
+  if (extraHoursCalc.extraHours > 0.001) {
+    extraHoursNoteEl.textContent = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " hrs beyond the " +
+      num("packageIncludedHours").toFixed(1).replace(/\.0$/, "") + " hrs included in the package, at " +
+      currency(extraHoursCalc.rate) + "/hr." + (extraHoursOn ? " Added to quote revenue." : " Toggle on to include in revenue.");
+  } else {
+    extraHoursNoteEl.textContent = "Service hours matches the package's included hours — no extra charge.";
+  }
  
   document.getElementById("cq-total").textContent = currency(totalRevenue);
+
+  const cqExtraHoursRow = document.getElementById("cq-extraHours-row");
+  const cqExtraHoursFeeEl = document.getElementById("cq-extraHours-fee");
+  if (extraHoursOn && extraHoursAmount > 0) {
+    cqExtraHoursRow.style.display = "flex";
+    cqExtraHoursFeeEl.textContent = currency(extraHoursAmount) + " (" + extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " extra hrs)";
+  } else {
+    cqExtraHoursRow.style.display = "none";
+  }
  
   const cqTravelRow = document.getElementById("cq-travel-row");
   const cqTravelFeeEl = document.getElementById("cq-travel-fee");
@@ -2201,11 +2261,11 @@ function recalc() {
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap","waterPerCoffee",
     "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
-    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote","stockBufferPct"];
+    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote","stockBufferPct","packageIncludedHours","extraHourRate"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
-    values, customFields, travelOn, generatorOn, overheadsOn, customOn,
+    values, customFields, travelOn, extraHoursOn, generatorOn, overheadsOn, customOn,
     splitPct: splitRange.value,
     selectedPackage,
     hourlyOn,
@@ -2270,6 +2330,7 @@ function load() {
       });
     }
     if (typeof s.travelOn === "boolean") travelOn = s.travelOn;
+    if (typeof s.extraHoursOn === "boolean") extraHoursOn = s.extraHoursOn;
     if (typeof s.generatorOn === "boolean") generatorOn = s.generatorOn;
     if (typeof s.overheadsOn === "boolean") overheadsOn = s.overheadsOn;
     if (typeof s.customOn === "boolean") customOn = s.customOn;
@@ -2285,6 +2346,8 @@ function load() {
  
     document.getElementById("toggle-travel").classList.toggle("on", travelOn);
     document.getElementById("card-travel").classList.toggle("off", !travelOn);
+    document.getElementById("toggle-extraHours").classList.toggle("on", extraHoursOn);
+    document.getElementById("card-extraHours").classList.toggle("off", !extraHoursOn);
     document.getElementById("toggle-overheads").classList.toggle("on", overheadsOn);
     document.getElementById("card-overheads").classList.toggle("off", !overheadsOn);
     document.getElementById("toggle-custom").classList.toggle("on", customOn);
@@ -2340,6 +2403,18 @@ function escapeHtml(str) {
   }[c]));
 }
 
+// Builds the suggested filename for the quote tab/PDF, e.g.
+// "Blend and Brew Quote - Test_2026-08-04". The browser's "Print > Save as
+// PDF" dialog uses the document's <title> as its default filename, so this
+// is set as the generated tab's <title> in buildQuoteDocumentHTML().
+function buildQuoteFilename(clientName, eventDateRaw) {
+  const cleanClient = (clientName || "Client").trim().replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ") || "Client";
+  const cleanDate = (eventDateRaw || "").trim();
+  const parts = [cleanClient];
+  if (cleanDate) parts.push(cleanDate);
+  return `Blend and Brew Quote - ${parts.join("_")}`;
+}
+
 function formatQuoteEventDate(dateStr) {
   if (!dateStr) return "—";
   const d = new Date(dateStr + "T00:00:00");
@@ -2356,6 +2431,24 @@ function formatQuotePhone(phone) {
     return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 10)}`;
   }
   return phone;
+}
+
+// Non-obvious value-adds worth spelling out on the quote — things a client
+// wouldn't automatically assume are covered (unlike, say, "espresso
+// equipment" or "coffee service", which go without saying).
+function buildInclusionItems(coffees) {
+  const baristaCount = coffees > 50 ? 2 : 1;
+  const baristaLabel = baristaCount + " Professional " + (baristaCount > 1 ? "Baristas" : "Barista");
+  const items = [
+    baristaLabel,
+    coffees + " Coffees",
+    "Setup and Pack-Down",
+    "Dietary and Milk Alternatives",
+    "Sugars, Sweeteners, and Condiments",
+    "Full Public Liability Insurance",
+  ];
+  if (overheadsOn && generatorOn) items.push("On-Board Power Generator — No Power Needed On-Site");
+  return items;
 }
 
 function buildQuoteDocumentHTML() {
@@ -2377,43 +2470,90 @@ function buildQuoteDocumentHTML() {
   const durationStr = duration ? duration + " hrs" : "—";
   const coffees = num("coffeeCap");
   const bookingPrice = num("bookingPrice");
+  const includedHours = num("packageIncludedHours");
+  const includedHoursLabel = includedHours ? includedHours.toFixed(1).replace(/\.0$/, "") : "0";
 
   const packageNameEl = selectedPackage
     ? document.querySelector(`.package-option[data-package="${selectedPackage}"] .package-name`)
     : null;
   const packageName = packageNameEl ? packageNameEl.textContent : "Custom estimate";
+  const inclusionItems = buildInclusionItems(coffees);
 
   const travelCalc = computeTravelSurcharge();
   const travelSurcharge = travelOn ? travelCalc.surcharge : 0;
+  const extraHoursCalc = computeExtraHoursCharge();
+  const extraHoursCharge = extraHoursOn ? extraHoursCalc.charge : 0;
+  const hasExtraHours = extraHoursOn && extraHoursCharge > 0;
+  const extraHoursLabel = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const suburb = document.getElementById("eventSuburb").value.trim();
   const km = num("travelChargeKm");
-  const total = bookingPrice + travelSurcharge;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+  const paymentLink = buildPaymentLink();
+  const paymentQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(paymentLink)}`;
   const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+  const serviceTimeSummary = hasExtraHours
+    ? `${includedHoursLabel} hrs + ${extraHoursLabel} additional hrs`
+    : durationStr;
 
-  let travelRowHtml = "";
-  if (travelOn && travelCalc.customQuote) {
-    const label = "Custom travel quote" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
-    const val = travelSurcharge > 0 ? currency(travelSurcharge) : "To be confirmed";
-    travelRowHtml = `<tr><td>${label}</td><td class="right">${val}</td></tr>`;
-  } else if (travelOn && travelSurcharge > 0) {
-    const label = "Travel surcharge" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
-    travelRowHtml = `<tr><td>${label}</td><td class="right">${currency(travelSurcharge)}</td></tr>`;
-  } else if (travelOn) {
-    const label = "Travel" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
-    travelRowHtml = `<tr><td>${label}</td><td class="right">Included</td></tr>`;
+  // The top "Service time" tile is worked out straight from the Event
+  // start/end times (e.g. 10:00 -> 14:00 = 4 hrs) instead of the package
+  // + extras breakdown shown further down the quote.
+  const startTimeVal = document.getElementById("eventStartTime").value;
+  const endTimeVal = document.getElementById("eventEndTime").value;
+  let topServiceTimeLabel = serviceTimeSummary;
+  if (startTimeVal && endTimeVal) {
+    const [startH, startM] = startTimeVal.split(":").map(Number);
+    const [endH, endM] = endTimeVal.split(":").map(Number);
+    if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM)) {
+      let diffMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+      if (diffMinutes < 0) diffMinutes += 24 * 60; // handles an event crossing midnight
+      const diffHours = diffMinutes / 60;
+      topServiceTimeLabel = diffHours.toFixed(1).replace(/\.0$/, "") + " hrs";
+    }
   }
+
+  let additionalServiceSectionHtml = "";
+  if (hasExtraHours) {
+    additionalServiceSectionHtml = `
+      <p class="package-service-eyebrow section-spaced">Additional Service</p>
+      <table class="lines">
+        <tr><td>${extraHoursLabel} additional hours @ ${currency(extraHoursCalc.rate)}/hr</td><td class="right">${currency(extraHoursCharge)}</td></tr>
+      </table>`;
+  }
+
+  let travelLabel = "";
+  let travelValue = "";
+  if (travelOn && travelCalc.customQuote) {
+    travelLabel = "Custom travel quote" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
+    travelValue = travelSurcharge > 0 ? currency(travelSurcharge) : "To be confirmed";
+  } else if (travelOn && travelSurcharge > 0) {
+    travelLabel = (suburb ? escapeHtml(suburb) + " — " : "") + `${km}km`;
+    travelValue = currency(travelSurcharge);
+  } else if (travelOn) {
+    travelLabel = (suburb ? escapeHtml(suburb) + " — " : "") + `${km}km (included)`;
+    travelValue = "Included";
+  }
+  const travelSectionHtml = travelLabel
+    ? `
+      <p class="package-service-eyebrow section-spaced">Travel</p>
+      <table class="lines">
+        <tr><td>${travelLabel}</td><td class="right">${travelValue}</td></tr>
+      </table>`
+    : "";
 
   const venueUtilityItems = getVenueInfoItems();
   const venueInfoItemsHtml = venueUtilityItems
     ? venueUtilityItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("\n          ")
     : `<li>Venue utilities to be confirmed with the client</li>`;
 
+  const quoteDocTitle = buildQuoteFilename(clientName, eventDateRaw);
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blend & Brew — Quote for ${escapeHtml(clientName)}</title>
+<title>${escapeHtml(quoteDocTitle)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -2424,6 +2564,7 @@ function buildQuoteDocumentHTML() {
     --gold: #B8823D;
     --rust: #A6472B;
     --line: #E4DCC9;
+    --qscale: 1;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -2473,51 +2614,69 @@ function buildQuoteDocumentHTML() {
     display: flex; flex-direction: column;
     overflow: hidden;
   }
-  .quote-top-spacer { flex: 0 0 auto; min-height: 6px; }
-  .quote-body-spacer { flex: 1 1 auto; min-height: 18px; }
+  .quote-content { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .quote-top-spacer { flex: 0 0 auto; min-height: calc(6px * var(--qscale)); }
+  .quote-body-spacer { flex: 1 1 auto; min-height: calc(18px * var(--qscale)); }
 
-  .quote-meta-row { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; margin-bottom: 34px; border-bottom: 1px dashed var(--line); }
-  .quote-meta-row .quote-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 21px; color: var(--ink); margin: 0; letter-spacing: -0.01em; }
-  .quote-meta-row .quote-for { font-size: 12.5px; color: var(--sub); margin: 4px 0 0; }
-  .prepared-for { margin-top: 4px; }
-  .prepared-for .quote-for { margin: 0; font-size: 11px; }
-  .prepared-for .prepared-line { font-size: 10px; color: var(--sub); margin: 2px 0 0; line-height: 1.4; }
-  .quote-meta-row .issued { font-size: 11px; color: var(--sub); text-align: right; white-space: nowrap; }
+  .quote-meta-row { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: calc(20px * var(--qscale)); margin-bottom: calc(34px * var(--qscale)); border-bottom: 1px dashed var(--line); }
+  .quote-meta-row .quote-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: calc(21px * var(--qscale)); color: var(--ink); margin: 0; letter-spacing: -0.01em; }
+  .quote-meta-row .quote-for { font-size: calc(12.5px * var(--qscale)); color: var(--sub); margin: calc(4px * var(--qscale)) 0 0; }
+  .prepared-for { margin-top: calc(4px * var(--qscale)); }
+  .prepared-for .quote-for { margin: 0; font-size: calc(11px * var(--qscale)); }
+  .prepared-for .prepared-line { font-size: calc(10px * var(--qscale)); color: var(--sub); margin: calc(2px * var(--qscale)) 0 0; line-height: 1.4; }
+  .quote-meta-row .issued { font-size: calc(11px * var(--qscale)); color: var(--sub); text-align: right; white-space: nowrap; }
 
-  .detail-grid { display: grid; grid-template-columns: 1.35fr 1.35fr 1.3fr; gap: 16px; margin-bottom: 66px; }
-  .detail-pair { display: flex; gap: 8px; }
+  .detail-grid { display: grid; grid-template-columns: 1.35fr 1.35fr 1.3fr; gap: calc(16px * var(--qscale)); margin-bottom: calc(66px * var(--qscale)); }
+  .detail-pair { display: flex; gap: calc(8px * var(--qscale)); }
   .detail-pair .detail-item { flex: 1; }
   .detail-item { border-left: 2px solid var(--gold); padding-left: 10px; }
-  .detail-item .d-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 3px; }
-  .detail-item .d-value { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .detail-item .d-label { font-size: calc(9.5px * var(--qscale)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: calc(3px * var(--qscale)); }
+  .detail-item .d-value { font-size: calc(13.5px * var(--qscale)); font-weight: 600; color: var(--ink); }
 
   table.lines { width: 100%; border-collapse: collapse; margin-bottom: 0; }
-  table.lines td { padding: 13px 0; font-size: 13.5px; vertical-align: top; }
-  table.lines td.right { text-align: right; font-weight: 600; white-space: nowrap; padding-left: 16px; }
-  table.lines tr.pkg-row td { font-weight: 600; font-size: 14.5px; }
-  table.lines tr.pkg-row td.right { color: var(--rust); font-size: 15px; }
-  table.lines.total-table { margin-bottom: 22px; flex-shrink: 0; }
-  table.lines tr.total-row td { border-top: 2px solid var(--gold); border-bottom: none; font-weight: 700; padding-top: 14px; padding-bottom: 0; }
-  table.lines tr.total-row td:first-child { font-family: 'Syne', sans-serif; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
-  table.lines tr.total-row td.right { font-size: 21px; color: var(--rust); }
-  .pkg-sub { color: var(--sub); font-weight: 400; font-size: 11.5px; display: block; margin-top: 6px; }
+  table.lines td { padding: calc(13px * var(--qscale)) 0; font-size: calc(13.5px * var(--qscale)); vertical-align: top; }
+  table.lines td.right { text-align: right; font-weight: 600; white-space: nowrap; padding-left: calc(16px * var(--qscale)); }
+  table.lines tr.pkg-row td { font-weight: 600; font-size: calc(14.5px * var(--qscale)); }
+  table.lines tr.pkg-row td.right { color: var(--rust); font-size: calc(15px * var(--qscale)); }
+  table.lines.total-table { margin-bottom: calc(22px * var(--qscale)); flex-shrink: 0; }
+  table.lines tr.total-row td { border-top: 2px solid var(--gold); border-bottom: none; font-weight: 700; padding-top: calc(14px * var(--qscale)); padding-bottom: 0; }
+  table.lines tr.total-row td:first-child { font-family: 'Syne', sans-serif; font-size: calc(13px * var(--qscale)); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+  table.lines tr.total-row td.right { font-size: calc(21px * var(--qscale)); color: var(--rust); }
+  .pkg-sub { color: var(--sub); font-weight: 400; font-size: calc(11.5px * var(--qscale)); display: block; margin-top: calc(6px * var(--qscale)); }
 
-  .dark-card { background: #F3E9D2; border: 1px solid #DCC79A; border-radius: 10px; padding: 13px 16px; }
-  .dark-card h3 { font-family: 'Syne', sans-serif; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 7px; }
-  .dark-card ul { margin: 0; padding-left: 14px; font-size: 12px; line-height: 1.5; color: var(--ink); }
+  .package-service-eyebrow { font-family: 'Syne', sans-serif; font-weight: 700; font-size: calc(10.5px * var(--qscale)); letter-spacing: 0.09em; text-transform: uppercase; color: var(--gold); margin: 0 0 calc(10px * var(--qscale)); }
+  .package-service-eyebrow.section-spaced { margin-top: calc(16px * var(--qscale)); }
+  .pkg-inclusions-label { font-size: calc(12px * var(--qscale)); color: var(--sub); font-weight: 400; line-height: 1.4; margin: calc(8px * var(--qscale)) 0 0; }
+  .pkg-inclusions { list-style: none; margin: calc(5px * var(--qscale)) 0 0; padding: 0; }
+  .pkg-inclusions li {
+    position: relative; padding-left: 15px; margin-top: calc(5px * var(--qscale));
+    font-size: calc(12px * var(--qscale)); color: var(--sub); font-weight: 400; line-height: 1.4;
+  }
+  .pkg-inclusions li::before {
+    content: ""; position: absolute; left: 0; top: calc(6px * var(--qscale));
+    width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
+  }
+
+  .dark-card { background: #F3E9D2; border: 1px solid #DCC79A; border-radius: 10px; padding: calc(13px * var(--qscale)) calc(16px * var(--qscale)); }
+  .dark-card h3 { font-family: 'Syne', sans-serif; font-size: calc(10.5px * var(--qscale)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 calc(7px * var(--qscale)); }
+  .dark-card ul { margin: 0; padding-left: 14px; font-size: calc(12px * var(--qscale)); line-height: 1.5; color: var(--ink); }
   .dark-card li::marker { color: var(--gold); }
-  .dark-card li.note-line { list-style: none; margin: 7px 0 0 -14px; padding-top: 7px; border-top: 1px dashed #DCC79A; font-size: 11px; color: var(--sub); font-style: italic; }
+  .dark-card li.note-line { list-style: none; margin: calc(7px * var(--qscale)) 0 0 -14px; padding-top: calc(7px * var(--qscale)); border-top: 1px dashed #DCC79A; font-size: calc(11px * var(--qscale)); color: var(--sub); font-style: italic; }
 
-  .two-col-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; margin: 0; flex-shrink: 0; }
+  .two-col-cards { display: grid; grid-template-columns: 1fr 1fr; gap: calc(18px * var(--qscale)); align-items: stretch; margin: 0; flex-shrink: 0; }
   .two-col-cards .dark-card { height: 100%; box-sizing: border-box; }
   @media (max-width: 560px) { .two-col-cards { grid-template-columns: 1fr; } }
 
-  .validity-note { font-size: 11px; color: var(--sub); font-style: italic; line-height: 1.6; margin: 0 0 16px; flex-shrink: 0; }
+  .validity-note { font-size: calc(11px * var(--qscale)); color: var(--sub); font-style: italic; line-height: 1.6; margin: 0 0 calc(16px * var(--qscale)); flex-shrink: 0; }
 
-  .payment-grid { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; row-gap: 6px; }
+  .payment-card-body { display: flex; align-items: center; justify-content: space-between; gap: calc(14px * var(--qscale)); }
+  .payment-grid { flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: auto 1fr; column-gap: calc(14px * var(--qscale)); row-gap: calc(6px * var(--qscale)); }
   .payment-item { display: contents; }
-  .payment-item .p-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); align-self: center; }
-  .payment-item .p-value { font-size: 11.5px; font-weight: 600; color: var(--ink); text-align: right; align-self: center; }
+  .payment-item .p-label { font-size: calc(9.5px * var(--qscale)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); align-self: center; }
+  .payment-item .p-value { font-size: calc(11.5px * var(--qscale)); font-weight: 600; color: var(--ink); text-align: right; align-self: center; }
+  .payment-qr { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .payment-qr-img { width: 62px; height: 62px; border-radius: 6px; background: #fff; padding: 3px; border: 1px solid #DCC79A; display: block; }
+  .payment-qr-caption { font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sub); text-align: center; white-space: nowrap; }
 
   .no-print { text-align: center; margin: 18px auto; max-width: 720px; }
   .no-print button {
@@ -2554,6 +2713,7 @@ function buildQuoteDocumentHTML() {
     </div>
 
     <div class="body-pad">
+      <div class="quote-content">
 
       <div class="quote-top-spacer"></div>
 
@@ -2574,18 +2734,26 @@ function buildQuoteDocumentHTML() {
         <div class="detail-item"><div class="d-label">Event date</div><div class="d-value">${escapeHtml(eventDateStr)}</div></div>
         <div class="detail-item"><div class="d-label">Event type</div><div class="d-value">${escapeHtml(eventType)}</div></div>
         <div class="detail-pair">
-          <div class="detail-item"><div class="d-label">Duration</div><div class="d-value">${escapeHtml(durationStr)}</div></div>
-          <div class="detail-item"><div class="d-label">Guests served</div><div class="d-value">${coffees} coffees</div></div>
+          <div class="detail-item"><div class="d-label">Allowance</div><div class="d-value">${coffees} coffees</div></div>
+          <div class="detail-item"><div class="d-label">Service time</div><div class="d-value">${escapeHtml(topServiceTimeLabel)}</div></div>
         </div>
       </div>
 
+      <p class="package-service-eyebrow">Package Service</p>
       <table class="lines">
         <tr class="pkg-row">
-          <td>${escapeHtml(packageName)}<span class="pkg-sub">${coffees} coffees &middot; two certified baristas, setup &amp; dismantling included</span></td>
+          <td>
+            ${escapeHtml(packageName)} — ${coffees} coffees / ${includedHoursLabel} hours
+            <p class="pkg-inclusions-label">Inclusive:</p>
+            <ul class="pkg-inclusions">
+              ${inclusionItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("\n              ")}
+            </ul>
+          </td>
           <td class="right">${currency(bookingPrice)}</td>
         </tr>
-        ${travelRowHtml}
       </table>
+      ${additionalServiceSectionHtml}
+      ${travelSectionHtml}
 
       <div class="quote-body-spacer"></div>
 
@@ -2605,15 +2773,22 @@ function buildQuoteDocumentHTML() {
 
         <div class="dark-card payment-card">
           <h3>Payment details</h3>
-          <div class="payment-grid">
-            <div class="payment-item"><div class="p-label">Account name</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NAME}</div></div>
-            <div class="payment-item"><div class="p-label">BSB</div><div class="p-value">${QUOTE_PAYMENT_BSB}</div></div>
-            <div class="payment-item"><div class="p-label">Account number</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NUMBER}</div></div>
-            <div class="payment-item"><div class="p-label">Reference</div><div class="p-value">${escapeHtml(referenceValue)}</div></div>
+          <div class="payment-card-body">
+            <div class="payment-grid">
+              <div class="payment-item"><div class="p-label">Account name</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NAME}</div></div>
+              <div class="payment-item"><div class="p-label">BSB</div><div class="p-value">${QUOTE_PAYMENT_BSB}</div></div>
+              <div class="payment-item"><div class="p-label">Account number</div><div class="p-value">${QUOTE_PAYMENT_ACCOUNT_NUMBER}</div></div>
+              <div class="payment-item"><div class="p-label">Reference</div><div class="p-value">${escapeHtml(referenceValue)}</div></div>
+            </div>
+            <div class="payment-qr">
+              <img class="payment-qr-img" src="${paymentQrUrl}" alt="Scan to pay online">
+              <span class="payment-qr-caption">Scan to pay</span>
+            </div>
           </div>
         </div>
       </div>
 
+      </div>
     </div>
 
     <div class="wood-band wood-band-foot">
@@ -2627,6 +2802,30 @@ function buildQuoteDocumentHTML() {
     </div>
 
   </div>
+
+  <script>
+    (function () {
+      function fitQuoteDocument() {
+        var bodyPad = document.querySelector('.body-pad');
+        var root = document.documentElement;
+        if (!bodyPad) return;
+        var minScale = 0.62;
+        var scale = 1;
+        root.style.setProperty('--qscale', '1');
+        for (var i = 0; i < 12; i++) {
+          var available = bodyPad.clientHeight;
+          var needed = bodyPad.scrollHeight;
+          if (needed <= available + 1 || scale <= minScale) break;
+          scale = Math.max(minScale, scale * (available / needed) * 0.985);
+          root.style.setProperty('--qscale', scale.toFixed(3));
+        }
+      }
+      window.addEventListener('load', fitQuoteDocument);
+      window.addEventListener('resize', fitQuoteDocument);
+      window.addEventListener('beforeprint', fitQuoteDocument);
+      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitQuoteDocument); }
+    })();
+  <\/script>
 </body>
 </html>`;
 }
@@ -2641,6 +2840,9 @@ function openQuoteWindow() {
   win.document.open();
   win.document.write(html);
   win.document.close();
+  const clientName = document.getElementById("clientName").value.trim() || "Client";
+  const eventDateRaw = document.getElementById("eventDate").value;
+  win.document.title = buildQuoteFilename(clientName, eventDateRaw);
 }
 
 document.getElementById("generate-quote-btn").addEventListener("click", openQuoteWindow);
@@ -2660,16 +2862,25 @@ function buildQuoteSummaryText() {
   const duration = num("eventDuration");
   const coffees = num("coffeeCap");
   const bookingPrice = num("bookingPrice");
+  const includedHours = num("packageIncludedHours");
+  const includedHoursLabel = includedHours ? includedHours.toFixed(1).replace(/\.0$/, "") : "0";
   const packageNameEl = selectedPackage
     ? document.querySelector(`.package-option[data-package="${selectedPackage}"] .package-name`)
     : null;
   const packageName = packageNameEl ? packageNameEl.textContent : "Custom estimate";
+  const inclusionItems = buildInclusionItems(coffees);
 
   const travelSurchargeCalc = computeTravelSurcharge();
   const travelSurcharge = travelOn ? travelSurchargeCalc.surcharge : 0;
+  const extraHoursCalc = computeExtraHoursCharge();
+  const extraHoursCharge = extraHoursOn ? extraHoursCalc.charge : 0;
+  const hasExtraHours = extraHoursOn && extraHoursCharge > 0;
+  const extraHoursLabel = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
+  const totalServiceHours = hasExtraHours ? includedHours + extraHoursCalc.extraHours : duration;
+  const totalServiceHoursLabel = totalServiceHours.toFixed(1).replace(/\.0$/, "");
   const suburb = document.getElementById("eventSuburb").value.trim();
   const km = num("travelChargeKm");
-  const total = bookingPrice + travelSurcharge;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge;
 
   const lines = [];
   lines.push("BLEND & BREW — EVENT QUOTE");
@@ -2680,18 +2891,32 @@ function buildQuoteSummaryText() {
   if (contact) lines.push(`Contact: ${contact}`);
   lines.push(`Event type: ${eventType}`);
   lines.push(`Event date: ${eventDateStr}`);
-  lines.push(`Event duration: ${duration} hrs`);
+  lines.push(`Coffee allowance: ${coffees} coffees`);
   lines.push("");
-  lines.push(`Package: ${packageName} (${coffees} coffees)`);
-  lines.push(`Package price: ${currency(bookingPrice)}`);
+  lines.push("PACKAGE SERVICE");
+  lines.push(`${packageName} — ${includedHoursLabel} hours: ${currency(bookingPrice)}`);
+  lines.push("Inclusive:");
+  inclusionItems.forEach((item) => lines.push(`- ${item}`));
+  if (hasExtraHours) {
+    lines.push("");
+    lines.push("ADDITIONAL SERVICE");
+    lines.push(`${extraHoursLabel} additional hours @ ${currency(extraHoursCalc.rate)}/hr: ${currency(extraHoursCharge)}`);
+  }
   if (travelOn && travelSurchargeCalc.customQuote) {
+    lines.push("");
+    lines.push("TRAVEL");
     lines.push(`Custom travel quote${suburb ? " — " + suburb : ""} (${km}km): ${travelSurcharge > 0 ? currency(travelSurcharge) : "to be confirmed"}`);
   } else if (travelOn && travelSurcharge > 0) {
-    lines.push(`Travel surcharge${suburb ? " — " + suburb : ""} (${km}km): ${currency(travelSurcharge)}`);
+    lines.push("");
+    lines.push("TRAVEL");
+    lines.push(`${suburb ? suburb + " — " : ""}${km}km: ${currency(travelSurcharge)}`);
   } else if (travelOn) {
-    lines.push(`Travel${suburb ? " — " + suburb : ""} (${km}km): included, no surcharge`);
+    lines.push("");
+    lines.push("TRAVEL");
+    lines.push(`${suburb ? suburb + " — " : ""}${km}km: included, no surcharge`);
   }
   lines.push("");
+  lines.push(`TOTAL SERVICE TIME: ${totalServiceHoursLabel} HOURS`);
   lines.push(`TOTAL: ${currency(total)}`);
   lines.push("");
   lines.push("VENUE INFORMATION");
@@ -2750,6 +2975,77 @@ function copyQuoteText() {
   }
 }
 document.getElementById("copy-quote-btn").addEventListener("click", copyQuoteText);
+
+// ---- Payment link (Square checkout page) ----
+// TODO: replace with the live payment page URL once payment.html is
+// deployed to the domain (e.g. https://www.blendandbrew.com.au/payment.html).
+const PAYMENT_PAGE_URL = "https://www.blendandbrew.com.au/payment.html";
+
+function buildPaymentLink() {
+  const clientName = document.getElementById("clientName").value.trim() || "Client";
+  const bookingNumber = document.getElementById("bookingNumber").value.trim();
+  const referenceValue = bookingNumber || clientName;
+
+  const bookingPrice = num("bookingPrice");
+  const travelSurchargeCalc = computeTravelSurcharge();
+  const travelSurcharge = travelOn ? travelSurchargeCalc.surcharge : 0;
+  const extraHoursCalc = computeExtraHoursCharge();
+  const extraHoursCharge = extraHoursOn ? extraHoursCalc.charge : 0;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+
+  const eventDate = document.getElementById("eventDate").value;
+  const location = document.getElementById("customerAddress").value.trim()
+    || document.getElementById("eventSuburb").value.trim();
+  const startTime = document.getElementById("eventStartTime").value;
+  const endTime = document.getElementById("eventEndTime").value;
+
+  const params = new URLSearchParams();
+  params.set("amount", total.toFixed(2));
+  params.set("ref", referenceValue);
+  params.set("name", clientName);
+  if (eventDate) params.set("date", eventDate);
+  if (location) params.set("location", location);
+  if (startTime) params.set("start", startTime);
+  if (endTime) params.set("end", endTime);
+
+  return `${PAYMENT_PAGE_URL}?${params.toString()}`;
+}
+
+function copyPaymentLink() {
+  const link = buildPaymentLink();
+  const btn = document.getElementById("copy-payment-link-btn");
+  const label = btn ? btn.querySelector(".copy-btn-label") : null;
+
+  function finish(ok) {
+    if (!btn || !label) return;
+    btn.classList.toggle("copied", ok);
+    label.textContent = ok ? "Copied!" : "Copy failed — try again";
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      label.textContent = "Copy payment link";
+    }, 1800);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => finish(true)).catch(() => finish(false));
+  } else {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = link;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      finish(true);
+    } catch (e) {
+      finish(false);
+    }
+  }
+}
+document.getElementById("copy-payment-link-btn").addEventListener("click", copyPaymentLink);
 
 document.getElementById("bookingSheetSelect").addEventListener("change", (e) => {
   const idx = e.target.value;
