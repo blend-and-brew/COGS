@@ -2403,6 +2403,13 @@ function escapeHtml(str) {
   }[c]));
 }
 
+// UTF-8 safe base64 encode — used to tuck a lightweight copy of the quote
+// into the payment link's URL, so payment.html can offer a "view quote"
+// link without needing anywhere to store it.
+function toBase64Utf8(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
 // Builds the suggested filename for the quote tab/PDF, e.g.
 // "Blend and Brew Quote - Test_2026-08-04". The browser's "Print > Save as
 // PDF" dialog uses the document's <title> as its default filename, so this
@@ -2591,21 +2598,20 @@ function buildQuoteDocumentHTML() {
   .wood-band::before {
     content: ""; position: absolute; inset: 0;
   }
-  .wood-band-head { padding: 26px 40px; flex-shrink: 0; }
+  .wood-band-head { padding: 22px 40px; flex-shrink: 0; }
   .wood-band-head::before { background: linear-gradient(100deg, rgba(18,12,6,0.62) 0%, rgba(18,12,6,0.30) 45%, rgba(18,12,6,0.08) 100%); }
-  .wood-band-head-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .wood-band-head img.square-logo { height: 67px; width: 67px; object-fit: contain; display: block; flex-shrink: 0; }
+  .wood-band-head-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .wood-band-head img.square-logo { height: 80px; width: 80px; object-fit: contain; display: block; flex-shrink: 0; }
   .wood-band-head-tagline { text-align: right; }
   .wood-band-head-tagline .eyebrow { font-family: 'Inter', sans-serif; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #E9DFC7; opacity: 0.85; margin: 0 0 3px; }
   .wood-band-head-tagline .doc-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: #fff; margin: 0; letter-spacing: -0.005em; }
 
-  .wood-band-foot { padding: 18px 40px 14px; text-align: center; flex-shrink: 0; }
+  .wood-band-foot { padding: 17px 40px 13px; text-align: center; flex-shrink: 0; }
   .wood-band-foot::before { background: rgba(15,10,5,0.58); }
   .wood-band-foot-inner { position: relative; z-index: 1; }
-  .wood-band-foot img.linear-logo { height: 26px; width: auto; display: inline-block; opacity: 0.96; }
+  .wood-band-foot img.linear-logo { height: 25px; width: auto; display: inline-block; opacity: 0.96; }
   .wood-band-foot .foot-meta { margin-top: 8px; font-size: 10.5px; letter-spacing: 0.02em; color: #D9CDAE; line-height: 1.4; }
   .wood-band-foot .foot-meta strong { color: #F0E6CC; font-weight: 600; }
-  .wood-band-foot .foot-meta .foot-abn { margin-bottom: 2px; }
 
   /* ---- Body ---- */
   .body-pad {
@@ -2618,7 +2624,7 @@ function buildQuoteDocumentHTML() {
   .quote-top-spacer { flex: 0 0 auto; min-height: calc(6px * var(--qscale)); }
   .quote-body-spacer { flex: 1 1 auto; min-height: calc(18px * var(--qscale)); }
 
-  .quote-meta-row { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: calc(20px * var(--qscale)); margin-bottom: calc(34px * var(--qscale)); border-bottom: 1px dashed var(--line); }
+  .quote-meta-row { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: calc(20px * var(--qscale)); margin-bottom: calc(16px * var(--qscale)); border-bottom: 1px dashed var(--line); }
   .quote-meta-row .quote-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: calc(21px * var(--qscale)); color: var(--ink); margin: 0; letter-spacing: -0.01em; }
   .quote-meta-row .quote-for { font-size: calc(12.5px * var(--qscale)); color: var(--sub); margin: calc(4px * var(--qscale)) 0 0; }
   .prepared-for { margin-top: calc(4px * var(--qscale)); }
@@ -2626,7 +2632,7 @@ function buildQuoteDocumentHTML() {
   .prepared-for .prepared-line { font-size: calc(10px * var(--qscale)); color: var(--sub); margin: calc(2px * var(--qscale)) 0 0; line-height: 1.4; }
   .quote-meta-row .issued { font-size: calc(11px * var(--qscale)); color: var(--sub); text-align: right; white-space: nowrap; }
 
-  .detail-grid { display: grid; grid-template-columns: 1.35fr 1.35fr 1.3fr; gap: calc(16px * var(--qscale)); margin-bottom: calc(66px * var(--qscale)); }
+  .detail-grid { display: grid; grid-template-columns: 1.35fr 1.35fr 1.3fr; gap: calc(16px * var(--qscale)); margin-bottom: calc(46px * var(--qscale)); }
   .detail-pair { display: flex; gap: calc(8px * var(--qscale)); }
   .detail-pair .detail-item { flex: 1; }
   .detail-item { border-left: 2px solid var(--gold); padding-left: 10px; }
@@ -2684,6 +2690,15 @@ function buildQuoteDocumentHTML() {
     padding: 9px 18px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif;
   }
   .no-print button:hover { background: #A5732F; }
+  .no-print .icon-copy-btn {
+    border: none; background: transparent; padding: 6px; margin: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--sub); opacity: 0.7; border-radius: 6px;
+    transition: opacity .15s ease, color .15s ease, background .15s ease;
+  }
+  .no-print .icon-copy-btn svg { width: 16px; height: 16px; display: block; }
+  .no-print .icon-copy-btn:hover { opacity: 1; color: var(--ink); background: rgba(140,129,113,0.14); }
+  .no-print .icon-copy-btn.copied { opacity: 1; color: var(--gold); }
 
   @page { size: A4 portrait; margin: 0; }
   @media print {
@@ -2699,7 +2714,16 @@ function buildQuoteDocumentHTML() {
 </style>
 </head>
 <body>
-  <div class="no-print"><button onclick="window.print()">Print / Save as PDF</button></div>
+  <div class="no-print">
+    <button onclick="window.print()">Print / Save as PDF</button>
+    <button id="visitPaymentLinkBtn" style="margin-left:8px;">Visit Payment Link</button>
+    <div id="paymentLinkRow" style="display:flex;margin-top:12px;justify-content:center;gap:8px;align-items:center;">
+      <input type="text" id="paymentLinkField" readonly value="${paymentLink}" style="width:min(520px,80%);padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:12px;font-family:'Inter',sans-serif;">
+      <button id="copyPaymentLinkBtn" class="icon-copy-btn" title="Copy payment link" aria-label="Copy payment link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+  </div>
   <div class="sheet">
 
     <div class="wood-band wood-band-head">
@@ -2794,10 +2818,7 @@ function buildQuoteDocumentHTML() {
     <div class="wood-band wood-band-foot">
       <div class="wood-band-foot-inner">
         <img class="linear-logo" src="${QUOTE_LINEAR_LOGO}" alt="Blend & Brew">
-        <div class="foot-meta">
-          <div class="foot-abn"><strong>ABN ${QUOTE_ABN}</strong></div>
-          <div>blendandbrew@hotmail.com.au &middot; Greater Sydney, NSW</div>
-        </div>
+        <div class="foot-meta">ABN ${QUOTE_ABN} &middot; <strong>blendandbrew@hotmail.com.au</strong> &middot; Greater Sydney, NSW</div>
       </div>
     </div>
 
@@ -2805,6 +2826,29 @@ function buildQuoteDocumentHTML() {
 
   <script>
     (function () {
+      var showBtn = document.getElementById('visitPaymentLinkBtn');
+      var copyBtn = document.getElementById('copyPaymentLinkBtn');
+      var paymentLinkRow = document.getElementById('paymentLinkRow');
+      var paymentLinkField = document.getElementById('paymentLinkField');
+      if (showBtn) {
+        showBtn.addEventListener('click', function () {
+          window.open(paymentLinkField.value, '_blank');
+        });
+      }
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+          paymentLinkField.select();
+          paymentLinkField.setSelectionRange(0, 99999);
+          try { navigator.clipboard.writeText(paymentLinkField.value); } catch (e) { document.execCommand('copy'); }
+          copyBtn.classList.add('copied');
+          copyBtn.setAttribute('title', 'Copied!');
+          setTimeout(function () {
+            copyBtn.classList.remove('copied');
+            copyBtn.setAttribute('title', 'Copy payment link');
+          }, 1500);
+        });
+      }
+
       function fitQuoteDocument() {
         var bodyPad = document.querySelector('.body-pad');
         var root = document.documentElement;
@@ -2826,6 +2870,185 @@ function buildQuoteDocumentHTML() {
       if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitQuoteDocument); }
     })();
   <\/script>
+</body>
+</html>`;
+}
+
+// Compact, image-free version of the quote — used to embed a "view quote"
+// copy directly inside the payment link (see buildPaymentLink()), since the
+// full styled quote's embedded logos/textures are far too large for a URL.
+function buildQuoteViewHTML() {
+  const clientName = document.getElementById("clientName").value.trim() || "—";
+  const organisation = document.getElementById("clientOrganisation").value.trim();
+  const clientPhone = formatQuotePhone(document.getElementById("clientPhone").value.trim());
+  const clientEmail = document.getElementById("clientEmail").value.trim();
+  const contact = [clientPhone, clientEmail].filter(Boolean).join(" · ");
+  const preparedAddress = document.getElementById("customerAddress").value.trim();
+  const eventType = getEventTypeValue() || "—";
+  const eventDateRaw = document.getElementById("eventDate").value;
+  const eventDateStr = formatQuoteEventDate(eventDateRaw);
+  const coffees = num("coffeeCap");
+  const bookingPrice = num("bookingPrice");
+  const includedHours = num("packageIncludedHours");
+  const includedHoursLabel = includedHours ? includedHours.toFixed(1).replace(/\.0$/, "") : "0";
+
+  const packageNameEl = selectedPackage
+    ? document.querySelector(`.package-option[data-package="${selectedPackage}"] .package-name`)
+    : null;
+  const packageName = packageNameEl ? packageNameEl.textContent : "Custom estimate";
+  const inclusionItems = buildInclusionItems(coffees);
+
+  const travelCalc = computeTravelSurcharge();
+  const travelSurcharge = travelOn ? travelCalc.surcharge : 0;
+  const extraHoursCalc = computeExtraHoursCharge();
+  const extraHoursCharge = extraHoursOn ? extraHoursCalc.charge : 0;
+  const hasExtraHours = extraHoursOn && extraHoursCharge > 0;
+  const extraHoursLabel = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
+  const suburb = document.getElementById("eventSuburb").value.trim();
+  const km = num("travelChargeKm");
+  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+  const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+
+  const startTimeVal = document.getElementById("eventStartTime").value;
+  const endTimeVal = document.getElementById("eventEndTime").value;
+  let topServiceTimeLabel = includedHoursLabel + " hrs";
+  if (startTimeVal && endTimeVal) {
+    const [startH, startM] = startTimeVal.split(":").map(Number);
+    const [endH, endM] = endTimeVal.split(":").map(Number);
+    if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM)) {
+      let diffMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+      if (diffMinutes < 0) diffMinutes += 24 * 60;
+      topServiceTimeLabel = (diffMinutes / 60).toFixed(1).replace(/\.0$/, "") + " hrs";
+    }
+  }
+
+  let additionalServiceHtml = "";
+  if (hasExtraHours) {
+    additionalServiceHtml = `
+      <p class="qv-eyebrow">Additional Service</p>
+      <table class="qv-lines"><tr><td>${extraHoursLabel} additional hours @ ${currency(extraHoursCalc.rate)}/hr</td><td class="right">${currency(extraHoursCharge)}</td></tr></table>`;
+  }
+
+  let travelHtml = "";
+  if (travelOn && travelCalc.customQuote) {
+    const label = "Custom travel quote" + (suburb ? " — " + escapeHtml(suburb) : "") + ` (${km}km)`;
+    const value = travelSurcharge > 0 ? currency(travelSurcharge) : "To be confirmed";
+    travelHtml = `<p class="qv-eyebrow">Travel</p><table class="qv-lines"><tr><td>${label}</td><td class="right">${value}</td></tr></table>`;
+  } else if (travelOn && travelSurcharge > 0) {
+    const label = (suburb ? escapeHtml(suburb) + " — " : "") + `${km}km`;
+    travelHtml = `<p class="qv-eyebrow">Travel</p><table class="qv-lines"><tr><td>${label}</td><td class="right">${currency(travelSurcharge)}</td></tr></table>`;
+  } else if (travelOn) {
+    const label = (suburb ? escapeHtml(suburb) + " — " : "") + `${km}km (included)`;
+    travelHtml = `<p class="qv-eyebrow">Travel</p><table class="qv-lines"><tr><td>${label}</td><td class="right">Included</td></tr></table>`;
+  }
+
+  const venueUtilityItems = getVenueInfoItems();
+  const venueInfoItemsHtml = venueUtilityItems
+    ? venueUtilityItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
+    : `<li>Venue utilities to be confirmed with the client</li>`;
+
+  const quoteDocTitle = buildQuoteFilename(clientName, eventDateRaw);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(quoteDocTitle)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#FBF9F4; --ink:#241C14; --sub:#8C8171; --gold:#B8823D; --rust:#A6472B; --line:#E4DCC9; --walnut:#13110F; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Inter',sans-serif; background:#EFE9DC; color:var(--ink); -webkit-font-smoothing:antialiased; }
+  .sheet { max-width:640px; margin:32px auto; background:var(--paper); border-radius:14px; overflow:hidden; box-shadow:0 24px 60px rgba(36,28,20,0.16); }
+  .qv-band { background:var(--walnut); color:#F0E6CC; padding:22px 34px; text-align:center; }
+  .qv-band .brand { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; letter-spacing:-0.01em; color:#fff; }
+  .qv-band .tag { font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; opacity:0.75; margin-top:4px; }
+  .qv-body { padding:30px 34px; }
+  .qv-title { font-family:'Syne',sans-serif; font-weight:700; font-size:19px; margin:0 0 4px; }
+  .qv-for { font-size:12px; color:var(--sub); margin:0 0 2px; }
+  .qv-line { font-size:10.5px; color:var(--sub); margin:2px 0 0; line-height:1.4; }
+  .qv-meta-row { display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:16px; margin-bottom:16px; border-bottom:1px dashed var(--line); }
+  .qv-issued { font-size:10.5px; color:var(--sub); text-align:right; white-space:nowrap; }
+  .qv-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:26px; }
+  .qv-detail-item { border-left:2px solid var(--gold); padding-left:9px; }
+  .qv-detail-item .d-label { font-size:9px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sub); margin-bottom:3px; }
+  .qv-detail-item .d-value { font-size:12.5px; font-weight:600; }
+  .qv-eyebrow { font-family:'Syne',sans-serif; font-weight:700; font-size:10px; letter-spacing:0.09em; text-transform:uppercase; color:var(--gold); margin:18px 0 8px; }
+  table.qv-lines { width:100%; border-collapse:collapse; }
+  table.qv-lines td { padding:10px 0; font-size:12.5px; vertical-align:top; }
+  table.qv-lines td.right { text-align:right; font-weight:600; white-space:nowrap; padding-left:14px; }
+  .qv-pkg-row td { font-weight:600; font-size:13.5px; }
+  .qv-pkg-row td.right { color:var(--rust); font-size:14px; }
+  .qv-inclusions { list-style:none; margin:6px 0 0; padding:0; }
+  .qv-inclusions li { position:relative; padding-left:14px; margin-top:4px; font-size:11px; color:var(--sub); line-height:1.4; }
+  .qv-inclusions li::before { content:""; position:absolute; left:0; top:6px; width:4px; height:4px; border-radius:50%; background:var(--gold); }
+  .qv-total-table { margin-top:14px; }
+  .qv-total-table tr td { border-top:2px solid var(--gold); font-weight:700; padding-top:12px; }
+  .qv-total-table tr td:first-child { font-family:'Syne',sans-serif; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; }
+  .qv-total-table tr td.right { font-size:19px; color:var(--rust); }
+  .qv-note { font-size:10.5px; color:var(--sub); font-style:italic; line-height:1.6; margin:16px 0; }
+  .qv-card { background:#F3E9D2; border:1px solid #DCC79A; border-radius:10px; padding:13px 16px; margin-top:16px; }
+  .qv-card h3 { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); margin:0 0 7px; }
+  .qv-card ul { margin:0; padding-left:14px; font-size:11.5px; line-height:1.5; }
+  .qv-foot { text-align:center; padding:16px 34px 22px; font-size:10px; color:var(--sub); border-top:1px dashed var(--line); }
+  @media print { body { background:#fff; } .sheet { box-shadow:none; margin:0; border-radius:0; } }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="qv-band">
+      <div class="brand">Blend &amp; Brew</div>
+      <div class="tag">Mobile Coffee Wagon · Greater Sydney, NSW</div>
+    </div>
+    <div class="qv-body">
+      <div class="qv-meta-row">
+        <div>
+          <p class="qv-title">Event Quote</p>
+          <p class="qv-for">Prepared for ${escapeHtml(clientName)}</p>
+          ${organisation ? `<p class="qv-line">${escapeHtml(organisation)}</p>` : ""}
+          ${preparedAddress ? `<p class="qv-line">${escapeHtml(preparedAddress)}</p>` : ""}
+          ${contact ? `<p class="qv-line">${escapeHtml(contact)}</p>` : ""}
+        </div>
+        <div class="qv-issued">Issued<br>${issueDate}</div>
+      </div>
+
+      <div class="qv-detail-grid">
+        <div class="qv-detail-item"><div class="d-label">Event date</div><div class="d-value">${escapeHtml(eventDateStr)}</div></div>
+        <div class="qv-detail-item"><div class="d-label">Event type</div><div class="d-value">${escapeHtml(eventType)}</div></div>
+        <div class="qv-detail-item"><div class="d-label">Allowance</div><div class="d-value">${coffees} coffees</div></div>
+        <div class="qv-detail-item"><div class="d-label">Service time</div><div class="d-value">${escapeHtml(topServiceTimeLabel)}</div></div>
+      </div>
+
+      <p class="qv-eyebrow" style="margin-top:0;">Package Service</p>
+      <table class="qv-lines">
+        <tr class="qv-pkg-row">
+          <td>
+            ${escapeHtml(packageName)} — ${coffees} coffees / ${includedHoursLabel} hours
+            <ul class="qv-inclusions">
+              ${inclusionItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+            </ul>
+          </td>
+          <td class="right">${currency(bookingPrice)}</td>
+        </tr>
+      </table>
+      ${additionalServiceHtml}
+      ${travelHtml}
+
+      <table class="qv-lines qv-total-table">
+        <tr><td>Total</td><td class="right">${currency(total)}</td></tr>
+      </table>
+
+      <p class="qv-note">Payment in full is required to secure your booking date and services.</p>
+
+      <div class="qv-card">
+        <h3>Venue information</h3>
+        <ul>${venueInfoItemsHtml}</ul>
+      </div>
+    </div>
+    <div class="qv-foot">Blend &amp; Brew · ABN ${QUOTE_ABN} · blendandbrew@hotmail.com.au</div>
+  </div>
 </body>
 </html>`;
 }
@@ -3007,6 +3230,7 @@ function buildPaymentLink() {
   if (location) params.set("location", location);
   if (startTime) params.set("start", startTime);
   if (endTime) params.set("end", endTime);
+  params.set("q", toBase64Utf8(buildQuoteViewHTML()));
 
   return `${PAYMENT_PAGE_URL}?${params.toString()}`;
 }
