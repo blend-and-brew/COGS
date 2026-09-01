@@ -2495,7 +2495,7 @@ function buildQuoteDocumentHTML() {
   const suburb = document.getElementById("eventSuburb").value.trim();
   const km = num("travelChargeKm");
   const total = bookingPrice + travelSurcharge + extraHoursCharge;
-  const paymentLink = buildPaymentLink();
+  const paymentLink = buildPaymentLink({ includeQuote: false });
   const paymentQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(paymentLink)}`;
   const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
   const serviceTimeSummary = hasExtraHours
@@ -3204,7 +3204,7 @@ document.getElementById("copy-quote-btn").addEventListener("click", copyQuoteTex
 // deployed to the domain (e.g. https://www.blendandbrew.com.au/payment.html).
 const PAYMENT_PAGE_URL = "https://www.blendandbrew.com.au/payment.html";
 
-function buildPaymentLink() {
+function buildPaymentLink({ includeQuote = true } = {}) {
   const clientName = document.getElementById("clientName").value.trim() || "Client";
   const bookingNumber = document.getElementById("bookingNumber").value.trim();
   const referenceValue = bookingNumber || clientName;
@@ -3230,7 +3230,12 @@ function buildPaymentLink() {
   if (location) params.set("location", location);
   if (startTime) params.set("start", startTime);
   if (endTime) params.set("end", endTime);
-  params.set("q", toBase64Utf8(buildQuoteViewHTML()));
+  // Embedding the quote (&q=...) makes the URL far too long to encode as a
+  // QR code, so it's left out when this link feeds the quote's own QR code
+  // — the client viewing the quote doesn't need a link back to itself.
+  // It's still included for the "Copy payment link" button, so that link
+  // is self-contained when shared elsewhere (e.g. text message).
+  if (includeQuote) params.set("q", toBase64Utf8(buildQuoteViewHTML()));
 
   return `${PAYMENT_PAGE_URL}?${params.toString()}`;
 }
