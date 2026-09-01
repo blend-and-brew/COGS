@@ -2497,6 +2497,12 @@ function buildQuoteDocumentHTML() {
   const km = num("travelChargeKm");
   const total = bookingPrice + travelSurcharge + extraHoursCharge;
   const paymentLink = buildPaymentLink({ includeQuote: false });
+  // This quote document previews its own payment link for testing — it can't
+  // also embed *itself* inside that link (that would recurse forever), so
+  // this preview copy intentionally skips the "view quote" embed. The real
+  // "Copy payment link" button on the dashboard still embeds the quote fine,
+  // since it only calls buildQuoteDocumentHTML() once.
+  const paymentLinkWithQuote = paymentLink;
   const paymentLinkWithQuote = buildPaymentLink({ includeQuote: true });
   const paymentQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(paymentLink)}`;
   const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
