@@ -475,7 +475,10 @@
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           <span class="card-title">Booking Quote</span>
         </div>
-        <button type="button" class="icon-clear-btn" id="clearBookingQuote" title="Clear booking quote fields" aria-label="Clear booking quote fields">Clear section</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="icon-clear-btn" id="openBookingBook" title="Open the Booking Book spreadsheet" aria-label="Open the Booking Book spreadsheet">Booking Book</button>
+          <button type="button" class="icon-clear-btn" id="clearBookingQuote" title="Clear booking quote fields" aria-label="Clear booking quote fields">Clear section</button>
+        </div>
       </div>
       <div class="card-body">
         <div class="field-grid">
@@ -1657,7 +1660,10 @@ function clearBookingQuoteForm() {
   eventTypeOtherInput.value = "";
   syncEventTypeOtherVisibility();
 
-  document.getElementById("bookingPrice").value = 1000;
+  document.getElementById("bookingAddress").value = "";
+  syncTravelAddressFromBooking();
+
+  document.getElementById("bookingPrice").value = "";
   document.getElementById("eventDuration").value = "";
 
   const statusEl = document.getElementById("sheetSyncStatus");
@@ -1754,6 +1760,9 @@ packageButtons.forEach((btn) => {
 
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
 document.getElementById("clearBookingQuote").addEventListener("click", clearBookingQuoteForm);
+document.getElementById("openBookingBook").addEventListener("click", () => {
+  window.open("https://docs.google.com/spreadsheets/d/1R8c3urQyG15e1euGKSVdKbW95ItgzTySR_lF3zB8Uq8/edit?gid=0#gid=0", "_blank", "noopener");
+});
 document.getElementById("clearTravel").addEventListener("click", clearTravelForm);
 
 // ----- Keep the Booking Quote "Event address" field and the Travel
