@@ -2503,7 +2503,6 @@ function buildQuoteDocumentHTML() {
   // "Copy payment link" button on the dashboard still embeds the quote fine,
   // since it only calls buildQuoteDocumentHTML() once.
   const paymentLinkWithQuote = paymentLink;
-  const paymentLinkWithQuote = buildPaymentLink({ includeQuote: true });
   const paymentQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(paymentLink)}`;
   const issueDate = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
   const serviceTimeSummary = hasExtraHours
