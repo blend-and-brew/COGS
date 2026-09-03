@@ -475,10 +475,7 @@
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           <span class="card-title">Booking Quote</span>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <button type="button" class="icon-clear-btn" id="openBookingBook" title="Open the Booking Book spreadsheet" aria-label="Open the Booking Book spreadsheet">Booking Book</button>
-          <button type="button" class="icon-clear-btn" id="clearBookingQuote" title="Clear booking quote fields" aria-label="Clear booking quote fields">Clear section</button>
-        </div>
+        <button type="button" class="icon-clear-btn" id="clearBookingQuote" title="Clear booking quote fields" aria-label="Clear booking quote fields">Clear section</button>
       </div>
       <div class="card-body">
         <div class="field-grid">
@@ -1660,10 +1657,7 @@ function clearBookingQuoteForm() {
   eventTypeOtherInput.value = "";
   syncEventTypeOtherVisibility();
 
-  document.getElementById("bookingAddress").value = "";
-  syncTravelAddressFromBooking();
-
-  document.getElementById("bookingPrice").value = "";
+  document.getElementById("bookingPrice").value = 1000;
   document.getElementById("eventDuration").value = "";
 
   const statusEl = document.getElementById("sheetSyncStatus");
@@ -1760,9 +1754,6 @@ packageButtons.forEach((btn) => {
 
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
 document.getElementById("clearBookingQuote").addEventListener("click", clearBookingQuoteForm);
-document.getElementById("openBookingBook").addEventListener("click", () => {
-  window.open("https://docs.google.com/spreadsheets/d/1R8c3urQyG15e1euGKSVdKbW95ItgzTySR_lF3zB8Uq8/edit?gid=0#gid=0", "_blank", "noopener");
-});
 document.getElementById("clearTravel").addEventListener("click", clearTravelForm);
 
 // ----- Keep the Booking Quote "Event address" field and the Travel
@@ -3047,6 +3038,49 @@ const PAYMENT_PAGE_URL = "https://www.blendandbrew.com.au/payment.html";
 // button/copy field use — far too dense to encode as a QR code though, so
 // the QR image on the printed quote always calls this with
 // includeQuote:false instead.
+// Builds the same line items shown on the printed quote (package, extra
+// hours, travel) as a compact array for payment.html's collapsible "View
+// cost breakdown" panel — keeps the two screens in sync automatically.
+function buildQuoteBreakdownItems() {
+  const coffees = num("coffeeCap");
+  const bookingPrice = num("bookingPrice");
+  const includedHours = num("packageIncludedHours");
+  const includedHoursLabel = includedHours ? includedHours.toFixed(1).replace(/\.0$/, "") : "0";
+  const packageNameEl = selectedPackage
+    ? document.querySelector(`.package-option[data-package="${selectedPackage}"] .package-name`)
+    : null;
+  const packageName = packageNameEl ? packageNameEl.textContent : "Custom estimate";
+
+  const travelCalc = computeTravelSurcharge();
+  const travelSurcharge = travelOn ? travelCalc.surcharge : 0;
+  const extraHoursCalc = computeExtraHoursCharge();
+  const extraHoursCharge = extraHoursOn ? extraHoursCalc.charge : 0;
+  const hasExtraHours = extraHoursOn && extraHoursCharge > 0;
+  const extraHoursLabel = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
+  const suburb = document.getElementById("eventSuburb").value.trim();
+  const km = num("travelChargeKm");
+  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+
+  const items = [];
+  items.push({ label: `${packageName} — ${coffees} coffees / ${includedHoursLabel} hrs`, amount: bookingPrice });
+
+  if (hasExtraHours) {
+    items.push({ label: `${extraHoursLabel} additional hrs @ ${currency(extraHoursCalc.rate)}/hr`, amount: extraHoursCharge });
+  }
+
+  if (travelOn && travelCalc.customQuote) {
+    items.push({
+      label: `Custom travel quote${suburb ? " — " + suburb : ""} (${km}km)`,
+      amount: travelSurcharge,
+    });
+  } else if (travelOn && travelSurcharge > 0) {
+    items.push({ label: `Travel${suburb ? " — " + suburb : ""} (${km}km)`, amount: travelSurcharge });
+  }
+
+  items.push({ label: "Total", amount: total, subtotal: true });
+  return items;
+}
+
 function buildPaymentLink({ includeQuote = true } = {}) {
   const clientName = document.getElementById("clientName").value.trim() || "Client";
   const bookingNumber = document.getElementById("bookingNumber").value.trim();
@@ -3073,6 +3107,9 @@ function buildPaymentLink({ includeQuote = true } = {}) {
   if (location) params.set("location", location);
   if (startTime) params.set("start", startTime);
   if (endTime) params.set("end", endTime);
+  // Cost breakdown for payment.html's collapsible "View cost breakdown"
+  // panel — mirrors the quote's line items (package, extra hours, travel).
+  params.set("breakdown", toBase64Utf8(JSON.stringify(buildQuoteBreakdownItems())));
   // Embedding the quote (&q=...) makes the URL far too long to encode as a
   // QR code, so it's left out when this link feeds the quote's own QR code
   // — the client viewing the quote doesn't need a link back to itself.
