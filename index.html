@@ -1723,7 +1723,7 @@ function clearBookingQuoteForm() {
   syncEventTypeOtherVisibility();
   updateEventTypeQuoteDisplay();
 
-  document.getElementById("bookingPrice").value = 1000;
+  document.getElementById("bookingPrice").value = "";
   document.getElementById("eventDuration").value = "";
 
   document.getElementById("bookingAddress").value = "";
@@ -2490,6 +2490,19 @@ function toBase64Utf8(str) {
   return btoa(unescape(encodeURIComponent(str)));
 }
 
+// Reformats a free-typed or autocomplete-filled address into the single
+// format used on the quote: "Street, Suburb STATE Postcode" — one comma
+// after the street, everything after that space-joined (no trailing
+// "Australia", no extra commas between suburb/state/postcode).
+function formatQuoteAddress(raw) {
+  const parts = String(raw || "")
+    .split(",")
+    .map((p) => p.trim())
+    .filter((p) => p && !/^australia$/i.test(p));
+  if (parts.length <= 1) return parts[0] || "";
+  return parts[0] + ", " + parts.slice(1).join(" ");
+}
+
 // Builds the suggested filename for the quote tab/PDF, e.g.
 // "Blend and Brew Quote - Test_2026-08-04". The browser's "Print > Save as
 // PDF" dialog uses the document's <title> as its default filename, so this
@@ -2549,7 +2562,7 @@ function buildQuoteDocumentHTML() {
   // (e.g. BB-04082026) whenever one's loaded — falling back to the client's
   // name if a booking number hasn't been entered/loaded yet.
   const referenceValue = bookingNumber || clientName;
-  const preparedAddress = document.getElementById("customerAddress").value.trim();
+  const preparedAddress = formatQuoteAddress(document.getElementById("customerAddress").value.trim());
   const eventType = getEventTypeValue() || "—";
   const eventDateRaw = document.getElementById("eventDate").value;
   const eventDateStr = formatQuoteEventDate(eventDateRaw);
@@ -2984,7 +2997,7 @@ function buildQuoteSummaryText() {
   const contact = [clientPhone, clientEmail].filter(Boolean).join(" · ");
   const bookingNumber = document.getElementById("bookingNumber").value.trim();
   const referenceValue = bookingNumber || clientName;
-  const preparedAddress = document.getElementById("customerAddress").value.trim();
+  const preparedAddress = formatQuoteAddress(document.getElementById("customerAddress").value.trim());
   const eventType = getEventTypeValue() || "—";
   const eventDateRaw = document.getElementById("eventDate").value;
   const eventDateStr = formatQuoteEventDate(eventDateRaw);
