@@ -116,6 +116,12 @@
     background: transparent; border: none; outline: none; width: 100%;
     font-size: 14.5px; color: var(--ink); font-family: 'Inter', sans-serif;
   }
+  .field-box input[readonly] { color: var(--sub); cursor: default; -moz-appearance: textfield; }
+  .field-box input[readonly]::-webkit-outer-spin-button,
+  .field-box input[readonly]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field-box-readonly { background: var(--border); opacity: 0.85; }
+  .extra-hours-rate-box input { width: auto; flex: 0 0 42px; text-align: right; }
+  .extra-hours-rate-box input#extraHourRate { flex: 0 0 52px; }
   .text-input {
     border: 1px solid var(--border); background: var(--bg); padding: 7px 10px;
     border-radius: 6px; font-size: 14.5px; color: var(--ink); font-family: 'Inter', sans-serif; width: 100%;
@@ -797,15 +803,20 @@
       <div class="card-body">
         <div class="field-grid">
           <label class="field"><span class="field-label">Hours included in package</span>
-            <div class="field-box"><input type="number" id="packageIncludedHours" value="0" step="0.5" min="0"><span>hrs</span></div></label>
-          <label class="field"><span class="field-label">Extra hour rate</span>
-            <div class="field-box"><span>$</span><input type="number" id="extraHourRate" value="80" step="1" min="0"><span>/hr</span></div></label>
+            <div class="field-box field-box-readonly"><input type="number" id="packageIncludedHours" value="0" step="0.5" min="0" readonly tabindex="-1"><span>hrs</span></div></label>
+          <label class="field"><span class="field-label">Extra hours @ rate</span>
+            <div class="field-box extra-hours-rate-box">
+              <input type="number" id="extraHoursDisplay" value="0" step="0.5" readonly tabindex="-1">
+              <span>hrs @ $</span>
+              <input type="number" id="extraHourRate" value="80" step="1" min="0">
+              <span>/hr</span>
+            </div></label>
         </div>
         <div class="divider-row">
           <span class="label">Extra hours charge</span>
           <span class="value" id="out-extraHoursCharge">$0</span>
         </div>
-        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Selecting a package fills in its included hours above. If Service hours (in Booking Quote) is higher, the difference is charged at the extra hour rate.</p>
+        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Hours included comes from the selected package (edit the package to change it). Anything beyond that, up to Service hours in Booking Quote, is charged at the rate shown.</p>
       </div>
     </div>
  
@@ -1376,7 +1387,7 @@ function renderCustomFields() {
   });
   container.querySelectorAll(".remove-custom").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const id = e.target.getAttribute("data-id");
+      const id = e.currentTarget.getAttribute("data-id");
       customFields = customFields.filter((x) => x.id !== id);
       renderCustomFields();
       recalc();
@@ -1752,7 +1763,7 @@ packageButtons.forEach((btn) => {
       if (selectedPackage === pkgId) {
         document.getElementById("bookingPrice").value = data.price;
         document.getElementById("coffeeCap").value = data.coffees;
-        document.getElementById("eventDuration").value = data.hours;
+        document.getElementById("packageIncludedHours").value = data.hours;
       }
       recalc();
       save();
@@ -2179,6 +2190,7 @@ function recalc() {
     (travelOn ? " Added to quote revenue." : " Toggle Travel on to include in revenue.");
 
   document.getElementById("out-extraHoursCharge").textContent = currency(extraHoursCalc.charge);
+  document.getElementById("extraHoursDisplay").value = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const extraHoursNoteEl = document.getElementById("extraHoursNote");
   if (extraHoursCalc.extraHours > 0.001) {
     extraHoursNoteEl.textContent = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " hrs beyond the " +
