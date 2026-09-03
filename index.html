@@ -122,6 +122,14 @@
   .field-box-readonly { background: var(--border); opacity: 0.85; }
   .extra-hours-rate-box input { width: auto; flex: 0 0 42px; text-align: right; }
   .extra-hours-rate-box input#extraHourRate { flex: 0 0 52px; }
+  .service-time-box { min-width: 0; }
+  .service-time-value { color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .extra-hours-split { display: flex; align-items: center; gap: 6px; }
+  .extra-hours-hrs-box { flex: 0 0 auto; }
+  .extra-hours-hrs-box input { width: 44px; flex: 0 0 44px; text-align: right; }
+  .extra-hours-at { font-size: 13px; color: var(--sub); flex: 0 0 auto; }
+  .extra-hours-rate-box2 { flex: 1 1 auto; min-width: 0; }
+  .extra-hours-rate-box2 input { flex: 1 1 auto; min-width: 0; text-align: left; }
   .text-input {
     border: 1px solid var(--border); background: var(--bg); padding: 7px 10px;
     border-radius: 6px; font-size: 14.5px; color: var(--ink); font-family: 'Inter', sans-serif; width: 100%;
@@ -802,14 +810,17 @@
       </div>
       <div class="card-body">
         <div class="field-grid">
+          <label class="field"><span class="field-label">Service time</span>
+            <div class="field-box field-box-readonly service-time-box"><span class="service-time-value" id="serviceTimeRange">Set start &amp; end time above</span></div></label>
+          <label class="field"><span class="field-label">Total hours</span>
+            <div class="field-box field-box-readonly service-time-box"><span class="service-time-value" id="serviceTimeTotal">—</span></div></label>
           <label class="field"><span class="field-label">Hours included in package</span>
             <div class="field-box field-box-readonly"><input type="number" id="packageIncludedHours" value="0" step="0.5" min="0" readonly tabindex="-1"><span>hrs</span></div></label>
           <label class="field"><span class="field-label">Extra hours @ rate</span>
-            <div class="field-box extra-hours-rate-box">
-              <input type="number" id="extraHoursDisplay" value="0" step="0.5" readonly tabindex="-1">
-              <span>hrs @ $</span>
-              <input type="number" id="extraHourRate" value="80" step="1" min="0">
-              <span>/hr</span>
+            <div class="extra-hours-split">
+              <div class="field-box extra-hours-hrs-box"><input type="number" id="extraHoursDisplay" value="0" step="0.5" readonly tabindex="-1"><span>hrs</span></div>
+              <span class="extra-hours-at">@</span>
+              <div class="field-box extra-hours-rate-box2"><span>$</span><input type="number" id="extraHourRate" value="80" step="1" min="0"><span>/hr</span></div>
             </div></label>
         </div>
         <div class="divider-row">
@@ -1359,6 +1370,39 @@ function syncDateTimeValueClass(id) {
 function syncAllDateTimeValueClasses() {
   ["eventDate", "eventStartTime", "eventEndTime"].forEach(syncDateTimeValueClass);
 }
+
+function formatTimeLabel(t) {
+  if (!t) return null;
+  const parts = t.split(":").map(Number);
+  const h = parts[0], m = parts[1];
+  if (isNaN(h) || isNaN(m)) return null;
+  const period = h >= 12 ? "PM" : "AM";
+  let h12 = h % 12;
+  if (h12 === 0) h12 = 12;
+  return h12 + ":" + String(m).padStart(2, "0") + " " + period;
+}
+
+function updateServiceTimeSummary() {
+  const rangeEl = document.getElementById("serviceTimeRange");
+  const totalEl = document.getElementById("serviceTimeTotal");
+  if (!rangeEl || !totalEl) return;
+  const startVal = document.getElementById("eventStartTime").value;
+  const endVal = document.getElementById("eventEndTime").value;
+  const startLabel = formatTimeLabel(startVal);
+  const endLabel = formatTimeLabel(endVal);
+  if (!startLabel || !endLabel) {
+    rangeEl.textContent = "Set start & end time above";
+    totalEl.textContent = "—";
+    return;
+  }
+  rangeEl.textContent = startLabel + " – " + endLabel;
+  const [sh, sm] = startVal.split(":").map(Number);
+  const [eh, em] = endVal.split(":").map(Number);
+  let diffMinutes = (eh * 60 + em) - (sh * 60 + sm);
+  if (diffMinutes < 0) diffMinutes += 24 * 60; // handles an event crossing midnight
+  const diffHours = diffMinutes / 60;
+  totalEl.textContent = diffHours.toFixed(1).replace(/\.0$/, "") + " hrs";
+}
  
 function renderCustomFields() {
   const container = document.getElementById("custom-fields-container");
@@ -1530,8 +1574,10 @@ eventTypeBackBtn.addEventListener("click", () => {
   eventTypeSelect.focus();
 });
 
-document.getElementById("eventStartTime").addEventListener("change", () => { syncDateTimeValueClass("eventStartTime"); save(); });
-document.getElementById("eventEndTime").addEventListener("change", () => { syncDateTimeValueClass("eventEndTime"); save(); });
+document.getElementById("eventStartTime").addEventListener("change", () => { syncDateTimeValueClass("eventStartTime"); updateServiceTimeSummary(); save(); });
+document.getElementById("eventEndTime").addEventListener("change", () => { syncDateTimeValueClass("eventEndTime"); updateServiceTimeSummary(); save(); });
+document.getElementById("eventStartTime").addEventListener("input", updateServiceTimeSummary);
+document.getElementById("eventEndTime").addEventListener("input", updateServiceTimeSummary);
 
 document.querySelectorAll('input[type="number"]').forEach((inp) => {
   inp.addEventListener("input", () => {
@@ -1675,9 +1721,21 @@ function clearBookingQuoteForm() {
   eventTypeSelect.value = "";
   eventTypeOtherInput.value = "";
   syncEventTypeOtherVisibility();
+  updateEventTypeQuoteDisplay();
 
   document.getElementById("bookingPrice").value = 1000;
   document.getElementById("eventDuration").value = "";
+
+  document.getElementById("bookingAddress").value = "";
+  syncTravelAddressFromBooking();
+  document.getElementById("eventSuburb").value = "";
+  const suggestionsBox = document.getElementById("addressSuggestions");
+  if (suggestionsBox) suggestionsBox.innerHTML = "";
+  const distanceStatusEl = document.getElementById("distanceStatus");
+  if (distanceStatusEl) {
+    distanceStatusEl.textContent = "";
+    distanceStatusEl.className = "distance-status";
+  }
 
   const statusEl = document.getElementById("sheetSyncStatus");
   if (statusEl) {
@@ -2134,6 +2192,7 @@ document.getElementById("feeBreakdownSave").addEventListener("click", () => {
 });
  
 function recalc() {
+  updateServiceTimeSummary();
   const coffees = Math.max(0, num("coffeeCap"));
 
   // Packing buffer: when enabled, cost the stock for the buffered coffee
