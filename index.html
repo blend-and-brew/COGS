@@ -107,6 +107,11 @@
   .field-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
   label.field { display: flex; flex-direction: column; gap: 4px; }
   .field-label { font-size: 11.5px; color: var(--sub); font-weight: 500; }
+  .package-price-tag {
+    display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+    background: rgba(184,130,61,0.14); color: var(--accent); font-size: 10.5px; font-weight: 600;
+    vertical-align: middle; letter-spacing: 0.01em;
+  }
   .field-box {
     display: flex; align-items: center; gap: 4px; border: 1px solid var(--border);
     background: var(--bg); border-radius: 6px; padding: 7px 10px;
@@ -569,7 +574,7 @@
             <input type="time" id="eventEndTime" class="text-input"></label>
         </div>
         <div class="field-grid">
-          <label class="field"><span class="field-label">Package / booking price</span>
+          <label class="field"><span class="field-label">Package / booking price <span class="package-price-tag" id="bookingPricePackageTag" style="display:none;"></span></span>
             <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
           <label class="field"><span class="field-label">Booking number</span>
             <input type="text" id="bookingNumber" class="text-input" placeholder="BB-DDMMYY"></label>
@@ -1660,6 +1665,23 @@ function selectPackageHighlightOnly(btn) {
   selectedPackage = btn.getAttribute("data-package");
 }
 
+// ----- Keep the "Package / booking price" label's name tag in sync -----
+function updatePackagePriceTag() {
+  const tag = document.getElementById("bookingPricePackageTag");
+  if (!tag) return;
+  const btn = selectedPackage
+    ? document.querySelector(`.package-option[data-package="${selectedPackage}"]`)
+    : null;
+  const nameEl = btn ? btn.querySelector(".package-name") : null;
+  if (nameEl) {
+    tag.textContent = nameEl.textContent;
+    tag.style.display = "inline-block";
+  } else {
+    tag.textContent = "";
+    tag.style.display = "none";
+  }
+}
+
 function syncPackageSelectionWithServiceFields() {
   // Only kick in once a package (including Custom) has actually been
   // selected — an untouched form shouldn't jump straight to "Custom".
@@ -1725,6 +1747,10 @@ function clearBookingQuoteForm() {
 
   document.getElementById("bookingPrice").value = "";
   document.getElementById("eventDuration").value = "";
+
+  packageButtons.forEach((b) => b.classList.remove("active"));
+  selectedPackage = null;
+  document.getElementById("packageIncludedHours").value = 0;
 
   document.getElementById("bookingAddress").value = "";
   syncTravelAddressFromBooking();
@@ -2336,6 +2362,7 @@ function recalc() {
 
   updateFeePreview();
   syncPackageSelectionWithServiceFields();
+  updatePackagePriceTag();
 }
  
 function collectState() {
