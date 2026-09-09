@@ -589,6 +589,18 @@
             <input type="text" id="bookingNumber" class="text-input" placeholder="BB-DDMMYY"></label>
         </div>
         <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
+        <div class="divider-row" id="bq-extraHours-row" style="display:none;border-top:1px dashed var(--booking-border);padding-top:10px;margin-top:2px;">
+          <span class="label">Extra hours fee</span>
+          <span class="value" id="bq-extraHours-fee" style="font-size:16px;"></span>
+        </div>
+        <div class="divider-row" id="bq-customCosts-row" style="display:none;border-top:1px dashed var(--booking-border);padding-top:10px;margin-top:2px;">
+          <span class="label">Custom costs</span>
+          <span class="value" id="bq-customCosts-fee" style="font-size:16px;"></span>
+        </div>
+        <div class="divider-row" id="bq-overheads-row" style="display:none;border-top:1px dashed var(--booking-border);padding-top:10px;margin-top:2px;">
+          <span class="label">Running overheads</span>
+          <span class="value" id="bq-overheads-fee" style="font-size:16px;"></span>
+        </div>
         </div>
       </div>
     </div>
@@ -824,7 +836,7 @@
       </div>
       <div class="card-body">
         <div class="field-grid">
-          <label class="field"><span class="field-label">Service time</span>
+          <label class="field"><span class="field-label">Event time</span>
             <div class="field-box field-box-readonly service-time-box"><span class="service-time-value" id="serviceTimeRange">Set start &amp; end time above</span></div></label>
           <label class="field"><span class="field-label">Total hours</span>
             <div class="field-box field-box-readonly service-time-box"><span class="service-time-value" id="serviceTimeTotal">—</span></div></label>
@@ -1768,6 +1780,10 @@ function clearBookingQuoteForm() {
     distanceStatusEl.className = "distance-status";
   }
 
+  document.getElementById("travelChargeKm").value = 0;
+  syncFeeSliderToKm();
+  document.getElementById("coffeeCap").value = 1;
+
   const statusEl = document.getElementById("sheetSyncStatus");
   if (statusEl) {
     statusEl.textContent = "";
@@ -2117,13 +2133,13 @@ function computeExtraHoursCharge() {
   const hoursNeeded = num("eventDuration");
   const includedHours = num("packageIncludedHours");
   const rate = num("extraHourRate");
-  // Event running longer than the package's included hours — genuine extra
-  // service time, charged at the extra-hour rate.
-  const chargeableHours = Math.max(0, hoursNeeded - includedHours);
-  // Package including more hours than the event actually runs for — not
-  // charged (the customer already paid for the package), but still worth
-  // surfacing so it's obvious the package covers more than is needed.
-  const unusedHours = Math.max(0, includedHours - hoursNeeded);
+  // Package including more hours than the event actually runs for — the
+  // package has "gone over" the event time, so the excess is charged at
+  // the extra-hour rate.
+  const chargeableHours = Math.max(0, includedHours - hoursNeeded);
+  // Event running longer than the package's included hours — not charged
+  // here, but still worth surfacing for context.
+  const unusedHours = Math.max(0, hoursNeeded - includedHours);
   const extraHours = chargeableHours > 0 ? chargeableHours : unusedHours;
   const charge = chargeableHours * rate;
   return { extraHours, chargeableHours, unusedHours, rate, charge };
@@ -2280,7 +2296,7 @@ function recalc() {
   document.getElementById("stat-totalCosts").textContent = currency(totalCosts);
   document.getElementById("stat-grossProfit").textContent = currency(grossProfit);
   document.getElementById("stat-margin").textContent = marginPct.toFixed(1) + "%";
-  document.getElementById("booking-note").textContent = "Price charged for the " + coffees + "-coffee package above.";
+  document.getElementById("booking-note").innerHTML = "Price charged for the <strong>" + coffees + "-coffee</strong> package above.";
  
   document.getElementById("out-travelSurcharge").textContent = currency(travelChargeCalc.surcharge);
   document.getElementById("travelSurchargeNote").textContent = travelChargeCalc.bracket +
@@ -2290,12 +2306,13 @@ function recalc() {
   document.getElementById("extraHoursDisplay").value = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const extraHoursNoteEl = document.getElementById("extraHoursNote");
   if (extraHoursCalc.chargeableHours > 0.001) {
-    extraHoursNoteEl.textContent = extraHoursCalc.chargeableHours.toFixed(1).replace(/\.0$/, "") + " hrs beyond the " +
-      num("packageIncludedHours").toFixed(1).replace(/\.0$/, "") + " hrs included in the package, at " +
-      currency(extraHoursCalc.rate) + "/hr." + (extraHoursOn ? " Added to quote revenue." : " Toggle on to include in revenue.");
+    extraHoursNoteEl.textContent = "Package includes " + extraHoursCalc.chargeableHours.toFixed(1).replace(/\.0$/, "") +
+      " more hrs than the event's running time, charged at " + currency(extraHoursCalc.rate) + "/hr." +
+      (extraHoursOn ? " Added to quote revenue." : " Toggle on to include in revenue.");
   } else if (extraHoursCalc.unusedHours > 0.001) {
-    extraHoursNoteEl.textContent = "Package includes " + extraHoursCalc.unusedHours.toFixed(1).replace(/\.0$/, "") +
-      " more hrs than the event's running time — no extra charge.";
+    extraHoursNoteEl.textContent = "Event runs " + extraHoursCalc.unusedHours.toFixed(1).replace(/\.0$/, "") +
+      " hrs longer than the " + num("packageIncludedHours").toFixed(1).replace(/\.0$/, "") +
+      " hrs included in the package — no extra charge.";
   } else {
     extraHoursNoteEl.textContent = "Event running hours matches the package's included hours — no extra charge.";
   }
@@ -2304,11 +2321,35 @@ function recalc() {
 
   const cqExtraHoursRow = document.getElementById("cq-extraHours-row");
   const cqExtraHoursFeeEl = document.getElementById("cq-extraHours-fee");
+  const bqExtraHoursRow = document.getElementById("bq-extraHours-row");
+  const bqExtraHoursFeeEl = document.getElementById("bq-extraHours-fee");
   if (extraHoursOn && extraHoursAmount > 0) {
+    const extraHoursFeeLabel = currency(extraHoursAmount) + " (" + extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " extra hrs)";
     cqExtraHoursRow.style.display = "flex";
-    cqExtraHoursFeeEl.textContent = currency(extraHoursAmount) + " (" + extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " extra hrs)";
+    cqExtraHoursFeeEl.textContent = extraHoursFeeLabel;
+    bqExtraHoursRow.style.display = "flex";
+    bqExtraHoursFeeEl.textContent = extraHoursFeeLabel;
   } else {
     cqExtraHoursRow.style.display = "none";
+    bqExtraHoursRow.style.display = "none";
+  }
+
+  const bqCustomCostsRow = document.getElementById("bq-customCosts-row");
+  const bqCustomCostsFeeEl = document.getElementById("bq-customCosts-fee");
+  if (customOn && customTotal > 0) {
+    bqCustomCostsRow.style.display = "flex";
+    bqCustomCostsFeeEl.textContent = currency(customTotal);
+  } else {
+    bqCustomCostsRow.style.display = "none";
+  }
+
+  const bqOverheadsRow = document.getElementById("bq-overheads-row");
+  const bqOverheadsFeeEl = document.getElementById("bq-overheads-fee");
+  if (overheadsOn && overheadsTotal > 0) {
+    bqOverheadsRow.style.display = "flex";
+    bqOverheadsFeeEl.textContent = currency(overheadsTotal);
+  } else {
+    bqOverheadsRow.style.display = "none";
   }
  
   const cqTravelRow = document.getElementById("cq-travel-row");
