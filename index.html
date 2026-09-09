@@ -815,7 +815,7 @@
             <label class="field"><span class="field-label">Cup + lid</span>
               <div class="field-box"><span>$</span><input type="number" id="cupLid" value="0.22" step="0.01" min="0"><span>/ea</span></div></label>
             <label class="field"><span class="field-label">Coffee cap for event</span>
-              <div class="field-box"><input type="number" id="coffeeCap" value="100" step="1" min="0"><span>cups</span></div></label>
+              <div class="field-box"><input type="number" id="coffeeCap" value="1" step="1" min="0"><span>cups</span></div></label>
           </div>
         </div>
         <div class="divider-row">
@@ -878,7 +878,7 @@
           </label>
           <label class="field">
             <span class="field-label">Distance to venue (one-way)</span>
-            <div class="field-box"><input type="number" id="travelChargeKm" value="20" step="1" min="0"><span>km</span></div>
+            <div class="field-box"><input type="number" id="travelChargeKm" value="0" step="1" min="0"><span>km</span></div>
             <span class="distance-status" id="distanceStatus"></span>
           </label>
         </div>
@@ -1721,7 +1721,7 @@ function clearTravelForm() {
   const suggestionsBox = document.getElementById("addressSuggestions");
   if (suggestionsBox) suggestionsBox.innerHTML = "";
 
-  document.getElementById("travelChargeKm").value = 20;
+  document.getElementById("travelChargeKm").value = 0;
   document.getElementById("includedKm").value = 15;
   document.getElementById("travelMinFee").value = 20;
   document.getElementById("travelSurchargeRate").value = 1.50;
@@ -1877,7 +1877,7 @@ packageButtons.forEach((btn) => {
 });
 
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
-document.getElementById("clearBookingQuote").addEventListener("click", clearBookingQuoteForm);
+document.getElementById("clearBookingQuote").addEventListener("click", () => performHardReset("Clear everything and reset the whole dashboard back to its defaults? Any unsaved changes on every card will be lost — this can't be undone."));
 document.getElementById("clearTravel").addEventListener("click", clearTravelForm);
 
 // ----- Keep the Booking Quote "Event address" field and the Travel
@@ -2543,8 +2543,8 @@ function load() {
   } catch (e) {}
 }
  
-document.getElementById("reset-btn").addEventListener("click", () => {
-  const confirmed = window.confirm("Hard reset? This clears all saved values and reloads the dashboard exactly as it ships in the HTML file — this can't be undone.");
+function performHardReset(confirmMessage) {
+  const confirmed = window.confirm(confirmMessage || "Hard reset? This clears all saved values and reloads the dashboard exactly as it ships in the HTML file — this can't be undone.");
   if (!confirmed) return;
   try {
     localStorage.removeItem(STORAGE_KEY);
@@ -2557,7 +2557,9 @@ document.getElementById("reset-btn").addEventListener("click", () => {
   const url = new URL(location.href);
   url.searchParams.set("_hardreset", Date.now().toString());
   location.replace(url.toString());
-});
+}
+
+document.getElementById("reset-btn").addEventListener("click", () => performHardReset());
 
 // ===================================================
 // GENERATE QUOTE — opens a print-ready HTML tab
