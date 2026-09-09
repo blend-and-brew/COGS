@@ -234,6 +234,10 @@
   .booking-details-label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
   .booking-details-body { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
   .booking-details-body.off { display: none; }
+  .booking-subsection-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: -6px;
+  }
   #card-packages, #card-stock { background: var(--packages-card); border-color: var(--packages-border); }
  
   .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
@@ -525,6 +529,7 @@
         </div>
 
         <div class="booking-details-body" id="bookingDetailsBody">
+        <div class="booking-subsection-label">Contact Details</div>
         <div class="field-grid">
           <label class="field"><span class="field-label">Client name</span>
             <input type="text" id="clientName" class="text-input" placeholder="First Last"></label>
@@ -537,7 +542,9 @@
           <label class="field"><span class="field-label">Contact phone</span>
             <input type="text" id="clientPhone" class="text-input" placeholder="0400 000 000"></label>
         </div>
-        <div class="field-grid" id="eventTypeRow">
+
+        <div class="booking-subsection-label">Event Details</div>
+        <div class="field-grid-3" id="eventTypeRow">
           <label class="field"><span class="field-label">Event address</span>
             <input type="text" id="bookingAddress" class="text-input" placeholder="Auto-fills from Booking Sheet or Travel section" autocomplete="off"></label>
           <label class="field"><span class="field-label">Event type</span>
@@ -560,22 +567,24 @@
               </button>
             </div>
           </label>
-        </div>
-        <div class="field-grid">
           <label class="field"><span class="field-label">Event date</span>
             <input type="date" id="eventDate" class="text-input"></label>
-          <label class="field"><span class="field-label">Service hours</span>
-            <div class="field-box"><input type="number" id="eventDuration" value="" placeholder="0" step="0.5" min="0.5"><span>hrs</span></div></label>
         </div>
-        <div class="field-grid">
+        <div class="field-grid-3">
           <label class="field"><span class="field-label">Event start time</span>
             <input type="time" id="eventStartTime" class="text-input"></label>
           <label class="field"><span class="field-label">Event end time</span>
             <input type="time" id="eventEndTime" class="text-input"></label>
+          <label class="field"><span class="field-label">Event running hours</span>
+            <div class="field-box field-box-readonly"><input type="number" id="eventDuration" value="" placeholder="0" readonly tabindex="-1"><span>hrs</span></div></label>
         </div>
-        <div class="field-grid">
+
+        <div class="booking-subsection-label">Package Details</div>
+        <div class="field-grid-3">
           <label class="field"><span class="field-label">Package / booking price <span class="package-price-tag" id="bookingPricePackageTag" style="display:none;"></span></span>
             <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
+          <label class="field"><span class="field-label">Package service time</span>
+            <div class="field-box field-box-readonly"><input type="number" id="packageServiceTime" value="0" readonly tabindex="-1"><span>hrs</span></div></label>
           <label class="field"><span class="field-label">Booking number</span>
             <input type="text" id="bookingNumber" class="text-input" placeholder="BB-DDMMYY"></label>
         </div>
@@ -832,7 +841,7 @@
           <span class="label">Extra hours charge</span>
           <span class="value" id="out-extraHoursCharge">$0</span>
         </div>
-        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Hours included comes from the selected package (edit the package to change it). Anything beyond that, up to Service hours in Booking Quote, is charged at the rate shown.</p>
+        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Hours included comes from the selected package (edit the package to change it). Anything beyond that, up to Event running hours in Booking Quote, is charged at the rate shown.</p>
       </div>
     </div>
  
@@ -1216,18 +1225,6 @@ async function loadBookingsFromSheet() {
   }
 }
 
-function parseDurationHours(raw, fallback) {
-  if (raw === "" || raw === null || raw === undefined) return null;
-  const s = String(raw).trim();
-  // Reject spreadsheet date/time artifacts, e.g. "1899-12-30" or full ISO timestamps
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return null;
-  const match = s.match(/(\d+(\.\d+)?)/);
-  if (!match) return null;
-  const n = parseFloat(match[1]);
-  if (isNaN(n) || n <= 0 || n > 48) return null; // sanity bounds: no event runs 0 or 48+ hrs
-  return n;
-}
-
 function normalizePackageName(s) {
   return String(s || "").toLowerCase().replace(/^the\s+/, "").replace(/[^a-z0-9]/g, "");
 }
@@ -1279,7 +1276,6 @@ function applyBookingToForm(booking) {
   const startTimeRaw = getBookingField(booking, "Start Time", "Event Start Time", "Start");
   const endTimeRaw = getBookingField(booking, "End Time", "Event End Time", "Finish Time", "End");
   const bookingPrice = getBookingField(booking, "Booking Price", "Package Price", "Price");
-  const duration = getBookingField(booking, "Service Hours", "Event Duration", "Duration");
   const coffeeCap = getBookingField(booking, "Servings", "Coffee Cap", "Coffees", "Guests");
   const address = getBookingField(booking, "Location", "Customer Address", "Address");
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
@@ -1327,10 +1323,6 @@ function applyBookingToForm(booking) {
   syncDateTimeValueClass("eventEndTime");
 
   if (bookingPrice !== "") document.getElementById("bookingPrice").value = Math.max(0, parseFloat(bookingPrice) || 0);
-  if (duration !== "") {
-    const parsedDuration = parseDurationHours(duration);
-    if (parsedDuration !== null) document.getElementById("eventDuration").value = Math.max(0.5, parsedDuration);
-  }
   if (coffeeCap !== "") document.getElementById("coffeeCap").value = Math.max(0, parseFloat(coffeeCap) || 0);
   if (address) document.getElementById("customerAddress").value = address;
   syncBookingAddressFromTravel();
@@ -1387,26 +1379,41 @@ function formatTimeLabel(t) {
   return h12 + ":" + String(m).padStart(2, "0") + " " + period;
 }
 
+function computeDurationHoursFromTimes() {
+  const startVal = document.getElementById("eventStartTime").value;
+  const endVal = document.getElementById("eventEndTime").value;
+  if (!startVal || !endVal) return null;
+  const [sh, sm] = startVal.split(":").map(Number);
+  const [eh, em] = endVal.split(":").map(Number);
+  if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) return null;
+  let diffMinutes = (eh * 60 + em) - (sh * 60 + sm);
+  if (diffMinutes < 0) diffMinutes += 24 * 60; // handles an event crossing midnight
+  return diffMinutes / 60;
+}
+
+// Event running hours is always the gap between Event start time and Event
+// end time — it has nothing to do with the selected package. Package
+// selection only sets "Hours included in package" (used for the extra-hours
+// charge); it never touches this field.
 function updateServiceTimeSummary() {
   const rangeEl = document.getElementById("serviceTimeRange");
   const totalEl = document.getElementById("serviceTimeTotal");
-  if (!rangeEl || !totalEl) return;
+  const durationInput = document.getElementById("eventDuration");
   const startVal = document.getElementById("eventStartTime").value;
   const endVal = document.getElementById("eventEndTime").value;
   const startLabel = formatTimeLabel(startVal);
   const endLabel = formatTimeLabel(endVal);
-  if (!startLabel || !endLabel) {
-    rangeEl.textContent = "Set start & end time above";
-    totalEl.textContent = "—";
+  const diffHours = computeDurationHoursFromTimes();
+  if (diffHours === null) {
+    if (rangeEl) rangeEl.textContent = "Set start & end time above";
+    if (totalEl) totalEl.textContent = "—";
+    if (durationInput) durationInput.value = "";
     return;
   }
-  rangeEl.textContent = startLabel + " – " + endLabel;
-  const [sh, sm] = startVal.split(":").map(Number);
-  const [eh, em] = endVal.split(":").map(Number);
-  let diffMinutes = (eh * 60 + em) - (sh * 60 + sm);
-  if (diffMinutes < 0) diffMinutes += 24 * 60; // handles an event crossing midnight
-  const diffHours = diffMinutes / 60;
-  totalEl.textContent = diffHours.toFixed(1).replace(/\.0$/, "") + " hrs";
+  if (rangeEl) rangeEl.textContent = startLabel + " – " + endLabel;
+  const roundedHours = Math.round(diffHours * 100) / 100;
+  if (totalEl) totalEl.textContent = roundedHours.toFixed(1).replace(/\.0$/, "") + " hrs";
+  if (durationInput) durationInput.value = roundedHours;
 }
  
 function renderCustomFields() {
@@ -1615,7 +1622,6 @@ function selectPackage(btn, { skipFieldUpdate } = {}) {
       if (milkPriceAttr) document.getElementById("milkPrice").value = milkPriceAttr;
       const hoursAttr = btn.getAttribute("data-hours");
       if (hoursAttr) {
-        document.getElementById("eventDuration").value = hoursAttr;
         document.getElementById("packageIncludedHours").value = hoursAttr;
       }
     }
@@ -1629,7 +1635,6 @@ function selectPackage(btn, { skipFieldUpdate } = {}) {
 function clearPackageSelection() {
   packageButtons.forEach((b) => b.classList.remove("active"));
   selectedPackage = null;
-  document.getElementById("eventDuration").value = "";
   document.getElementById("packageIncludedHours").value = 0;
   recalc();
   save();
@@ -2112,9 +2117,16 @@ function computeExtraHoursCharge() {
   const hoursNeeded = num("eventDuration");
   const includedHours = num("packageIncludedHours");
   const rate = num("extraHourRate");
-  const extraHours = Math.max(0, hoursNeeded - includedHours);
-  const charge = extraHours * rate;
-  return { extraHours, rate, charge };
+  // Event running longer than the package's included hours — genuine extra
+  // service time, charged at the extra-hour rate.
+  const chargeableHours = Math.max(0, hoursNeeded - includedHours);
+  // Package including more hours than the event actually runs for — not
+  // charged (the customer already paid for the package), but still worth
+  // surfacing so it's obvious the package covers more than is needed.
+  const unusedHours = Math.max(0, includedHours - hoursNeeded);
+  const extraHours = chargeableHours > 0 ? chargeableHours : unusedHours;
+  const charge = chargeableHours * rate;
+  return { extraHours, chargeableHours, unusedHours, rate, charge };
 }
 
 // ----- Distance / fee preview slider + editable breakdown -----
@@ -2277,12 +2289,15 @@ function recalc() {
   document.getElementById("out-extraHoursCharge").textContent = currency(extraHoursCalc.charge);
   document.getElementById("extraHoursDisplay").value = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const extraHoursNoteEl = document.getElementById("extraHoursNote");
-  if (extraHoursCalc.extraHours > 0.001) {
-    extraHoursNoteEl.textContent = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " hrs beyond the " +
+  if (extraHoursCalc.chargeableHours > 0.001) {
+    extraHoursNoteEl.textContent = extraHoursCalc.chargeableHours.toFixed(1).replace(/\.0$/, "") + " hrs beyond the " +
       num("packageIncludedHours").toFixed(1).replace(/\.0$/, "") + " hrs included in the package, at " +
       currency(extraHoursCalc.rate) + "/hr." + (extraHoursOn ? " Added to quote revenue." : " Toggle on to include in revenue.");
+  } else if (extraHoursCalc.unusedHours > 0.001) {
+    extraHoursNoteEl.textContent = "Package includes " + extraHoursCalc.unusedHours.toFixed(1).replace(/\.0$/, "") +
+      " more hrs than the event's running time — no extra charge.";
   } else {
-    extraHoursNoteEl.textContent = "Service hours matches the package's included hours — no extra charge.";
+    extraHoursNoteEl.textContent = "Event running hours matches the package's included hours — no extra charge.";
   }
  
   document.getElementById("cq-total").textContent = currency(totalRevenue);
@@ -2363,12 +2378,18 @@ function recalc() {
   updateFeePreview();
   syncPackageSelectionWithServiceFields();
   updatePackagePriceTag();
+  syncPackageServiceTimeDisplay();
+}
+
+function syncPackageServiceTimeDisplay() {
+  const el = document.getElementById("packageServiceTime");
+  if (el) el.value = document.getElementById("packageIncludedHours").value;
 }
  
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap","waterPerCoffee",
     "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
-    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventType","eventTypeOther","customerAddress","customTravelQuote","stockBufferPct","packageIncludedHours","extraHourRate"];
+    "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventStartTime","eventEndTime","eventType","eventTypeOther","customerAddress","customTravelQuote","stockBufferPct","packageIncludedHours","extraHourRate"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
   return {
