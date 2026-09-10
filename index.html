@@ -1671,6 +1671,8 @@ function clearPackageSelection() {
   packageButtons.forEach((b) => b.classList.remove("active"));
   selectedPackage = null;
   document.getElementById("packageIncludedHours").value = 0;
+  document.getElementById("bookingPrice").value = "";
+  document.getElementById("coffeeCap").value = 0;
   recalc();
   save();
 }
