@@ -582,25 +582,13 @@
         <div class="booking-subsection-label">Package Details</div>
         <div class="field-grid-3">
           <label class="field"><span class="field-label">Package / booking price <span class="package-price-tag" id="bookingPricePackageTag" style="display:none;"></span></span>
-            <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="1000" step="10" min="0"></div></label>
+            <div class="field-box"><span>$</span><input type="number" id="bookingPrice" value="" placeholder="0" step="10" min="0"></div></label>
           <label class="field"><span class="field-label">Package service time</span>
             <div class="field-box field-box-readonly"><input type="number" id="packageServiceTime" value="0" readonly tabindex="-1"><span>hrs</span></div></label>
           <label class="field"><span class="field-label">Booking number</span>
             <input type="text" id="bookingNumber" class="text-input" placeholder="BB-DDMMYY"></label>
         </div>
         <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
-        <div class="divider-row" id="bq-extraHours-row" style="display:none;border-top:1px dashed var(--booking-border);padding-top:10px;margin-top:2px;">
-          <span class="label">Extra hours fee</span>
-          <span class="value" id="bq-extraHours-fee" style="font-size:16px;"></span>
-        </div>
-        <div class="divider-row" id="bq-customCosts-row" style="display:none;border-top:1px dashed var(--booking-border);padding-top:10px;margin-top:2px;">
-          <span class="label">Custom costs</span>
-          <span class="value" id="bq-customCosts-fee" style="font-size:16px;"></span>
-        </div>
-        <div class="divider-row" id="bq-overheads-row" style="display:none;border-top:1px dashed var(--booking-border);padding-top:10px;margin-top:2px;">
-          <span class="label">Running overheads</span>
-          <span class="value" id="bq-overheads-fee" style="font-size:16px;"></span>
-        </div>
         </div>
       </div>
     </div>
@@ -1049,7 +1037,7 @@
     <div class="card" id="card-customer-quote">
       <div class="card-head">
         <div class="card-head-left">
-          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           <span class="card-title">Customer Quote</span>
         </div>
       </div>
@@ -1062,13 +1050,21 @@
           <span class="label">Extra hours fee</span>
           <span class="value" id="cq-extraHours-fee" style="font-size:14px;"></span>
         </div>
+        <div class="divider-row" id="cq-customCosts-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
+          <span class="label">Custom costs</span>
+          <span class="value" id="cq-customCosts-fee" style="font-size:14px;"></span>
+        </div>
+        <div class="divider-row" id="cq-overheads-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
+          <span class="label">Running overheads</span>
+          <span class="value" id="cq-overheads-fee" style="font-size:14px;"></span>
+        </div>
+        <div class="divider-row" id="cq-generator-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
+          <span class="label">Generator/fuel</span>
+          <span class="value" id="cq-generator-fee" style="font-size:14px;"></span>
+        </div>
         <div class="divider-row" id="cq-travel-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
           <span class="label">Travel fee</span>
           <span class="value" id="cq-travel-fee" style="font-size:14px;"></span>
-        </div>
-        <div class="divider-row" id="cq-event-type-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
-          <span class="label">Event type</span>
-          <span class="value" id="cq-event-type" style="font-size:14px;"></span>
         </div>
         <p style="font-size:11px;color:var(--sub);margin:2px 0 0;">What the customer sees — the quoted total, not your internal costs.</p>
         <button type="button" class="copy-quote-btn" id="copy-quote-btn">
@@ -1566,15 +1562,7 @@ function getEventTypeValue() {
 }
 
 function updateEventTypeQuoteDisplay() {
-  const val = getEventTypeValue();
-  const row = document.getElementById("cq-event-type-row");
-  const span = document.getElementById("cq-event-type");
-  if (val) {
-    row.style.display = "flex";
-    span.textContent = val;
-  } else {
-    row.style.display = "none";
-  }
+  // Event type is intentionally not shown on the Customer Quote panel.
 }
 
 eventTypeSelect.addEventListener("change", () => {
@@ -1765,24 +1753,7 @@ function clearBookingQuoteForm() {
   document.getElementById("bookingPrice").value = "";
   document.getElementById("eventDuration").value = "";
 
-  packageButtons.forEach((b) => b.classList.remove("active"));
-  selectedPackage = null;
-  document.getElementById("packageIncludedHours").value = 0;
-
   document.getElementById("bookingAddress").value = "";
-  syncTravelAddressFromBooking();
-  document.getElementById("eventSuburb").value = "";
-  const suggestionsBox = document.getElementById("addressSuggestions");
-  if (suggestionsBox) suggestionsBox.innerHTML = "";
-  const distanceStatusEl = document.getElementById("distanceStatus");
-  if (distanceStatusEl) {
-    distanceStatusEl.textContent = "";
-    distanceStatusEl.className = "distance-status";
-  }
-
-  document.getElementById("travelChargeKm").value = 0;
-  syncFeeSliderToKm();
-  document.getElementById("coffeeCap").value = 1;
 
   const statusEl = document.getElementById("sheetSyncStatus");
   if (statusEl) {
@@ -1877,7 +1848,11 @@ packageButtons.forEach((btn) => {
 });
 
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
-document.getElementById("clearBookingQuote").addEventListener("click", () => performHardReset("Clear everything and reset the whole dashboard back to its defaults? Any unsaved changes on every card will be lost — this can't be undone."));
+document.getElementById("clearBookingQuote").addEventListener("click", () => {
+  const confirmed = window.confirm("Clear the Booking Quote fields? Client details, event details, and booking price will be reset — this can't be undone.");
+  if (!confirmed) return;
+  clearBookingQuoteForm();
+});
 document.getElementById("clearTravel").addEventListener("click", clearTravelForm);
 
 // ----- Keep the Booking Quote "Event address" field and the Travel
@@ -2273,11 +2248,12 @@ function recalc() {
   const travelSurchargeAmount = travelOn ? travelChargeCalc.surcharge : 0;
   const extraHoursCalc = computeExtraHoursCharge();
   const extraHoursAmount = extraHoursOn ? extraHoursCalc.charge : 0;
-  const totalRevenue = bookingPrice + travelSurchargeAmount + extraHoursAmount;
+  const customTotal = customOn ? customFields.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0) : 0;
+  const customCostsAmount = customOn ? customTotal : 0;
+  const totalRevenue = bookingPrice + travelSurchargeAmount + extraHoursAmount + customCostsAmount;
  
   const cardFeeCost = overheadsOn ? totalRevenue * (num("cardFeePct") / 100) : 0;
   const overheadsTotal = overheadsOn ? num("insurance") + num("servicing") + num("permits") : 0;
-  const customTotal = customOn ? customFields.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0) : 0;
  
   const totalCosts = consumablesTotal + generatorCost + cardFeeCost + overheadsTotal + customTotal;
   const grossProfit = totalRevenue - totalCosts;
@@ -2317,41 +2293,53 @@ function recalc() {
     extraHoursNoteEl.textContent = "Event running hours matches the package's included hours — no extra charge.";
   }
  
-  document.getElementById("cq-total").textContent = currency(totalRevenue);
+  // Running overheads (insurance/servicing/permits/card fee) are shown on
+  // the Customer Quote as one lump sum with a bulleted per-item breakdown;
+  // the generator charge is kept as its own separate running-cost line.
+  // Both are added into the quoted total since the customer is charged for
+  // them. cardFeeCost above is already based on totalRevenue (pre-overheads),
+  // so it doesn't circularly apply to itself.
+  const cqOverheadsLumpSum = overheadsOn ? (num("insurance") + num("servicing") + num("permits") + cardFeeCost) : 0;
+  const cqTotal = totalRevenue + cqOverheadsLumpSum + generatorCost;
+  document.getElementById("cq-total").textContent = currency(cqTotal);
 
   const cqExtraHoursRow = document.getElementById("cq-extraHours-row");
   const cqExtraHoursFeeEl = document.getElementById("cq-extraHours-fee");
-  const bqExtraHoursRow = document.getElementById("bq-extraHours-row");
-  const bqExtraHoursFeeEl = document.getElementById("bq-extraHours-fee");
   if (extraHoursOn && extraHoursAmount > 0) {
     const extraHoursFeeLabel = currency(extraHoursAmount) + " (" + extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "") + " extra hrs)";
     cqExtraHoursRow.style.display = "flex";
     cqExtraHoursFeeEl.textContent = extraHoursFeeLabel;
-    bqExtraHoursRow.style.display = "flex";
-    bqExtraHoursFeeEl.textContent = extraHoursFeeLabel;
   } else {
     cqExtraHoursRow.style.display = "none";
-    bqExtraHoursRow.style.display = "none";
   }
 
-  const bqCustomCostsRow = document.getElementById("bq-customCosts-row");
-  const bqCustomCostsFeeEl = document.getElementById("bq-customCosts-fee");
+  const cqCustomCostsRow = document.getElementById("cq-customCosts-row");
+  const cqCustomCostsFeeEl = document.getElementById("cq-customCosts-fee");
   if (customOn && customTotal > 0) {
-    bqCustomCostsRow.style.display = "flex";
-    bqCustomCostsFeeEl.textContent = currency(customTotal);
+    cqCustomCostsRow.style.display = "flex";
+    cqCustomCostsFeeEl.textContent = currency(customTotal);
   } else {
-    bqCustomCostsRow.style.display = "none";
+    cqCustomCostsRow.style.display = "none";
   }
 
-  const bqOverheadsRow = document.getElementById("bq-overheads-row");
-  const bqOverheadsFeeEl = document.getElementById("bq-overheads-fee");
-  if (overheadsOn && overheadsTotal > 0) {
-    bqOverheadsRow.style.display = "flex";
-    bqOverheadsFeeEl.textContent = currency(overheadsTotal);
+  const cqOverheadsRow = document.getElementById("cq-overheads-row");
+  const cqOverheadsFeeEl = document.getElementById("cq-overheads-fee");
+  if (overheadsOn && cqOverheadsLumpSum > 0) {
+    cqOverheadsRow.style.display = "flex";
+    cqOverheadsFeeEl.textContent = currency(cqOverheadsLumpSum);
   } else {
-    bqOverheadsRow.style.display = "none";
+    cqOverheadsRow.style.display = "none";
   }
- 
+
+  const cqGeneratorRow = document.getElementById("cq-generator-row");
+  const cqGeneratorFeeEl = document.getElementById("cq-generator-fee");
+  if (overheadsOn && generatorOn && generatorCost > 0) {
+    cqGeneratorRow.style.display = "flex";
+    cqGeneratorFeeEl.textContent = currency(generatorCost);
+  } else {
+    cqGeneratorRow.style.display = "none";
+  }
+
   const cqTravelRow = document.getElementById("cq-travel-row");
   const cqTravelFeeEl = document.getElementById("cq-travel-fee");
   if (travelOn && travelChargeCalc.customQuote) {
@@ -2678,7 +2666,23 @@ function buildQuoteDocumentHTML() {
   const extraHoursLabel = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const suburb = document.getElementById("eventSuburb").value.trim();
   const km = num("travelChargeKm");
-  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+  const customCostItems = customOn ? customFields.filter((f) => (parseFloat(f.amount) || 0) > 0) : [];
+  const customCostsTotal = customCostItems.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
+
+  // Running overheads: insurance/servicing/permits/card fees are shown on
+  // the quote as one lump sum (with a bulleted per-item breakdown below it);
+  // the generator charge is kept as its own separate running-cost line
+  // rather than folded into that lump sum. Card fee % is applied to the
+  // price total *before* overheads/generator are added, so the fee doesn't
+  // circularly apply to itself.
+  const preOverheadsTotal = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
+  const cardFeeAmount = overheadsOn ? preOverheadsTotal * (num("cardFeePct") / 100) : 0;
+  const overheadsLumpSum = overheadsOn
+    ? num("insurance") + num("servicing") + num("permits") + cardFeeAmount
+    : 0;
+  const generatorChargeAmount = overheadsOn && generatorOn ? num("genHours") * num("genLph") * num("fuelPrice") : 0;
+
+  const total = preOverheadsTotal + overheadsLumpSum + generatorChargeAmount;
   const paymentLink = buildPaymentLink({ includeQuote: false });
   // This quote document previews its own payment link for testing — it can't
   // also embed *itself* inside that link (that would recurse forever), so
@@ -2737,6 +2741,48 @@ function buildQuoteDocumentHTML() {
         <tr><td>${travelLabel}</td><td class="right">${travelValue}</td></tr>
       </table>`
     : "";
+
+  let customCostsSectionHtml = "";
+  if (customCostItems.length) {
+    const customCostRows = customCostItems
+      .map((f) => `<tr><td>${escapeHtml(f.label || "Additional item")}</td><td class="right">${currency(parseFloat(f.amount) || 0)}</td></tr>`)
+      .join("\n        ");
+    customCostsSectionHtml = `
+      <p class="package-service-eyebrow section-spaced">Additional Items</p>
+      <table class="lines">
+        ${customCostRows}
+      </table>`;
+  }
+
+  let runningCostsSectionHtml = "";
+  if (overheadsOn) {
+    const overheadsBulletItems = [
+      ["Insurance", num("insurance")],
+      ["Servicing/depreciation", num("servicing")],
+      ["Permits/council fees", num("permits")],
+      ["Card/EFTPOS fees", cardFeeAmount],
+    ];
+    const overheadsBulletsHtml = overheadsBulletItems
+      .map(([label, amt]) => `<li>${escapeHtml(label)} — ${currency(amt)}</li>`)
+      .join("\n              ");
+    const generatorRowHtml = generatorOn
+      ? `<tr><td>Generator/fuel</td><td class="right">${currency(generatorChargeAmount)}</td></tr>`
+      : "";
+    runningCostsSectionHtml = `
+      <p class="package-service-eyebrow section-spaced">Running Costs</p>
+      <table class="lines">
+        <tr class="pkg-row">
+          <td>
+            Running overheads
+            <ul class="pkg-inclusions">
+              ${overheadsBulletsHtml}
+            </ul>
+          </td>
+          <td class="right">${currency(overheadsLumpSum)}</td>
+        </tr>
+        ${generatorRowHtml}
+      </table>`;
+  }
 
   const venueUtilityItems = getVenueInfoItems();
   const venueInfoItemsHtml = venueUtilityItems
@@ -2967,6 +3013,8 @@ function buildQuoteDocumentHTML() {
         </tr>
       </table>
       ${additionalServiceSectionHtml}
+      ${customCostsSectionHtml}
+      ${runningCostsSectionHtml}
       ${travelSectionHtml}
 
       <div class="quote-body-spacer"></div>
@@ -3113,7 +3161,9 @@ function buildQuoteSummaryText() {
   const totalServiceHoursLabel = totalServiceHours.toFixed(1).replace(/\.0$/, "");
   const suburb = document.getElementById("eventSuburb").value.trim();
   const km = num("travelChargeKm");
-  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+  const customCostItems = customOn ? customFields.filter((f) => (parseFloat(f.amount) || 0) > 0) : [];
+  const customCostsTotal = customCostItems.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
+  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
 
   const lines = [];
   lines.push("BLEND & BREW — EVENT QUOTE");
@@ -3134,6 +3184,11 @@ function buildQuoteSummaryText() {
     lines.push("");
     lines.push("ADDITIONAL SERVICE");
     lines.push(`${extraHoursLabel} additional hours @ ${currency(extraHoursCalc.rate)}/hr: ${currency(extraHoursCharge)}`);
+  }
+  if (customCostItems.length) {
+    lines.push("");
+    lines.push("ADDITIONAL ITEMS");
+    customCostItems.forEach((f) => lines.push(`${f.label || "Additional item"}: ${currency(parseFloat(f.amount) || 0)}`));
   }
   if (travelOn && travelSurchargeCalc.customQuote) {
     lines.push("");
@@ -3242,7 +3297,9 @@ function buildQuoteBreakdownItems() {
   const extraHoursLabel = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const suburb = document.getElementById("eventSuburb").value.trim();
   const km = num("travelChargeKm");
-  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+  const customCostItems = customOn ? customFields.filter((f) => (parseFloat(f.amount) || 0) > 0) : [];
+  const customCostsTotal = customCostItems.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
+  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
 
   const items = [];
   items.push({ label: `${packageName} — ${coffees} coffees / ${includedHoursLabel} hrs`, amount: bookingPrice });
@@ -3250,6 +3307,10 @@ function buildQuoteBreakdownItems() {
   if (hasExtraHours) {
     items.push({ label: `${extraHoursLabel} additional hrs @ ${currency(extraHoursCalc.rate)}/hr`, amount: extraHoursCharge });
   }
+
+  customCostItems.forEach((f) => {
+    items.push({ label: f.label || "Additional item", amount: parseFloat(f.amount) || 0 });
+  });
 
   if (travelOn && travelCalc.customQuote) {
     items.push({
@@ -3274,7 +3335,8 @@ function buildPaymentLink({ includeQuote = true } = {}) {
   const travelSurcharge = travelOn ? travelSurchargeCalc.surcharge : 0;
   const extraHoursCalc = computeExtraHoursCharge();
   const extraHoursCharge = extraHoursOn ? extraHoursCalc.charge : 0;
-  const total = bookingPrice + travelSurcharge + extraHoursCharge;
+  const customCostsTotal = customOn ? customFields.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0) : 0;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
 
   const eventDate = document.getElementById("eventDate").value;
   const location = document.getElementById("customerAddress").value.trim()
