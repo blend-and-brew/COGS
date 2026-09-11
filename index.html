@@ -1369,6 +1369,12 @@ function applyBookingToForm(booking) {
   if (travelKm !== "") {
     document.getElementById("travelChargeKm").value = Math.max(0, parseFloat(travelKm) || 0);
     syncFeeSliderToKm();
+  } else if (address && typeof window.blendAndBrewComputeDistance === "function") {
+    // The booking sheet doesn't store a distance figure (it's only ever
+    // calculated here in COGS via geocoding), so when a booking is loaded
+    // with an address but no distance, auto-calculate it now rather than
+    // leaving the field stuck at 0 until the address is manually retyped.
+    window.blendAndBrewComputeDistance(address);
   }
 
   // ----- Package matching -----
@@ -2027,18 +2033,13 @@ if (bookingAddressInput) {
     return data.routes[0].distance / 1000; // metres -> km
   }
 
-  async function selectAddress(place) {
-    suggestionsBox.classList.remove("show");
-    suggestionsBox.innerHTML = "";
-    addressInput.value = formatAddress(place);
-    syncBookingAddressFromTravel();
-
-    if (suburbHidden) suburbHidden.value = parseSuburb(place.address);
+  async function applyDistanceForCoords(lat, lon, addrDetails) {
+    if (suburbHidden && !suburbHidden.value && addrDetails) suburbHidden.value = parseSuburb(addrDetails);
 
     setStatus("Calculating driving distance…", "loading");
 
     try {
-      const km = await routeDistanceKm(parseFloat(place.lat), parseFloat(place.lon));
+      const km = await routeDistanceKm(lat, lon);
       const rounded = Math.round(km * 10) / 10;
       kmInput.value = rounded;
       if (typeof syncFeeSliderToKm === "function") syncFeeSliderToKm();
@@ -2050,6 +2051,36 @@ if (bookingAddressInput) {
     recalc();
     save();
   }
+
+  async function selectAddress(place) {
+    suggestionsBox.classList.remove("show");
+    suggestionsBox.innerHTML = "";
+    addressInput.value = formatAddress(place);
+    syncBookingAddressFromTravel();
+
+    if (suburbHidden) suburbHidden.value = parseSuburb(place.address);
+
+    await applyDistanceForCoords(parseFloat(place.lat), parseFloat(place.lon), place.address);
+  }
+
+  // Exposed so a booking loaded from the Google Sheet (which has no stored
+  // distance of its own) can trigger the same geocode-then-route lookup
+  // used when a person picks an address from the autocomplete dropdown.
+  window.blendAndBrewComputeDistance = async function (addressText) {
+    if (!addressText) return;
+    setStatus("Locating address…", "loading");
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=au&q=${encodeURIComponent(addressText)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) throw new Error("No match found for address.");
+      const place = data[0];
+      await applyDistanceForCoords(parseFloat(place.lat), parseFloat(place.lon), place.address);
+    } catch (err) {
+      console.error("Distance calc error:", err);
+      setStatus("Couldn't auto-calculate distance — please enter the km manually.", "err");
+    }
+  };
 
   addressInput.addEventListener("input", function () {
     syncBookingAddressFromTravel();
