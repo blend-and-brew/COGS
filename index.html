@@ -1124,7 +1124,8 @@ const QUOTE_PAYMENT_BANK_NAME = "[Bank name]";
 // 3. Deploy > New deployment > Web app. Execute as "Me", access "Anyone with the link".
 // 4. Copy the resulting /exec URL and the token below.
 // ===================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzLtYXcLnGB_2zorsVVHVOjoJvJpht1SPS6hZ616Stb9ZCVIry6lV-HBCbRkLKZhowwg/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2gOKCJgmsjjEneP0QkuPrKInprpKsceDz_X6gCfOjCNz3l1ZsM2geLM5wcByaFUF5hg/exec";
+
 const APPS_SCRIPT_TOKEN = "blendandbrew45-sheet-token";
 let sheetBookings = [];
 
@@ -1295,8 +1296,15 @@ function applyBookingToForm(booking) {
   const eventTypeOther = getBookingField(booking, "Event Type Other", "Other Event Type");
   const startTimeRaw = getBookingField(booking, "Start Time", "Event Start Time", "Start");
   const endTimeRaw = getBookingField(booking, "End Time", "Event End Time", "Finish Time", "End");
-  const bookingPrice = getBookingField(booking, "Booking Price", "Package Price", "Price");
-  const coffeeCap = getBookingField(booking, "Servings", "Coffee Cap", "Coffees", "Guests");
+  // "Package Price" is now the authoritative price — it's the exact figure
+  // the website's calculator showed at booking time (sent as packagePrice),
+  // whether that landed on a preset package or a Custom/in-between total.
+  // "Booking Price" is kept as a fallback for older sheets/manual entries.
+  // "Packge Price" covers the current header spelling on the live sheet —
+  // safe to keep even after it's renamed to "Package Price", since an
+  // extra unmatched alias is simply ignored.
+  const bookingPrice = getBookingField(booking, "Package Price", "Packge Price", "Booking Price", "Price");
+  const coffeeCap = getBookingField(booking, "Servings", "Coffee Cap", "Coffees");
   const address = getBookingField(booking, "Location", "Customer Address", "Address");
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
