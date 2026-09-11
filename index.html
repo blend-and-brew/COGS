@@ -1124,7 +1124,7 @@ const QUOTE_PAYMENT_BANK_NAME = "[Bank name]";
 // 3. Deploy > New deployment > Web app. Execute as "Me", access "Anyone with the link".
 // 4. Copy the resulting /exec URL and the token below.
 // ===================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2gOKCJgmsjjEneP0QkuPrKInprpKsceDz_X6gCfOjCNz3l1ZsM2geLM5wcByaFUF5hg/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-pUqNL_L8eOVPKuHaV0SneM_AoAIIGd80cQ45d9XzKbZReMoHdbORYFM1BHKphHZLLQ/exec";
 
 const APPS_SCRIPT_TOKEN = "blendandbrew45-sheet-token";
 let sheetBookings = [];
@@ -1246,6 +1246,17 @@ async function loadBookingsFromSheet() {
   }
 }
 
+// Pulls a plain numeric hours value out of a sheet cell that might read
+// "2 hrs", "2.5", or similar — used for both the Event Hrs and Package
+// Time columns, which are stored as free-text like the booking form sends.
+function parseHoursNumber(raw) {
+  if (raw === "" || raw === null || raw === undefined) return null;
+  const match = String(raw).match(/[\d.]+/);
+  if (!match) return null;
+  const val = parseFloat(match[0]);
+  return isNaN(val) ? null : val;
+}
+
 function normalizePackageName(s) {
   return String(s || "").toLowerCase().replace(/^the\s+/, "").replace(/[^a-z0-9]/g, "");
 }
@@ -1305,6 +1316,13 @@ function applyBookingToForm(booking) {
   // extra unmatched alias is simply ignored.
   const bookingPrice = getBookingField(booking, "Package Price", "Packge Price", "Booking Price", "Price");
   const coffeeCap = getBookingField(booking, "Servings", "Coffee Cap", "Coffees");
+  // "Event Hrs" is the event's own running time (Service end minus Service
+  // start), independent of the package. "Package Time" is the number of
+  // service hours the quoted total actually included (from the website's
+  // 1hr/2hr/3hr slider tiers) — this is what feeds "Hours included in
+  // package" below, including for Custom/in-between totals.
+  const eventHrsRaw = getBookingField(booking, "Event Hrs", "Event Time", "Service Hours", "Event Duration");
+  const packageServiceHoursRaw = getBookingField(booking, "Package Time", "Package Service Hours", "Package Hours", "PackageTime");
   const address = getBookingField(booking, "Location", "Customer Address", "Address");
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
@@ -1358,21 +1376,41 @@ function applyBookingToForm(booking) {
   // the correct event length as its "hours of service".
   updateServiceTimeSummary();
 
+  // The sheet's own "Event Hrs" is the figure actually agreed with the
+  // client (Service end minus Service start at booking time) — prefer it
+  // over recomputing from the Event start/end time fields, which can be
+  // blank or mis-parsed for older rows.
+  const eventHrsParsed = parseHoursNumber(eventHrsRaw);
+  if (eventHrsParsed !== null) {
+    document.getElementById("eventDuration").value = eventHrsParsed;
+  }
+
+  const packageServiceHoursParsed = parseHoursNumber(packageServiceHoursRaw);
+
   const pkgBtn = findPackageButton(packageRaw);
   if (pkgBtn && pkgBtn.getAttribute("data-package") !== "custom") {
     selectPackage(pkgBtn);
+    // The preset package's own data-hours is usually correct, but the
+    // sheet's Package Time (captured at booking time from the 1hr/2hr/3hr
+    // slider tier) is the actual figure quoted — prefer it if present.
+    if (packageServiceHoursParsed !== null) {
+      document.getElementById("packageIncludedHours").value = packageServiceHoursParsed;
+    }
   } else {
     // No preset matches (or the sheet explicitly says "Custom") — prefill
     // the Custom tile itself with this booking's own price/coffees/hours so
     // it can be reviewed or tweaked afterwards via its edit (pencil) tool,
-    // exactly like the preset packages.
+    // exactly like the preset packages. Hours come from the sheet's
+    // Package Time column (the 1hr/2hr/3hr tier the quoted total actually
+    // fell into) rather than the event's own running time, falling back to
+    // the event duration only for older rows that predate that column.
     const customBtn = document.querySelector('.package-option[data-package="custom"]');
     if (customBtn) {
       const customData = {
         name: (packageRaw && normalizePackageName(packageRaw) !== "custom") ? packageRaw : "Custom",
         price: Math.max(0, parseFloat(bookingPrice) || 0),
         coffees: Math.max(0, parseFloat(coffeeCap) || 0),
-        hours: Math.max(0, num("eventDuration") || 0),
+        hours: packageServiceHoursParsed !== null ? packageServiceHoursParsed : Math.max(0, num("eventDuration") || 0),
       };
       applyPackageDataToDOM(customBtn, customData);
       packageOverrides["custom"] = customData;
