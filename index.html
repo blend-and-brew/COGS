@@ -1139,7 +1139,7 @@ const QUOTE_PAYMENT_BANK_NAME = "[Bank name]";
 // 3. Deploy > New deployment > Web app. Execute as "Me", access "Anyone with the link".
 // 4. Copy the resulting /exec URL and the token below.
 // ===================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyGHHZRkTcOKmboNsLogakJwMs2tM0t6-TrQbTDidANMrVaFBGh8F2kfoppjb57EF-iA/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqiFF63MQD7r29LSMgeRAvoCdFfqmhtITJ0FvQo60o2ch1SrCaP3nbyVCCGGzFNrNksw/exec";
 
 const APPS_SCRIPT_TOKEN = "blendandbrew45-sheet-token";
 let sheetBookings = [];
@@ -1372,13 +1372,16 @@ function applyBookingToForm(booking) {
   // package" below, including for Custom/in-between totals.
   const eventHrsRaw = getBookingField(booking, "Event Hrs", "Event Time", "Service Hours", "Event Duration");
   const packageServiceHoursRaw = getBookingField(booking, "Package Time", "Package Service Hours", "Package Hours", "PackageTime");
-  // "Unit/No." and "Location" are separate columns on the sheet (the unit
-  // or house number, and the street & suburb text, kept apart precisely so
-  // a leading unit number never gets fed into the geocoder below). COGS
-  // recombines them into one full address for anywhere the complete
-  // address needs to be shown — the Travel/Booking Details address field
-  // and the generated quote — but geocodes only the street/suburb portion.
-  const houseNumberField = getBookingField(booking, "Unit/No.", "Unit No", "Unit Number", "House Number", "houseNumber");
+  // "Unit/No." and "Location" are separate columns on the sheet: "Unit/No."
+  // holds just the street number (or unit/street number), and "Location"
+  // holds the street name, suburb, state and postcode — kept apart
+  // precisely so a leading street number never gets fed into the geocoder
+  // below. Booking Details' "Event address" shows the two combined (the
+  // full address, for reading/reference), while the Travel section's
+  // "Address" field and the distance calculation use "Location" alone —
+  // that's the only part that needs to be geocoded, and a street number
+  // in front of it can throw the geocoder off.
+  const houseNumberField = getBookingField(booking, "Unit/No.", "Unit No", "Unit Number", "House Number", "Street Number", "houseNumber");
   const streetSuburb = getBookingField(booking, "Location", "Customer Address", "Address");
   const address = [houseNumberField, streetSuburb].filter(Boolean).join(" ").trim();
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
@@ -1420,8 +1423,15 @@ function applyBookingToForm(booking) {
 
   if (bookingPrice !== "") document.getElementById("bookingPrice").value = Math.max(0, parseFloat(bookingPrice) || 0);
   if (coffeeCap !== "") document.getElementById("coffeeCap").value = Math.max(0, parseFloat(coffeeCap) || 0);
-  if (address) document.getElementById("customerAddress").value = address;
-  syncBookingAddressFromTravel();
+  // Travel's "Address" field gets just the street/suburb/state/postcode
+  // (Location) so distance is calculated from that alone; Booking
+  // Details' "Event address" gets the full combined address (street
+  // number + Location) so it reads as a complete address to the user.
+  // These two fields are set independently here on purpose — the usual
+  // mirroring (see syncBookingAddressFromTravel/syncTravelAddressFromBooking)
+  // only kicks back in once someone types into one of the fields by hand.
+  if (streetSuburb) document.getElementById("customerAddress").value = streetSuburb;
+  if (address) document.getElementById("bookingAddress").value = address;
   if (suburb) document.getElementById("eventSuburb").value = suburb;
   if (travelKm !== "") {
     document.getElementById("travelChargeKm").value = Math.max(0, parseFloat(travelKm) || 0);
