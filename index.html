@@ -124,7 +124,14 @@
   .field-box input[readonly] { color: var(--sub); cursor: default; -moz-appearance: textfield; }
   .field-box input[readonly]::-webkit-outer-spin-button,
   .field-box input[readonly]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .field-box-readonly { background: var(--border); opacity: 0.85; }
+  .field-box-readonly { background: rgba(184,130,61,0.14); border-color: transparent; }
+  .utility-status-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 2px 0; }
+  .utility-status { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink); font-weight: 500; }
+  .utility-status-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s ease, color .15s ease; }
+  .utility-status-icon.yes { background: rgba(184,130,61,0.16); color: var(--accent); }
+  .utility-status-icon.no { background: rgba(189,90,52,0.14); color: var(--rust); }
+  .utility-status-icon.neutral { background: rgba(184,130,61,0.14); color: var(--accent); }
+  .utility-status-icon svg { width: 10px; height: 10px; display: block; }
   .extra-hours-rate-box input { width: auto; flex: 0 0 42px; text-align: right; }
   .extra-hours-rate-box input#extraHourRate { flex: 0 0 52px; }
   .service-time-box { min-width: 0; }
@@ -500,8 +507,8 @@
     <div class="card booking-card">
       <div class="card-head">
         <div class="card-head-left">
-          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          <span class="card-title">Booking Quote</span>
+          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          <span class="card-title">Booking Details</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           <a href="https://docs.google.com/spreadsheets/d/1R8c3urQyG15e1euGKSVdKbW95ItgzTySR_lF3zB8Uq8/edit?gid=0#gid=0" target="_blank" rel="noopener" class="icon-clear-btn" id="openBookingSheet" title="Open bookings Google Sheet" aria-label="Open bookings Google Sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></a>
@@ -524,7 +531,7 @@
         </div>
 
         <div class="booking-details-header" id="bookingDetailsHeader">
-          <span class="booking-details-label">Booking Details</span>
+          <span class="booking-details-label">Details</span>
           <div class="toggle on" id="toggle-bookingDetails"><div class="knob"></div></div>
         </div>
 
@@ -577,6 +584,15 @@
             <input type="time" id="eventEndTime" class="text-input"></label>
           <label class="field"><span class="field-label">Event running hours</span>
             <div class="field-box field-box-readonly"><input type="number" id="eventDuration" value="" placeholder="0" readonly tabindex="-1"><span>hrs</span></div></label>
+        </div>
+        <div class="field-grid-3">
+          <label class="field" style="grid-column: 1 / -1;"><span class="field-label">Venue utilities <span style="font-weight:400;text-transform:none;letter-spacing:normal;">(from booking sheet)</span></span>
+            <div class="utility-status-row">
+              <span class="utility-status"><span class="utility-status-icon neutral" id="utilElectricityIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg></span>Electricity</span>
+              <span class="utility-status"><span class="utility-status-icon neutral" id="utilSinksIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg></span>Sinks</span>
+              <span class="utility-status"><span class="utility-status-icon neutral" id="utilShelterIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg></span>Shelter</span>
+            </div>
+          </label>
         </div>
 
         <div class="booking-subsection-label">Package Details</div>
@@ -853,7 +869,7 @@
           <span class="label">Extra hours charge</span>
           <span class="value" id="out-extraHoursCharge">$0</span>
         </div>
-        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Hours included comes from the selected package (edit the package to change it). Anything beyond that, up to Event running hours in Booking Quote, is charged at the rate shown.</p>
+        <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Hours included comes from the selected package (edit the package to change it). Anything beyond that, up to Event running hours in Booking Details, is charged at the rate shown.</p>
       </div>
     </div>
  
@@ -955,14 +971,17 @@
           <div class="toggle" id="toggle-generator"><div class="knob"></div></div>
           <span>Bringing the GENPOWER generator</span>
         </div>
-        <div class="field-grid-3" id="generator-fields" style="display:none;">
+        <div class="field-grid-4" id="generator-fields" style="display:none;">
           <label class="field"><span class="field-label">Run time</span>
             <div class="field-box"><input type="number" id="genHours" value="3" step="0.5" min="0"><span>hrs</span></div></label>
           <label class="field"><span class="field-label">Fuel use</span>
             <div class="field-box"><input type="number" id="genLph" value="3.00" step="0.1" min="0"><span>L/hr</span></div></label>
           <label class="field"><span class="field-label">Fuel price</span>
             <div class="field-box"><span>$</span><input type="number" id="fuelPrice" value="1.75" step="0.01" min="0"><span>/L</span></div></label>
+          <label class="field"><span class="field-label">Hire cost (billed)</span>
+            <div class="field-box"><span>$</span><input type="number" id="genHireCost" value="50" step="1" min="0"></div></label>
         </div>
+        <p style="font-size:11px;color:var(--sub);margin:6px 0 0;font-style:italic;">Run time/fuel is our internal cost only. Hire cost is billed to the customer and shown on their quote.</p>
       </div>
     </div>
 
@@ -970,7 +989,7 @@
     <div class="card off" id="card-custom">
       <div class="card-head">
         <div class="card-head-left">
-          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
           <span class="card-title">Custom Costs</span>
         </div>
         <div class="toggle" id="toggle-custom"><div class="knob"></div></div>
@@ -1066,12 +1085,8 @@
           <span class="label">Custom costs</span>
           <span class="value" id="cq-customCosts-fee" style="font-size:14px;"></span>
         </div>
-        <div class="divider-row" id="cq-overheads-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
-          <span class="label">Running overheads</span>
-          <span class="value" id="cq-overheads-fee" style="font-size:14px;"></span>
-        </div>
         <div class="divider-row" id="cq-generator-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
-          <span class="label">Generator/fuel</span>
+          <span class="label">Generator hire</span>
           <span class="value" id="cq-generator-fee" style="font-size:14px;"></span>
         </div>
         <div class="divider-row" id="cq-travel-row" style="display:none;border-top:1px dashed var(--border);padding-top:10px;margin-top:2px;">
@@ -1124,7 +1139,7 @@ const QUOTE_PAYMENT_BANK_NAME = "[Bank name]";
 // 3. Deploy > New deployment > Web app. Execute as "Me", access "Anyone with the link".
 // 4. Copy the resulting /exec URL and the token below.
 // ===================================================
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwUuWj19uAxPDtR3vURHewPYjTKUZXHucBLowpLpVXqnTvrONRFlzPjxYKw3EwdBKdKQ/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyGHHZRkTcOKmboNsLogakJwMs2tM0t6-TrQbTDidANMrVaFBGh8F2kfoppjb57EF-iA/exec";
 
 const APPS_SCRIPT_TOKEN = "blendandbrew45-sheet-token";
 let sheetBookings = [];
@@ -1293,9 +1308,43 @@ function getVenueInfoItems() {
   return items.length ? items : null;
 }
 
+const UTILITY_CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+const UTILITY_X_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const UTILITY_DASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
+
+// Reflects the sheet's ⚡/💧/🏠 Utilities emoji onto the three status
+// icons in the Booking Details panel — a tick if the emoji is present, an X
+// if it isn't. When no booking is loaded (hasBooking is false — e.g. on a
+// fresh load, or after "Clear booking quote fields"), all three show as
+// neutral light-cream circles with a dash instead, since there's no venue
+// to report on yet.
+function updateUtilityStatusIcons(utilitiesRaw, hasBooking) {
+  const iconMap = [
+    { emoji: "⚡", iconId: "utilElectricityIcon" },
+    { emoji: "💧", iconId: "utilSinksIcon" },
+    { emoji: "🏠", iconId: "utilShelterIcon" },
+  ];
+  iconMap.forEach(({ emoji, iconId }) => {
+    const el = document.getElementById(iconId);
+    if (!el) return;
+    if (!hasBooking) {
+      el.classList.remove("yes", "no");
+      el.classList.add("neutral");
+      el.innerHTML = UTILITY_DASH_SVG;
+      return;
+    }
+    const present = !!(utilitiesRaw && utilitiesRaw.indexOf(emoji) !== -1);
+    el.classList.remove("neutral");
+    el.classList.toggle("yes", present);
+    el.classList.toggle("no", !present);
+    el.innerHTML = present ? UTILITY_CHECK_SVG : UTILITY_X_SVG;
+  });
+}
+
 function applyBookingToForm(booking) {
   if (!booking) return;
   lastAppliedBooking = booking;
+  updateUtilityStatusIcons(getBookingField(booking, "Utilities", "Utilities Provided", "Site Utilities", "Venue Utilities", "Amenities"), true);
   const clientName = getBookingField(booking, "Name", "Client Name", "Client");
   const organisation = getBookingField(booking, "Organisation", "Organization", "Company");
   const contactPhone = getBookingField(booking, "Contact Phone", "Phone", "Contact Number", "Mobile");
@@ -1323,7 +1372,15 @@ function applyBookingToForm(booking) {
   // package" below, including for Custom/in-between totals.
   const eventHrsRaw = getBookingField(booking, "Event Hrs", "Event Time", "Service Hours", "Event Duration");
   const packageServiceHoursRaw = getBookingField(booking, "Package Time", "Package Service Hours", "Package Hours", "PackageTime");
-  const address = getBookingField(booking, "Location", "Customer Address", "Address");
+  // "Unit/No." and "Location" are separate columns on the sheet (the unit
+  // or house number, and the street & suburb text, kept apart precisely so
+  // a leading unit number never gets fed into the geocoder below). COGS
+  // recombines them into one full address for anywhere the complete
+  // address needs to be shown — the Travel/Booking Details address field
+  // and the generated quote — but geocodes only the street/suburb portion.
+  const houseNumberField = getBookingField(booking, "Unit/No.", "Unit No", "Unit Number", "House Number", "houseNumber");
+  const streetSuburb = getBookingField(booking, "Location", "Customer Address", "Address");
+  const address = [houseNumberField, streetSuburb].filter(Boolean).join(" ").trim();
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
   const packageRaw = getBookingField(booking, "Package");
@@ -1369,12 +1426,15 @@ function applyBookingToForm(booking) {
   if (travelKm !== "") {
     document.getElementById("travelChargeKm").value = Math.max(0, parseFloat(travelKm) || 0);
     syncFeeSliderToKm();
-  } else if (address && typeof window.blendAndBrewComputeDistance === "function") {
+  } else if (streetSuburb && typeof window.blendAndBrewComputeDistance === "function") {
     // The booking sheet doesn't store a distance figure (it's only ever
     // calculated here in COGS via geocoding), so when a booking is loaded
     // with an address but no distance, auto-calculate it now rather than
     // leaving the field stuck at 0 until the address is manually retyped.
-    window.blendAndBrewComputeDistance(address);
+    // Deliberately geocodes the street/suburb text alone — not the
+    // combined "address" with the unit number prefixed — since a unit
+    // number can throw off the geocoder.
+    window.blendAndBrewComputeDistance(streetSuburb);
   }
 
   // ----- Package matching -----
@@ -1821,6 +1881,7 @@ function clearTravelForm() {
 
 function clearBookingQuoteForm() {
   lastAppliedBooking = null;
+  updateUtilityStatusIcons("", false);
   const sheetSelect = document.getElementById("bookingSheetSelect");
   if (sheetSelect) sheetSelect.value = "";
 
@@ -1938,13 +1999,13 @@ packageButtons.forEach((btn) => {
 
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
 document.getElementById("clearBookingQuote").addEventListener("click", () => {
-  const confirmed = window.confirm("Clear the Booking Quote fields? Client details, event details, and booking price will be reset — this can't be undone.");
+  const confirmed = window.confirm("Clear the Booking Details fields? Client details, event details, and booking price will be reset — this can't be undone.");
   if (!confirmed) return;
   clearBookingQuoteForm();
 });
 document.getElementById("clearTravel").addEventListener("click", clearTravelForm);
 
-// ----- Keep the Booking Quote "Event address" field and the Travel
+// ----- Keep the Booking Details "Event address" field and the Travel
 // "Address" field mirroring each other, since they represent the same
 // underlying event address. -----
 function syncBookingAddressFromTravel() {
@@ -2017,6 +2078,7 @@ if (bookingAddressInput) {
     } catch (e) {}
     const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=au&q=${encodeURIComponent(ORIGIN_ADDRESS)}`;
     const res = await fetch(url);
+    if (!res.ok) throw new Error("Nominatim request failed: " + res.status);
     const data = await res.json();
     if (!Array.isArray(data) || !data.length) throw new Error("Could not locate home base address.");
     originCoords = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
@@ -2024,13 +2086,40 @@ if (bookingAddressInput) {
     return originCoords;
   }
 
+  // Straight-line ("as the crow flies") distance in km between two lat/lon
+  // points. Used as a fallback when the free OSRM routing server is down,
+  // overloaded, or rate-limited, so a distance still gets filled in rather
+  // than the field being left at 0.
+  function haversineKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const toRad = (d) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  // Tries the free OSRM driving-route API first (real road distance). If
+  // that server is unreachable/rate-limited, falls back to a straight-line
+  // estimate scaled up ~30% to approximate road distance, so the km field
+  // still populates instead of staying at 0.
   async function routeDistanceKm(destLat, destLon) {
     const origin = await getOriginCoords();
-    const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destLon},${destLat}?overview=false&alternatives=false&steps=false`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (!data.routes || !data.routes.length) throw new Error("No route found.");
-    return data.routes[0].distance / 1000; // metres -> km
+    try {
+      const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destLon},${destLat}?overview=false&alternatives=false&steps=false`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("OSRM request failed: " + res.status);
+      const data = await res.json();
+      if (data.code !== "Ok" || !data.routes || !data.routes.length) throw new Error("No route found.");
+      return { km: data.routes[0].distance / 1000, estimated: false }; // metres -> km
+    } catch (err) {
+      console.warn("OSRM routing unavailable, falling back to straight-line estimate:", err);
+      const straightKm = haversineKm(origin.lat, origin.lon, destLat, destLon);
+      return { km: straightKm * 1.3, estimated: true }; // +30% approximates road vs straight-line distance
+    }
   }
 
   async function applyDistanceForCoords(lat, lon, addrDetails) {
@@ -2039,11 +2128,15 @@ if (bookingAddressInput) {
     setStatus("Calculating driving distance…", "loading");
 
     try {
-      const km = await routeDistanceKm(lat, lon);
-      const rounded = Math.round(km * 10) / 10;
+      const result = await routeDistanceKm(lat, lon);
+      const rounded = Math.round(result.km * 10) / 10;
       kmInput.value = rounded;
       if (typeof syncFeeSliderToKm === "function") syncFeeSliderToKm();
-      setStatus(`✓ ${rounded} km driving distance from Edensor Park (auto-calculated).`, "ok");
+      if (result.estimated) {
+        setStatus(`≈ ${rounded} km estimated distance from Edensor Park (routing service unavailable — straight-line estimate, please check).`, "loading");
+      } else {
+        setStatus(`✓ ${rounded} km driving distance from Edensor Park (auto-calculated).`, "ok");
+      }
     } catch (err) {
       console.error("Distance calc error:", err);
       setStatus("Couldn't auto-calculate distance — please enter the km manually.", "err");
@@ -2222,13 +2315,14 @@ function computeExtraHoursCharge() {
   const hoursNeeded = num("eventDuration");
   const includedHours = num("packageIncludedHours");
   const rate = num("extraHourRate");
-  // Package including more hours than the event actually runs for — the
-  // package has "gone over" the event time, so the excess is charged at
-  // the extra-hour rate.
-  const chargeableHours = Math.max(0, includedHours - hoursNeeded);
-  // Event running longer than the package's included hours — not charged
-  // here, but still worth surfacing for context.
-  const unusedHours = Math.max(0, hoursNeeded - includedHours);
+  // Event running longer than the package's included hours — the customer
+  // needs service beyond what the package covers, so the excess is charged
+  // at the extra-hour rate.
+  const chargeableHours = Math.max(0, hoursNeeded - includedHours);
+  // Package including more hours than the event actually runs for — that's
+  // already paid for as part of the package price, so no extra charge; only
+  // worth surfacing for context.
+  const unusedHours = Math.max(0, includedHours - hoursNeeded);
   const extraHours = chargeableHours > 0 ? chargeableHours : unusedHours;
   const charge = chargeableHours * rate;
   return { extraHours, chargeableHours, unusedHours, rate, charge };
@@ -2355,7 +2449,11 @@ function recalc() {
   const consumablesTotal = beansCost + milkCost + cupsCost + sundriesCost;
   const costPerCoffee = coffees > 0 ? consumablesTotal / coffees : 0;
  
-  const generatorCost = overheadsOn && generatorOn ? num("genHours") * num("genLph") * num("fuelPrice") : 0;
+  // Generator run cost (fuel) is our own internal expense — like the rest of
+  // Running Overheads, it's never billed to the customer. Hire cost is the
+  // separate flat fee we *do* charge the customer for bringing the generator.
+  const generatorFuelCost = overheadsOn && generatorOn ? num("genHours") * num("genLph") * num("fuelPrice") : 0;
+  const generatorHireCost = overheadsOn && generatorOn ? num("genHireCost") : 0;
   const bookingPrice = num("bookingPrice");
  
   const travelChargeCalc = computeTravelSurcharge();
@@ -2364,12 +2462,12 @@ function recalc() {
   const extraHoursAmount = extraHoursOn ? extraHoursCalc.charge : 0;
   const customTotal = customOn ? customFields.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0) : 0;
   const customCostsAmount = customOn ? customTotal : 0;
-  const totalRevenue = bookingPrice + travelSurchargeAmount + extraHoursAmount + customCostsAmount;
+  const totalRevenue = bookingPrice + travelSurchargeAmount + extraHoursAmount + customCostsAmount + generatorHireCost;
  
   const cardFeeCost = overheadsOn ? totalRevenue * (num("cardFeePct") / 100) : 0;
   const overheadsTotal = overheadsOn ? num("insurance") + num("servicing") + num("permits") : 0;
  
-  const totalCosts = consumablesTotal + generatorCost + cardFeeCost + overheadsTotal + customTotal;
+  const totalCosts = consumablesTotal + generatorFuelCost + cardFeeCost + overheadsTotal + customTotal;
   const grossProfit = totalRevenue - totalCosts;
   const marginPct = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
  
@@ -2396,25 +2494,24 @@ function recalc() {
   document.getElementById("extraHoursDisplay").value = extraHoursCalc.extraHours.toFixed(1).replace(/\.0$/, "");
   const extraHoursNoteEl = document.getElementById("extraHoursNote");
   if (extraHoursCalc.chargeableHours > 0.001) {
-    extraHoursNoteEl.textContent = "Package includes " + extraHoursCalc.chargeableHours.toFixed(1).replace(/\.0$/, "") +
-      " more hrs than the event's running time, charged at " + currency(extraHoursCalc.rate) + "/hr." +
+    extraHoursNoteEl.textContent = "Event runs " + extraHoursCalc.chargeableHours.toFixed(1).replace(/\.0$/, "") +
+      " hrs longer than the " + num("packageIncludedHours").toFixed(1).replace(/\.0$/, "") +
+      " hrs included in the package, charged at " + currency(extraHoursCalc.rate) + "/hr." +
       (extraHoursOn ? " Added to quote revenue." : " Toggle on to include in revenue.");
   } else if (extraHoursCalc.unusedHours > 0.001) {
-    extraHoursNoteEl.textContent = "Event runs " + extraHoursCalc.unusedHours.toFixed(1).replace(/\.0$/, "") +
-      " hrs longer than the " + num("packageIncludedHours").toFixed(1).replace(/\.0$/, "") +
-      " hrs included in the package — no extra charge.";
+    extraHoursNoteEl.textContent = "Package includes " + extraHoursCalc.unusedHours.toFixed(1).replace(/\.0$/, "") +
+      " more hrs than the event's running time — already covered by the package price, no extra charge.";
   } else {
     extraHoursNoteEl.textContent = "Event running hours matches the package's included hours — no extra charge.";
   }
  
-  // Running overheads (insurance/servicing/permits/card fee) are shown on
-  // the Customer Quote as one lump sum with a bulleted per-item breakdown;
-  // the generator charge is kept as its own separate running-cost line.
-  // Both are added into the quoted total since the customer is charged for
-  // them. cardFeeCost above is already based on totalRevenue (pre-overheads),
-  // so it doesn't circularly apply to itself.
-  const cqOverheadsLumpSum = overheadsOn ? (num("insurance") + num("servicing") + num("permits") + cardFeeCost) : 0;
-  const cqTotal = totalRevenue + cqOverheadsLumpSum + generatorCost;
+  // Running Overheads (insurance/servicing/permits/card fee) and the
+  // generator's own run cost (fuel) are our expenses only — they're never
+  // billed to the customer, so they stay out of the quoted total and only
+  // show up in Total Costs above. The generator hire cost is the one part
+  // of that section that IS billed, and it's already folded into
+  // totalRevenue, so the quoted total is simply totalRevenue itself.
+  const cqTotal = totalRevenue;
   document.getElementById("cq-total").textContent = currency(cqTotal);
 
   const cqExtraHoursRow = document.getElementById("cq-extraHours-row");
@@ -2436,20 +2533,11 @@ function recalc() {
     cqCustomCostsRow.style.display = "none";
   }
 
-  const cqOverheadsRow = document.getElementById("cq-overheads-row");
-  const cqOverheadsFeeEl = document.getElementById("cq-overheads-fee");
-  if (overheadsOn && cqOverheadsLumpSum > 0) {
-    cqOverheadsRow.style.display = "flex";
-    cqOverheadsFeeEl.textContent = currency(cqOverheadsLumpSum);
-  } else {
-    cqOverheadsRow.style.display = "none";
-  }
-
   const cqGeneratorRow = document.getElementById("cq-generator-row");
   const cqGeneratorFeeEl = document.getElementById("cq-generator-fee");
-  if (overheadsOn && generatorOn && generatorCost > 0) {
+  if (overheadsOn && generatorOn && generatorHireCost > 0) {
     cqGeneratorRow.style.display = "flex";
-    cqGeneratorFeeEl.textContent = currency(generatorCost);
+    cqGeneratorFeeEl.textContent = currency(generatorHireCost);
   } else {
     cqGeneratorRow.style.display = "none";
   }
@@ -2506,7 +2594,7 @@ function recalc() {
     ["Beans", beansCost],
     ["Milk", milkCost],
     ["Cups & sundries", cupsCost + sundriesCost],
-    ["Generator/fuel", generatorCost],
+    ["Generator/fuel", generatorFuelCost],
     ["Card fees", cardFeeCost],
     ["Overheads", overheadsTotal],
     ["Custom costs", customTotal],
@@ -2531,7 +2619,7 @@ function syncPackageServiceTimeDisplay() {
  
 function collectState() {
   const ids = ["beanPrice","dose","milkPrice","milkMl","milkWastage","cupLid","sundries","coffeeCap","waterPerCoffee",
-    "genHours","genLph","fuelPrice","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
+    "genHours","genLph","fuelPrice","genHireCost","insurance","servicing","permits","cardFeePct","bookingPrice","eventDuration",
     "eventSuburb","travelChargeKm","includedKm","travelMinFee","travelSurchargeRate","quoteThresholdKm","clientName","clientOrganisation","clientPhone","clientEmail","bookingNumber","eventDate","eventStartTime","eventEndTime","eventType","eventTypeOther","customerAddress","customTravelQuote","stockBufferPct","packageIncludedHours","extraHourRate"];
   const values = {};
   ids.forEach((id) => { values[id] = document.getElementById(id).value; });
@@ -2730,10 +2818,8 @@ function formatQuotePhone(phone) {
 // wouldn't automatically assume are covered (unlike, say, "espresso
 // equipment" or "coffee service", which go without saying).
 function buildInclusionItems(coffees) {
-  const baristaCount = coffees > 50 ? 2 : 1;
-  const baristaLabel = baristaCount + " Professional " + (baristaCount > 1 ? "Baristas" : "Barista");
   const items = [
-    baristaLabel,
+    "2 Professional Baristas",
     coffees + " Coffees",
     "Setup and Pack-Down",
     "Dietary and Milk Alternatives",
@@ -2783,20 +2869,13 @@ function buildQuoteDocumentHTML() {
   const customCostItems = customOn ? customFields.filter((f) => (parseFloat(f.amount) || 0) > 0) : [];
   const customCostsTotal = customCostItems.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
 
-  // Running overheads: insurance/servicing/permits/card fees are shown on
-  // the quote as one lump sum (with a bulleted per-item breakdown below it);
-  // the generator charge is kept as its own separate running-cost line
-  // rather than folded into that lump sum. Card fee % is applied to the
-  // price total *before* overheads/generator are added, so the fee doesn't
-  // circularly apply to itself.
-  const preOverheadsTotal = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
-  const cardFeeAmount = overheadsOn ? preOverheadsTotal * (num("cardFeePct") / 100) : 0;
-  const overheadsLumpSum = overheadsOn
-    ? num("insurance") + num("servicing") + num("permits") + cardFeeAmount
-    : 0;
-  const generatorChargeAmount = overheadsOn && generatorOn ? num("genHours") * num("genLph") * num("fuelPrice") : 0;
+  // Running Overheads (insurance/servicing/permits/card fees) and the
+  // generator's own run cost (fuel) are our expenses only and are never
+  // billed to the customer. The generator hire cost is the one billable
+  // part of that section, so it's the only piece added to the quote total.
+  const generatorHireAmount = overheadsOn && generatorOn ? num("genHireCost") : 0;
 
-  const total = preOverheadsTotal + overheadsLumpSum + generatorChargeAmount;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal + generatorHireAmount;
   const paymentLink = buildPaymentLink({ includeQuote: false });
   // This quote document previews its own payment link for testing — it can't
   // also embed *itself* inside that link (that would recurse forever), so
@@ -2869,32 +2948,11 @@ function buildQuoteDocumentHTML() {
   }
 
   let runningCostsSectionHtml = "";
-  if (overheadsOn) {
-    const overheadsBulletItems = [
-      ["Insurance", num("insurance")],
-      ["Servicing/depreciation", num("servicing")],
-      ["Permits/council fees", num("permits")],
-      ["Card/EFTPOS fees", cardFeeAmount],
-    ];
-    const overheadsBulletsHtml = overheadsBulletItems
-      .map(([label, amt]) => `<li>${escapeHtml(label)} — ${currency(amt)}</li>`)
-      .join("\n              ");
-    const generatorRowHtml = generatorOn
-      ? `<tr><td>Generator/fuel</td><td class="right">${currency(generatorChargeAmount)}</td></tr>`
-      : "";
+  if (overheadsOn && generatorOn && generatorHireAmount > 0) {
     runningCostsSectionHtml = `
       <p class="package-service-eyebrow section-spaced">Running Costs</p>
       <table class="lines">
-        <tr class="pkg-row">
-          <td>
-            Running overheads
-            <ul class="pkg-inclusions">
-              ${overheadsBulletsHtml}
-            </ul>
-          </td>
-          <td class="right">${currency(overheadsLumpSum)}</td>
-        </tr>
-        ${generatorRowHtml}
+        <tr><td>Generator hire</td><td class="right">${currency(generatorHireAmount)}</td></tr>
       </table>`;
   }
 
@@ -3277,7 +3335,12 @@ function buildQuoteSummaryText() {
   const km = num("travelChargeKm");
   const customCostItems = customOn ? customFields.filter((f) => (parseFloat(f.amount) || 0) > 0) : [];
   const customCostsTotal = customCostItems.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
-  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
+  // Running Overheads (insurance/servicing/permits/card fees) and the
+  // generator's own run cost (fuel) are internal expenses only — never
+  // billed. The generator hire cost is the one billable part of that
+  // section, so it's the only piece added to the quote total.
+  const generatorHireAmount = overheadsOn && generatorOn ? num("genHireCost") : 0;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal + generatorHireAmount;
 
   const lines = [];
   lines.push("BLEND & BREW — EVENT QUOTE");
@@ -3303,6 +3366,11 @@ function buildQuoteSummaryText() {
     lines.push("");
     lines.push("ADDITIONAL ITEMS");
     customCostItems.forEach((f) => lines.push(`${f.label || "Additional item"}: ${currency(parseFloat(f.amount) || 0)}`));
+  }
+  if (generatorHireAmount > 0) {
+    lines.push("");
+    lines.push("RUNNING COSTS");
+    lines.push(`Generator hire: ${currency(generatorHireAmount)}`);
   }
   if (travelOn && travelSurchargeCalc.customQuote) {
     lines.push("");
@@ -3413,7 +3481,11 @@ function buildQuoteBreakdownItems() {
   const km = num("travelChargeKm");
   const customCostItems = customOn ? customFields.filter((f) => (parseFloat(f.amount) || 0) > 0) : [];
   const customCostsTotal = customCostItems.reduce((s, f) => s + (parseFloat(f.amount) || 0), 0);
-  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal;
+  // Running Overheads and the generator's own run cost (fuel) are internal
+  // expenses only — never billed. The generator hire cost is the one
+  // billable part of that section.
+  const generatorHireAmount = overheadsOn && generatorOn ? num("genHireCost") : 0;
+  const total = bookingPrice + travelSurcharge + extraHoursCharge + customCostsTotal + generatorHireAmount;
 
   const items = [];
   items.push({ label: `${packageName} — ${coffees} coffees / ${includedHoursLabel} hrs`, amount: bookingPrice });
@@ -3425,6 +3497,10 @@ function buildQuoteBreakdownItems() {
   customCostItems.forEach((f) => {
     items.push({ label: f.label || "Additional item", amount: parseFloat(f.amount) || 0 });
   });
+
+  if (generatorHireAmount > 0) {
+    items.push({ label: "Generator hire", amount: generatorHireAmount });
+  }
 
   if (travelOn && travelCalc.customQuote) {
     items.push({
