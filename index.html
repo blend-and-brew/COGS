@@ -1157,6 +1157,20 @@ function getBookingField(booking, ...candidates) {
     const v = map[normalizeKey(c)];
     if (v !== undefined && v !== null && v !== "") return v;
   }
+  // Fuzzy fallback: the sheet's actual header text sometimes differs
+  // slightly from the aliases above (extra words, slashes, plus signs,
+  // etc — e.g. "Location/Street+Suburb" vs the alias "Location"). If no
+  // exact match was found, fall back to the first sheet column whose
+  // normalized header contains, or is contained by, one of our aliases.
+  for (const c of candidates) {
+    const target = normalizeKey(c);
+    if (!target) continue;
+    for (const key of Object.keys(map)) {
+      const v = map[key];
+      if (v === undefined || v === null || v === "") continue;
+      if (key.indexOf(target) !== -1 || target.indexOf(key) !== -1) return v;
+    }
+  }
   return "";
 }
 
@@ -1382,7 +1396,7 @@ function applyBookingToForm(booking) {
   // that's the only part that needs to be geocoded, and a street number
   // in front of it can throw the geocoder off.
   const houseNumberField = getBookingField(booking, "Unit/No.", "Unit No", "Unit Number", "House Number", "Street Number", "houseNumber");
-  const streetSuburb = getBookingField(booking, "Location", "Customer Address", "Address");
+  const streetSuburb = getBookingField(booking, "Location/Street+Suburb", "Location/Street + Suburb", "Street+Suburb", "Street/Suburb", "Location", "Customer Address", "Address");
   const address = [houseNumberField, streetSuburb].filter(Boolean).join(" ").trim();
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
@@ -1423,28 +1437,29 @@ function applyBookingToForm(booking) {
 
   if (bookingPrice !== "") document.getElementById("bookingPrice").value = Math.max(0, parseFloat(bookingPrice) || 0);
   if (coffeeCap !== "") document.getElementById("coffeeCap").value = Math.max(0, parseFloat(coffeeCap) || 0);
-  // Travel's "Address" field gets just the street/suburb/state/postcode
-  // (Location) so distance is calculated from that alone; Booking
-  // Details' "Event address" gets the full combined address (street
-  // number + Location) so it reads as a complete address to the user.
-  // These two fields are set independently here on purpose — the usual
-  // mirroring (see syncBookingAddressFromTravel/syncTravelAddressFromBooking)
-  // only kicks back in once someone types into one of the fields by hand.
-  if (streetSuburb) document.getElementById("customerAddress").value = streetSuburb;
-  if (address) document.getElementById("bookingAddress").value = address;
+  // Both the Booking Details "Event address" field and the Travel
+  // "Address" field get the same full combined address — Unit/No.
+  // (column H) plus Location (column I) — so they always read as one
+  // complete address wherever it's shown. These two fields are set
+  // independently here on purpose — the usual mirroring (see
+  // syncBookingAddressFromTravel/syncTravelAddressFromBooking) only
+  // kicks back in once someone types into one of the fields by hand.
+  if (address) {
+    document.getElementById("customerAddress").value = address;
+    document.getElementById("bookingAddress").value = address;
+  }
   if (suburb) document.getElementById("eventSuburb").value = suburb;
   if (travelKm !== "") {
     document.getElementById("travelChargeKm").value = Math.max(0, parseFloat(travelKm) || 0);
     syncFeeSliderToKm();
-  } else if (streetSuburb && typeof window.blendAndBrewComputeDistance === "function") {
+  } else if (address && typeof window.blendAndBrewComputeDistance === "function") {
     // The booking sheet doesn't store a distance figure (it's only ever
     // calculated here in COGS via geocoding), so when a booking is loaded
     // with an address but no distance, auto-calculate it now rather than
     // leaving the field stuck at 0 until the address is manually retyped.
-    // Deliberately geocodes the street/suburb text alone — not the
-    // combined "address" with the unit number prefixed — since a unit
-    // number can throw off the geocoder.
-    window.blendAndBrewComputeDistance(streetSuburb);
+    // Geocodes the full combined address (Unit/No. + Location) — the same
+    // text now shown in the Address field above.
+    window.blendAndBrewComputeDistance(address);
   }
 
   // ----- Package matching -----
