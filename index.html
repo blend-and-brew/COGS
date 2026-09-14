@@ -1157,20 +1157,6 @@ function getBookingField(booking, ...candidates) {
     const v = map[normalizeKey(c)];
     if (v !== undefined && v !== null && v !== "") return v;
   }
-  // Fuzzy fallback: the sheet's actual header text sometimes differs
-  // slightly from the aliases above (extra words, slashes, plus signs,
-  // etc — e.g. "Location/Street+Suburb" vs the alias "Location"). If no
-  // exact match was found, fall back to the first sheet column whose
-  // normalized header contains, or is contained by, one of our aliases.
-  for (const c of candidates) {
-    const target = normalizeKey(c);
-    if (!target) continue;
-    for (const key of Object.keys(map)) {
-      const v = map[key];
-      if (v === undefined || v === null || v === "") continue;
-      if (key.indexOf(target) !== -1 || target.indexOf(key) !== -1) return v;
-    }
-  }
   return "";
 }
 
@@ -1396,7 +1382,7 @@ function applyBookingToForm(booking) {
   // that's the only part that needs to be geocoded, and a street number
   // in front of it can throw the geocoder off.
   const houseNumberField = getBookingField(booking, "Unit/No.", "Unit No", "Unit Number", "House Number", "Street Number", "houseNumber");
-  const streetSuburb = getBookingField(booking, "Location/Street+Suburb", "Location/Street + Suburb", "Street+Suburb", "Street/Suburb", "Location", "Customer Address", "Address");
+  const streetSuburb = getBookingField(booking, "Location", "Customer Address", "Address");
   const address = [houseNumberField, streetSuburb].filter(Boolean).join(" ").trim();
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
@@ -2063,6 +2049,11 @@ if (bookingAddressInput) {
 (function () {
   const ORIGIN_ADDRESS = "23 Gwandalan Road, Edensor Park NSW, Australia";
   const ORIGIN_CACHE_KEY = "blendAndBrewOriginCoords";
+  // Emergency fallback only — used if Nominatim can't be reached to geocode
+  // our own home base address (e.g. rate-limited/temporarily down). This is
+  // the approximate Edensor Park location, close enough for travel-fee
+  // purposes; a successful live geocode always overrides it and gets cached.
+  const ORIGIN_FALLBACK_COORDS = { lat: -33.8803, lon: 150.8763 };
 
   const addressInput = document.getElementById("customerAddress");
   const suggestionsBox = document.getElementById("addressSuggestions");
@@ -2101,14 +2092,25 @@ if (bookingAddressInput) {
       const cached = JSON.parse(localStorage.getItem(ORIGIN_CACHE_KEY) || "null");
       if (cached && cached.lat && cached.lon) { originCoords = cached; return originCoords; }
     } catch (e) {}
-    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=au&q=${encodeURIComponent(ORIGIN_ADDRESS)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Nominatim request failed: " + res.status);
-    const data = await res.json();
-    if (!Array.isArray(data) || !data.length) throw new Error("Could not locate home base address.");
-    originCoords = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-    try { localStorage.setItem(ORIGIN_CACHE_KEY, JSON.stringify(originCoords)); } catch (e) {}
-    return originCoords;
+    // This lookup used to be able to take down the whole distance
+    // calculation if it failed (e.g. Nominatim briefly rate-limited or
+    // unreachable) — it now falls back to a hardcoded approximate location
+    // for our own home base instead of throwing, so a hiccup here doesn't
+    // block the OSRM/haversine fallback further down the chain.
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=au&q=${encodeURIComponent(ORIGIN_ADDRESS)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Nominatim request failed: " + res.status);
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) throw new Error("Could not locate home base address.");
+      originCoords = { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+      try { localStorage.setItem(ORIGIN_CACHE_KEY, JSON.stringify(originCoords)); } catch (e) {}
+      return originCoords;
+    } catch (err) {
+      console.warn("Could not geocode home base address, using fallback coordinates:", err);
+      originCoords = ORIGIN_FALLBACK_COORDS;
+      return originCoords;
+    }
   }
 
   // Straight-line ("as the crow flies") distance in km between two lat/lon
