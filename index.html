@@ -1157,6 +1157,20 @@ function getBookingField(booking, ...candidates) {
     const v = map[normalizeKey(c)];
     if (v !== undefined && v !== null && v !== "") return v;
   }
+  // Fuzzy fallback: the sheet's actual header text sometimes differs
+  // slightly from the aliases above (extra words, slashes, plus signs,
+  // etc — e.g. "Location/Street+Suburb" vs the alias "Location"). If no
+  // exact match was found, fall back to the first sheet column whose
+  // normalized header contains, or is contained by, one of our aliases.
+  for (const c of candidates) {
+    const target = normalizeKey(c);
+    if (!target) continue;
+    for (const key of Object.keys(map)) {
+      const v = map[key];
+      if (v === undefined || v === null || v === "") continue;
+      if (key.indexOf(target) !== -1 || target.indexOf(key) !== -1) return v;
+    }
+  }
   return "";
 }
 
@@ -1382,7 +1396,7 @@ function applyBookingToForm(booking) {
   // that's the only part that needs to be geocoded, and a street number
   // in front of it can throw the geocoder off.
   const houseNumberField = getBookingField(booking, "Unit/No.", "Unit No", "Unit Number", "House Number", "Street Number", "houseNumber");
-  const streetSuburb = getBookingField(booking, "Location", "Customer Address", "Address");
+  const streetSuburb = getBookingField(booking, "Location/Street+Suburb", "Location/Street + Suburb", "Street+Suburb", "Street/Suburb", "Location", "Customer Address", "Address");
   const address = [houseNumberField, streetSuburb].filter(Boolean).join(" ").trim();
   const suburb = getBookingField(booking, "Event Suburb", "Suburb");
   const travelKm = getBookingField(booking, "Travel Distance Km", "Distance Km", "Km");
