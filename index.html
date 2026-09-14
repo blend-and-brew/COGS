@@ -1452,14 +1452,17 @@ function applyBookingToForm(booking) {
   if (travelKm !== "") {
     document.getElementById("travelChargeKm").value = Math.max(0, parseFloat(travelKm) || 0);
     syncFeeSliderToKm();
-  } else if (address && typeof window.blendAndBrewComputeDistance === "function") {
+  } else if (streetSuburb && typeof window.blendAndBrewComputeDistance === "function") {
     // The booking sheet doesn't store a distance figure (it's only ever
     // calculated here in COGS via geocoding), so when a booking is loaded
     // with an address but no distance, auto-calculate it now rather than
     // leaving the field stuck at 0 until the address is manually retyped.
-    // Geocodes the full combined address (Unit/No. + Location) — the same
-    // text now shown in the Address field above.
-    window.blendAndBrewComputeDistance(address);
+    // Geocode column I (Location/Street+Suburb) on its own rather than the
+    // full displayed address — column I is already a clean, complete
+    // street+suburb string, whereas prepending column H's unit/street
+    // number (or a blank H) in front of it was tripping up the geocoder
+    // and causing "Couldn't auto-calculate distance" failures.
+    window.blendAndBrewComputeDistance(streetSuburb);
   }
 
   // ----- Package matching -----
