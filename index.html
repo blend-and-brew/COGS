@@ -2777,14 +2777,18 @@ function load() {
   } catch (e) {}
 }
  
-function performHardReset(confirmMessage) {
-  const confirmed = window.confirm(confirmMessage || "Hard reset? This clears all saved values and reloads the dashboard exactly as it ships in the HTML file — this can't be undone.");
-  if (!confirmed) return;
+function clearPersistedDashboardState() {
   try {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem("blendAndBrewRightColWidth");
     localStorage.removeItem("blendAndBrewOriginCoords");
   } catch (e) {}
+}
+
+function performHardReset(confirmMessage) {
+  const confirmed = window.confirm(confirmMessage || "Hard reset? This clears all saved values and reloads the dashboard exactly as it ships in the HTML file — this can't be undone.");
+  if (!confirmed) return;
+  clearPersistedDashboardState();
   // Force a genuine reload from source, bypassing the browser's cached copy
   // of this page (not just the saved form state) so we truly load as-is
   // from the HTML file rather than any cached render of it.
@@ -3643,7 +3647,11 @@ document.getElementById("bookingSheetSelect").addEventListener("change", (e) => 
 document.getElementById("refreshBookingsBtn").addEventListener("click", loadBookingsFromSheet);
  
 initChart();
-load();
+// Every load starts from a clean slate — the same as clicking the "Reset"
+// button — regardless of anything saved in this browser from a previous
+// session. If you want the dashboard to remember values between visits
+// again, swap the line below back to `load();`.
+clearPersistedDashboardState();
 syncAllDateTimeValueClasses();
 syncBookingAddressFromTravel();
 renderCustomFields();
