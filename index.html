@@ -69,7 +69,7 @@
   .pdf-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
  
   .grid { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-  .left-col { padding: 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
+  .left-col { padding: 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; overflow-anchor: none; scrollbar-gutter: stable; }
   .right-col { padding: 20px; border-top: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #211C15; container-type: inline-size; }
   .col-resizer { display: none; }
   @media (min-width: 1024px) {
@@ -233,14 +233,24 @@
  
   .booking-card { background: var(--booking-card); border-color: var(--booking-border); }
   .booking-details-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 0 4px; margin-top: 6px;
-    border-top: 1px dashed var(--booking-border);
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    padding: 10px 0 0; margin-top: -6px; margin-bottom: 4px;
     cursor: pointer; user-select: none;
   }
   .booking-details-label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
-  .booking-details-body { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
-  .booking-details-body.off { display: none; }
+  .booking-chevron {
+    grid-column: 2; width: 44px; height: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--booking-border); cursor: pointer;
+  }
+  .booking-chevron svg { width: 44px; height: 12px; transition: transform .25s ease; }
+  .booking-chevron.on svg { transform: scaleY(-1); }
+  .booking-details-collapse {
+    display: grid; grid-template-rows: 1fr;
+    transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .booking-details-collapse.off { grid-template-rows: 0fr; }
+  .booking-details-body { display: flex; flex-direction: column; gap: 16px; overflow: hidden; min-height: 0; }
   .booking-subsection-label {
     font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
     color: var(--accent); margin-bottom: -6px;
@@ -251,7 +261,109 @@
   @media (max-width: 720px) {
     .top-row { grid-template-columns: 1fr; }
   }
- 
+
+  /* Icon rail styled as folder tabs, running horizontally across the top of
+     the panel at every screen width. The rail and the panel are stretched
+     to match each other's height (whichever is taller), so the panel always
+     reaches the full extent of the tab list rather than the two ending at
+     different heights. The panel drops its top border, since the tab row
+     sits directly above it. A single continuous line (the rail's own
+     ::after) runs the full length of that seam, sitting behind every tab;
+     each inactive tab's own matching-colour border simply overlaps it
+     invisibly, so the line reads as one unbroken stroke running through all
+     the inactive tabs and across the gaps between them. The active tab then
+     paints over that same stretch of the line in the panel's fill colour
+     (and overlaps it by 1px), erasing just that segment so the panel reads
+     as flowing straight out of the open tab with no line crossing it. */
+  .section-dock { display: flex; flex-direction: column; gap: 0; }
+  .section-rail {
+    display: flex; flex-direction: row; gap: 8px; flex: 0 0 auto;
+    overflow: visible; padding: 2px 0 0;
+    position: relative; z-index: 1;
+  }
+  .section-rail::after {
+    content: ''; position: absolute; background: var(--border); z-index: 0;
+    left: 0; right: 0; bottom: 0; height: 1px;
+  }
+  .section-stage { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+  /* Tab panels show/hide instantly (no height transition), but every tab
+     still opens to the same fixed height — the Travel panel's own height,
+     set at runtime as --stage-panel-height by the section-dock script
+     below — so switching tabs doesn't resize the column. A shorter panel's
+     content just sits at the top with empty space below it. This only
+     applies to these tab-dock panels; the Booking Details card above the
+     dock is unaffected. */
+  .section-stage > .card { display: none; border-radius: 0 0 10px 10px; border-top: none; }
+  .section-stage > .card.active-panel {
+    display: block;
+    height: var(--stage-panel-height, auto);
+    overflow: hidden;
+    flex: 1 1 auto;
+  }
+  .card-panel-inner { display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+  /* Every tab shares the rail equally (flex: 1 1 0) so the row always spans
+     exactly the panel's width below it — the first tab's left edge lines up
+     with the panel's left border and the last tab's right edge lines up
+     with the panel's right border, with no scrollbar since the tabs simply
+     shrink to fit instead of overflowing. */
+  .rail-icon {
+    flex: 1 1 0; min-width: 0; min-height: 56px; padding: 8px 3px 7px;
+    border-radius: 10px 10px 0 0; border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 4px; position: relative; z-index: 1; font-family: inherit;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+  .rail-icon svg { width: 19px; height: 19px; color: var(--accent); flex-shrink: 0; transition: color .15s ease, transform .25s ease; }
+  .rail-icon-label { font-size: 9px; font-weight: 600; color: var(--sub); text-align: center; line-height: 1.15; letter-spacing: 0.005em; transition: color .15s ease, opacity .2s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .rail-icon:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .rail-icon.active {
+    background: var(--card); border-color: var(--border); border-bottom-color: var(--card);
+    box-shadow: inset 0 2px 0 var(--accent);
+    margin-bottom: -1px; z-index: 2;
+  }
+  /* Packages & Stock open onto a cream panel rather than the default white
+     one, so their active tab needs to fill and border itself in that same
+     tone to actually blend into the panel it's attached to. */
+  .rail-icon.active[data-target="card-packages"],
+  .rail-icon.active[data-target="card-stock"] {
+    background: var(--packages-card); border-color: var(--packages-border);
+    border-bottom-color: var(--packages-card);
+  }
+  .rail-icon.active:hover { transform: none; }
+  .rail-icon.active svg, .rail-icon.active .rail-icon-label { color: var(--accent); }
+  /* Selected tab: the icon grows and drops to the tab's vertical centre while the label fades out
+     (the label keeps its space, so nothing else in the rail shifts). */
+  .rail-icon.active svg { transform: translateY(7px) scale(1.35); }
+  .rail-icon.active .rail-icon-label { opacity: 0; }
+  .rail-icon-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--rust); display: none; }
+  .rail-icon.section-off .rail-icon-dot { display: block; }
+
+  /* Active tab: fill the icon's own outer shape(s) solid with the accent
+     colour (its edge already reads the same as the plain outline, since
+     stroke and fill are both currentColor) while any element marked
+     .rail-icon-inner — a secondary line inside that outer shape — flips to
+     the tab's background colour instead, so it reads as a light knockout
+     line against the solid icon rather than being drawn as an accent
+     stroke. Elements aren't wrapped or masked, just recoloured. */
+  .rail-icon.active svg > :not(.rail-icon-inner) { fill: currentColor; transition: fill .15s ease; }
+  .rail-icon.active svg > .rail-icon-inner { stroke: var(--card); fill: none; transition: stroke .15s ease; }
+  .rail-icon.active[data-target="card-packages"] svg > .rail-icon-inner,
+  .rail-icon.active[data-target="card-stock"] svg > .rail-icon-inner { stroke: var(--packages-card); }
+  /* The packages icon's arch (handle) line should stay a plain brass
+     outline when active, not solid-filled like the outer bag/box shapes
+     and not knocked out to the panel colour like .rail-icon-inner lines. */
+  .rail-icon.active svg > .rail-icon-line-only { fill: none; stroke: currentColor; }
+  /* The travel icon's wheels should stay outlined (not solid-filled) when
+     the tab is active, same as when it isn't. */
+  .rail-icon.active[data-target="card-travel"] svg > .travel-wheel { fill: none; stroke: currentColor; }
+  /* The stock icon's top diagonal flap line sits slightly differently
+     depending on whether the tab is active (filled) or not, so two copies
+     are drawn and swapped via CSS rather than moved in the shared markup. */
+  .rail-icon .stock-flap-active { display: none; }
+  .rail-icon.active .stock-flap-default { display: none; }
+  .rail-icon.active .stock-flap-active { display: inline; }
+
   .package-list { display: flex; flex-direction: column; gap: 8px; }
   .package-row { display: flex; align-items: stretch; gap: 8px; }
   .package-option {
@@ -531,11 +643,11 @@
         </div>
 
         <div class="booking-details-header" id="bookingDetailsHeader">
-          <span class="booking-details-label">Details</span>
-          <div class="toggle on" id="toggle-bookingDetails"><div class="knob"></div></div>
+          <div class="booking-chevron on" id="toggle-bookingDetails" role="button" aria-label="Show or hide booking details"><svg viewBox="0 0 44 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l14 8 14-8"/></svg></div>
         </div>
 
-        <div class="booking-details-body" id="bookingDetailsBody">
+        <div class="booking-details-collapse" id="bookingDetailsBody">
+        <div class="booking-details-body">
         <div class="booking-subsection-label">Contact Details</div>
         <div class="field-grid">
           <label class="field"><span class="field-label">Client name</span>
@@ -606,12 +718,55 @@
         </div>
         <p style="font-size:12px;color:var(--sub);margin:0;" id="booking-note">Price charged for the 100-coffee package above.</p>
         </div>
+        </div>
       </div>
     </div>
 
-    <!-- STOCK/PACKAGES -->
-    <div class="top-row">
-      <div class="card" id="card-packages">
+    <div class="section-dock" id="sectionDock">
+      <div class="section-rail" id="sectionRail">
+        <button type="button" class="rail-icon" data-target="card-packages" title="Packages" aria-label="Packages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path class="rail-icon-line-only" d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span class="rail-icon-label">Packages</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-stock" title="Stock &amp; Packing Checklist" aria-label="Stock &amp; Packing Checklist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path class="rail-icon-inner stock-flap-default" d="m7.5 4.27 9 5.15"/><path class="rail-icon-inner stock-flap-active" d="m7.5 3.27 9 5.15"/><path class="rail-icon-inner" d="m3.3 7 8.7 5 8.7-5"/><path class="rail-icon-inner" d="M12 22V12"/></svg>
+          <span class="rail-icon-label">Stock</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-service" title="Service" aria-label="Service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path class="rail-icon-line-only" d="M17 8h1a4 4 0 1 1 0 8h-1"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>
+          <span class="rail-icon-label">Service</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-extraHours" title="Extra Service Hours" aria-label="Extra Service Hours">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path class="rail-icon-inner" d="M12 6v6l4 2"/></svg>
+          <span class="rail-icon-label">Extra Hrs</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-travel" title="Travel" aria-label="Travel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><mask id="travel-wheel-cutout"><rect x="0" y="0" width="24" height="24" fill="#fff"/><circle cx="7" cy="17" r="2" fill="#000"/><circle cx="17" cy="17" r="2" fill="#000"/></mask><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" mask="url(#travel-wheel-cutout)"/><circle class="travel-wheel" cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle class="travel-wheel" cx="17" cy="17" r="2"/></svg>
+          <span class="rail-icon-label">Travel</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-overheads" title="Running Overheads" aria-label="Running Overheads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path class="rail-icon-inner" d="m9 12 2 2 4-4"/></svg>
+          <span class="rail-icon-label">Overheads</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-custom" title="Custom Costs" aria-label="Custom Costs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle class="rail-icon-inner" cx="12" cy="12" r="2"/><path class="rail-icon-inner" d="M6 12h.01M18 12h.01"/></svg>
+          <span class="rail-icon-label">Custom</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+        <button type="button" class="rail-icon" data-target="card-profitSplit" title="Profit Split" aria-label="Profit Split">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="rail-icon-label">Split</span>
+          <span class="rail-icon-dot"></span>
+        </button>
+      </div>
+      <div class="section-stage" id="sectionStage">
+      <div class="card" id="card-packages"><div class="card-panel-inner">
         <div class="card-head">
           <div class="card-head-left">
             <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -743,10 +898,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </div></div>
 
       <!-- STOCK & PACKING CHECKLIST -->
-      <div class="card" id="card-stock">
+      <div class="card" id="card-stock"><div class="card-panel-inner">
         <div class="card-head">
           <div class="card-head-left">
             <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
@@ -795,20 +950,18 @@
             <div class="toggle" id="toggle-stockBuffer" title="Pack extra stock as a buffer" aria-label="Toggle packing buffer"><div class="knob"></div></div>
           </div>
         </div>
-      </div>
-    </div>
+      </div></div>
  
-    <!-- SERVICE -->
-    <div class="card" id="card-service">
+      <!-- SERVICE -->
+      <div class="card" id="card-service"><div class="card-panel-inner">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>
           <span class="card-title">Service</span>
         </div>
-        <div class="toggle" id="toggle-service"><div class="knob"></div></div>
       </div>
       <div class="card-body">
-        <div class="field-grid" id="service-fields" style="display:none;">
+        <div class="field-grid" id="service-fields">
           <div class="field-grid-3" style="grid-column: 1 / -1;">
             <label class="field"><span class="field-label">Bean price</span>
               <div class="field-box"><span>$</span><input type="number" id="beanPrice" value="32" step="0.01" min="0"><span>/kg</span></div></label>
@@ -839,16 +992,15 @@
           <span class="value" id="out-costPerCoffee">$0.00</span>
         </div>
       </div>
-    </div>
+    </div></div>
 
     <!-- EXTRA HOURS -->
-    <div class="card" id="card-extraHours">
+    <div class="card" id="card-extraHours"><div class="card-panel-inner">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           <span class="card-title">Extra Service Hours</span>
         </div>
-        <div class="toggle on" id="toggle-extraHours"><div class="knob"></div></div>
       </div>
       <div class="card-body">
         <div class="field-grid">
@@ -871,19 +1023,16 @@
         </div>
         <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="extraHoursNote">Hours included comes from the selected package (edit the package to change it). Anything beyond that, up to Event running hours in Booking Details, is charged at the rate shown.</p>
       </div>
-    </div>
+    </div></div>
  
     <!-- TRAVEL -->
-    <div class="card" id="card-travel">
+    <div class="card" id="card-travel"><div class="card-panel-inner">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
           <span class="card-title">Travel</span>
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <button type="button" class="icon-clear-btn" id="clearTravel" title="Clear travel fields" aria-label="Clear travel fields"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.7 5.7c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
-          <div class="toggle on" id="toggle-travel"><div class="knob"></div></div>
-        </div>
+        <button type="button" class="icon-clear-btn" id="clearTravel" title="Clear travel fields" aria-label="Clear travel fields"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.7 5.7c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
       </div>
       <div class="card-body">
         <div class="field-grid">
@@ -942,16 +1091,15 @@
         </div>
         <p style="font-size:11.5px;color:var(--sub);margin:0;font-style:italic;" id="travelSurchargeNote">Travel within 15km of Edensor Park NSW 2176 is included. Beyond that, a $20 minimum travel charge applies, increasing at $1.50 per km once that exceeds $20. Bookings over 80km away will be quoted individually.</p>
       </div>
-    </div>
+    </div></div>
 
     <!-- OVERHEADS -->
-    <div class="card off" id="card-overheads">
+    <div class="card" id="card-overheads"><div class="card-panel-inner">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
           <span class="card-title">Running Overheads</span>
         </div>
-        <div class="toggle" id="toggle-overheads"><div class="knob"></div></div>
       </div>
       <div class="card-body">
         <div class="field-grid">
@@ -983,25 +1131,24 @@
         </div>
         <p style="font-size:11px;color:var(--sub);margin:6px 0 0;font-style:italic;">Run time/fuel is our internal cost only. Hire cost is billed to the customer and shown on their quote.</p>
       </div>
-    </div>
+    </div></div>
 
     <!-- CUSTOM COSTS -->
-    <div class="card off" id="card-custom">
+    <div class="card" id="card-custom"><div class="card-panel-inner">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
           <span class="card-title">Custom Costs</span>
         </div>
-        <div class="toggle" id="toggle-custom"><div class="knob"></div></div>
       </div>
       <div class="card-body">
         <div id="custom-fields-container"></div>
         <button class="add-line-btn" id="add-custom-line"><svg class="icon-sub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add another line</button>
       </div>
-    </div>
+    </div></div>
  
-    <!-- PROFIT SPLIT -->
-    <div class="card">
+      <!-- PROFIT SPLIT -->
+      <div class="card" id="card-profitSplit"><div class="card-panel-inner">
       <div class="card-head">
         <div class="card-head-left">
           <svg class="icon-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1017,6 +1164,9 @@
           <input type="range" class="split-range" id="splitRange" min="0" max="100" value="50" step="5">
           <div class="split-hint">Drag to set the split of gross profit between partners.</div>
         </div>
+      </div>
+    </div></div>
+
       </div>
     </div>
  
@@ -1528,10 +1678,10 @@ let customFields = JSON.parse(JSON.stringify(defaultCustomFields));
 let travelOn = true;
 let extraHoursOn = true;
 let generatorOn = false;
-let overheadsOn = false;
-let customOn = false;
+let overheadsOn = true;
+let customOn = true;
 let hourlyOn = false;
-let serviceOn = false;
+let serviceOn = true;
 let bookingDetailsOn = true;
 let stockBufferOn = false;
  
@@ -1653,10 +1803,6 @@ function setupToggle(toggleId, getState, setState, onChange, cardId) {
   });
 }
  
-setupToggle("toggle-travel", () => travelOn, (v) => (travelOn = v), null, "card-travel");
-setupToggle("toggle-extraHours", () => extraHoursOn, (v) => (extraHoursOn = v), null, "card-extraHours");
-setupToggle("toggle-overheads", () => overheadsOn, (v) => (overheadsOn = v), null, "card-overheads");
-setupToggle("toggle-custom", () => customOn, (v) => (customOn = v), null, "card-custom");
 setupToggle("toggle-stockBuffer", () => stockBufferOn, (v) => (stockBufferOn = v), (v) => {
   document.getElementById("stockBufferPctBox").style.display = v ? "flex" : "none";
   document.querySelectorAll(".stock-amt-buffer").forEach((el) => { el.style.display = v ? "inline" : "none"; });
@@ -1667,9 +1813,6 @@ setupToggle("toggle-generator", () => generatorOn, (v) => (generatorOn = v), (v)
 setupToggle("toggle-hourly", () => hourlyOn, (v) => (hourlyOn = v), (v) => {
   document.getElementById("hourlyBody").style.display = v ? "block" : "none";
   if (v) syncHourlySliderFromDuration(num("eventDuration"));
-});
-setupToggle("toggle-service", () => serviceOn, (v) => (serviceOn = v), (v) => {
-  document.getElementById("service-fields").style.display = v ? "grid" : "none";
 });
 setupToggle("toggle-bookingDetails", () => bookingDetailsOn, (v) => (bookingDetailsOn = v), (v) => {
   document.getElementById("bookingDetailsBody").classList.toggle("off", !v);
@@ -2745,20 +2888,10 @@ function load() {
     if (typeof s.stockBufferOn === "boolean") stockBufferOn = s.stockBufferOn;
     if (s.splitPct) splitRange.value = Math.round(parseInt(s.splitPct, 10) / 5) * 5;
  
-    document.getElementById("toggle-travel").classList.toggle("on", travelOn);
-    document.getElementById("card-travel").classList.toggle("off", !travelOn);
-    document.getElementById("toggle-extraHours").classList.toggle("on", extraHoursOn);
-    document.getElementById("card-extraHours").classList.toggle("off", !extraHoursOn);
-    document.getElementById("toggle-overheads").classList.toggle("on", overheadsOn);
-    document.getElementById("card-overheads").classList.toggle("off", !overheadsOn);
-    document.getElementById("toggle-custom").classList.toggle("on", customOn);
-    document.getElementById("card-custom").classList.toggle("off", !customOn);
     document.getElementById("toggle-generator").classList.toggle("on", generatorOn);
     document.getElementById("generator-fields").style.display = generatorOn ? "grid" : "none";
     document.getElementById("toggle-hourly").classList.toggle("on", hourlyOn);
     document.getElementById("hourlyBody").style.display = hourlyOn ? "block" : "none";
-    document.getElementById("toggle-service").classList.toggle("on", serviceOn);
-    document.getElementById("service-fields").style.display = serviceOn ? "grid" : "none";
     document.getElementById("toggle-bookingDetails").classList.toggle("on", bookingDetailsOn);
     document.getElementById("bookingDetailsBody").classList.toggle("off", !bookingDetailsOn);
     document.getElementById("toggle-stockBuffer").classList.toggle("on", stockBufferOn);
@@ -3645,6 +3778,69 @@ document.getElementById("bookingSheetSelect").addEventListener("change", (e) => 
 document.getElementById("refreshBookingsBtn").addEventListener("click", loadBookingsFromSheet);
  
 initChart();
+
+// ----- Section dock: icon rail that expands one panel at a time -----
+(function () {
+  const rail = document.getElementById("sectionRail");
+  if (!rail) return;
+  const icons = Array.from(rail.querySelectorAll(".rail-icon"));
+
+  // Measures every panel (including the ones currently hidden) and returns
+  // Measures the Travel panel specifically and uses its height for every
+  // tabbed panel, so switching tabs never resizes the column — each tab is
+  // fixed to Travel's own height, not the tallest tab's. This only affects
+  // the tab-dock panels inside #sectionStage (Packages, Stock, Service,
+  // Extra Hrs, Travel, Overheads, Custom, Split); the always-visible
+  // Booking Details card above the dock is untouched.
+  function computeReferencePanelHeight() {
+    const stage = document.getElementById("sectionStage");
+    const width = stage.clientWidth;
+    const card = document.getElementById("card-travel");
+    if (!card) return 0;
+    if (card.classList.contains("active-panel")) {
+      return card.scrollHeight;
+    }
+    const prevCssText = card.style.cssText;
+    card.style.visibility = "hidden";
+    card.style.position = "absolute";
+    card.style.display = "block";
+    card.style.height = "auto";
+    card.style.width = width + "px";
+    const h = card.scrollHeight;
+    card.style.cssText = prevCssText;
+    return h;
+  }
+
+  // Instant show/hide — no transition — with every tab fixed to Travel's
+  // own height, recomputed on every switch in case that panel's content
+  // ever changes (e.g. the travel fee breakdown is opened).
+  function activate(targetId) {
+    icons.forEach((btn) => btn.classList.toggle("active", btn.getAttribute("data-target") === targetId));
+    document.querySelectorAll("#sectionStage > .card").forEach((card) => {
+      card.classList.toggle("active-panel", card.id === targetId);
+    });
+    document.getElementById("sectionStage").style.setProperty("--stage-panel-height", computeReferencePanelHeight() + "px");
+  }
+
+  icons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      // Prevent the native focus-scroll-into-view some browsers trigger on
+      // a clicked button, which can also drag the column's scroll position
+      // along with it.
+      e.preventDefault();
+      activate(btn.getAttribute("data-target"));
+      btn.blur();
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    const stage = document.getElementById("sectionStage");
+    if (stage) stage.style.setProperty("--stage-panel-height", computeReferencePanelHeight() + "px");
+  });
+
+  activate("card-packages");
+})();
+
 // Every load starts from a clean slate — the same as clicking the "Reset"
 // button — regardless of anything saved in this browser from a previous
 // session. If you want the dashboard to remember values between visits
