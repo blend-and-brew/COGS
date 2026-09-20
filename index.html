@@ -128,8 +128,8 @@
   .utility-status-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 2px 0; }
   .utility-status { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink); font-weight: 500; }
   .utility-status-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s ease, color .15s ease; }
-  .utility-status-icon.yes { background: rgba(184,130,61,0.16); color: var(--accent); }
-  .utility-status-icon.no { background: rgba(189,90,52,0.14); color: var(--rust); }
+  .utility-status-icon.yes { background: var(--accent); color: #fff; }
+  .utility-status-icon.no { background: var(--rust); color: #fff; }
   .utility-status-icon.neutral { background: rgba(184,130,61,0.14); color: var(--accent); }
   .utility-status-icon svg { width: 10px; height: 10px; display: block; }
   .extra-hours-rate-box input { width: auto; flex: 0 0 42px; text-align: right; }
@@ -212,12 +212,15 @@
   }
   input[type="range"].split-range::-webkit-slider-thumb {
     -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-    background: #fff; border: 3px solid var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.4); cursor: pointer;
+    background: var(--accent); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(33,28,21,0.35); cursor: pointer;
+    transition: transform .15s ease, background .15s ease;
   }
+  input[type="range"].split-range::-webkit-slider-thumb:hover { background: #A5732F; transform: scale(1.08); }
   input[type="range"].split-range::-moz-range-thumb {
-    width: 20px; height: 20px; border-radius: 50%; background: #fff;
-    border: 3px solid var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.4); cursor: pointer; border: none;
+    width: 20px; height: 20px; border-radius: 50%; background: var(--accent);
+    border: 3px solid #fff; box-shadow: 0 1px 4px rgba(33,28,21,0.35); cursor: pointer;
   }
+  input[type="range"].split-range::-moz-range-thumb:hover { background: #A5732F; }
   .split-hint { font-size: 12px; color: var(--sub); margin-top: 8px; }
  
   .custom-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -234,7 +237,7 @@
   .booking-card { background: var(--booking-card); border-color: var(--booking-border); }
   .booking-details-header {
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    padding: 10px 0 0; margin-top: -6px; margin-bottom: 4px;
+    padding: 4px 0 0; margin-top: -2px; margin-bottom: -12px;
     cursor: pointer; user-select: none;
   }
   .booking-details-label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
@@ -254,6 +257,8 @@
   .booking-subsection-label {
     font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
     color: var(--accent); margin-bottom: -6px;
+    display: flex; align-items: center; gap: 10px;
+    width: 33.333%; min-width: max-content;
   }
   #card-packages, #card-stock { background: var(--packages-card); border-color: var(--packages-border); }
  
@@ -286,19 +291,14 @@
     left: 0; right: 0; bottom: 0; height: 1px;
   }
   .section-stage { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
-  /* Tab panels show/hide instantly (no height transition), but every tab
-     still opens to the same fixed height — the Travel panel's own height,
-     set at runtime as --stage-panel-height by the section-dock script
-     below — so switching tabs doesn't resize the column. A shorter panel's
-     content just sits at the top with empty space below it. This only
-     applies to these tab-dock panels; the Booking Details card above the
-     dock is unaffected. */
+  /* Tab panels show/hide instantly and size themselves to their own content,
+     so each tab is only as tall as the fields and elements inside it. */
   .section-stage > .card { display: none; border-radius: 0 0 10px 10px; border-top: none; }
   .section-stage > .card.active-panel {
     display: block;
-    height: var(--stage-panel-height, auto);
-    overflow: hidden;
-    flex: 1 1 auto;
+    height: auto;
+    overflow: visible;
+    flex: 0 0 auto;
   }
   .card-panel-inner { display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
   /* Every tab shares the rail equally (flex: 1 1 0) so the row always spans
@@ -363,6 +363,13 @@
   .rail-icon .stock-flap-active { display: none; }
   .rail-icon.active .stock-flap-default { display: none; }
   .rail-icon.active .stock-flap-active { display: inline; }
+/* Split icon: solid base line only while active, to close the filled body shape */
+.rail-icon .split-base-active { display: none; }
+.rail-icon.active .split-base-active { display: inline; }
+/* Split icon: second body fill hugs the first body's contour with a buffer, only while active */
+.rail-icon .split-body-fill-active { display: none; }
+.rail-icon.active .split-body-fill-active { display: inline; }
+.rail-icon.active .split-body-line { display: none; }
 
   .package-list { display: flex; flex-direction: column; gap: 8px; }
   .package-row { display: flex; align-items: stretch; gap: 8px; }
@@ -760,7 +767,7 @@
           <span class="rail-icon-dot"></span>
         </button>
         <button type="button" class="rail-icon" data-target="card-profitSplit" title="Profit Split" aria-label="Profit Split">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><line class="split-base-active" x1="2" y1="21" x2="16" y2="21"/><circle cx="9" cy="7" r="4"/><path class="rail-icon-line-only split-body-line" d="M22 21v-2a4 4 0 0 0-3-3.87"/><path class="split-body-fill-active" d="M23 21v-2a4 4 0 0 0-4-4L18.64 15A7.75 7.75 0 0 1 19.75 19v2Z"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span class="rail-icon-label">Split</span>
           <span class="rail-icon-dot"></span>
         </button>
@@ -983,7 +990,7 @@
               <div class="field-box"><span>$</span><input type="number" id="sundries" value="0.08" step="0.01" min="0"><span>/ea</span></div></label>
             <label class="field"><span class="field-label">Cup + lid</span>
               <div class="field-box"><span>$</span><input type="number" id="cupLid" value="0.22" step="0.01" min="0"><span>/ea</span></div></label>
-            <label class="field"><span class="field-label">Coffee cap for event</span>
+            <label class="field"><span class="field-label">Coffee cap for package</span>
               <div class="field-box"><input type="number" id="coffeeCap" value="1" step="1" min="0"><span>cups</span></div></label>
           </div>
         </div>
@@ -3785,41 +3792,12 @@ initChart();
   if (!rail) return;
   const icons = Array.from(rail.querySelectorAll(".rail-icon"));
 
-  // Measures every panel (including the ones currently hidden) and returns
-  // Measures the Travel panel specifically and uses its height for every
-  // tabbed panel, so switching tabs never resizes the column — each tab is
-  // fixed to Travel's own height, not the tallest tab's. This only affects
-  // the tab-dock panels inside #sectionStage (Packages, Stock, Service,
-  // Extra Hrs, Travel, Overheads, Custom, Split); the always-visible
-  // Booking Details card above the dock is untouched.
-  function computeReferencePanelHeight() {
-    const stage = document.getElementById("sectionStage");
-    const width = stage.clientWidth;
-    const card = document.getElementById("card-travel");
-    if (!card) return 0;
-    if (card.classList.contains("active-panel")) {
-      return card.scrollHeight;
-    }
-    const prevCssText = card.style.cssText;
-    card.style.visibility = "hidden";
-    card.style.position = "absolute";
-    card.style.display = "block";
-    card.style.height = "auto";
-    card.style.width = width + "px";
-    const h = card.scrollHeight;
-    card.style.cssText = prevCssText;
-    return h;
-  }
-
-  // Instant show/hide — no transition — with every tab fixed to Travel's
-  // own height, recomputed on every switch in case that panel's content
-  // ever changes (e.g. the travel fee breakdown is opened).
+  // Instant show/hide — each panel keeps its natural height.
   function activate(targetId) {
     icons.forEach((btn) => btn.classList.toggle("active", btn.getAttribute("data-target") === targetId));
     document.querySelectorAll("#sectionStage > .card").forEach((card) => {
       card.classList.toggle("active-panel", card.id === targetId);
     });
-    document.getElementById("sectionStage").style.setProperty("--stage-panel-height", computeReferencePanelHeight() + "px");
   }
 
   icons.forEach((btn) => {
@@ -3833,12 +3811,95 @@ initChart();
     });
   });
 
-  window.addEventListener("resize", () => {
-    const stage = document.getElementById("sectionStage");
-    if (stage) stage.style.setProperty("--stage-panel-height", computeReferencePanelHeight() + "px");
+  activate("card-packages");
+})();
+
+// ----- Follow the open panel -----
+// When a tab panel grows or shrinks (switching tabs, editing a package,
+// adding a custom cost line, opening the travel fee breakdown), scroll the
+// left column so the bottom of the page stays snapped to the bottom of the
+// panel — a quick eased glide rather than a jump. Only reacts to changes that
+// follow a click/keypress inside the dock, so page load, font loading and
+// background updates never move the page on their own.
+(function () {
+  const leftCol = document.querySelector(".left-col");
+  const dock = document.getElementById("sectionDock");
+  const stage = document.getElementById("sectionStage");
+  if (!leftCol || !dock || !stage || typeof ResizeObserver === "undefined") return;
+
+  const BASE_PAD = parseFloat(getComputedStyle(leftCol).paddingBottom) || 20;
+  const DURATION = 220; // ms — quick but smooth
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let lastScrollTop = leftCol.scrollTop;
+  let lastHeight = null;
+  let lastInteraction = 0;
+  let rafId = null;
+  let curTop = 0;
+
+  // Track the scroll position from before a panel resize. The browser clamps
+  // scrollTop the instant a panel shrinks, so this is how we know where the
+  // view was and can glide up from there instead of jumping.
+  leftCol.addEventListener("scroll", () => { if (rafId === null) lastScrollTop = leftCol.scrollTop; }, { passive: true });
+
+  ["pointerdown", "keydown", "input", "change"].forEach((ev) => {
+    dock.addEventListener(ev, () => { lastInteraction = performance.now(); }, true);
   });
 
-  activate("card-packages");
+  // Let the user take over: scrolling by hand cancels a glide in progress.
+  function cancelGlide() {
+    if (rafId === null) return;
+    cancelAnimationFrame(rafId);
+    rafId = null;
+    leftCol.style.paddingBottom = "";
+  }
+  leftCol.addEventListener("wheel", cancelGlide, { passive: true });
+  leftCol.addEventListener("touchstart", cancelGlide, { passive: true });
+
+  function followPanel() {
+    const startTop = rafId !== null ? curTop : lastScrollTop;
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    leftCol.style.paddingBottom = "";
+    const target = Math.max(0, leftCol.scrollHeight - leftCol.clientHeight);
+
+    if (reduceMotion || Math.abs(target - startTop) < 1) {
+      leftCol.scrollTop = target;
+      lastScrollTop = target;
+      return;
+    }
+
+    // Panel shrank: temporarily pad the bottom so the view can stay where it
+    // was, then glide up to the new bottom.
+    if (startTop > target) leftCol.style.paddingBottom = (BASE_PAD + startTop - target) + "px";
+    leftCol.scrollTop = startTop;
+    curTop = startTop;
+
+    const t0 = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - t0) / DURATION);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      curTop = startTop + (target - startTop) * eased;
+      leftCol.scrollTop = curTop;
+      if (p < 1) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        rafId = null;
+        leftCol.style.paddingBottom = "";
+        leftCol.scrollTop = target;
+        lastScrollTop = target;
+      }
+    }
+    rafId = requestAnimationFrame(step);
+  }
+
+  new ResizeObserver(() => {
+    const h = stage.offsetHeight;
+    if (lastHeight === null) { lastHeight = h; return; }
+    if (Math.abs(h - lastHeight) < 1) return;
+    lastHeight = h;
+    if (performance.now() - lastInteraction > 800) return;
+    followPanel();
+  }).observe(stage);
 })();
 
 // Every load starts from a clean slate — the same as clicking the "Reset"
