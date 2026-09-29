@@ -269,6 +269,35 @@
     padding: 14px 14px 16px;
   }
   #card-packages, #card-stock { background: var(--packages-card); border-color: var(--packages-border); }
+
+  /* Packages slider */
+  .pkg-slider-wrap { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--packages-border); }
+  .pkg-slider-readout { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .pkg-slider-readout .pkg-slider-coffees { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--ink); }
+  .pkg-slider-readout .pkg-slider-meta { font-size: 11.5px; color: var(--sub); margin-left: 8px; font-family: 'Inter', sans-serif; font-weight: 500; }
+  .pkg-slider-readout .pkg-slider-price { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; color: var(--rust); }
+  .pkg-slider-row { display: flex; align-items: center; gap: 8px; }
+  .pkg-slider-end { font-size: 11px; font-weight: 600; color: var(--sub); flex: 0 0 auto; }
+  .pkg-slider-track { position: relative; flex: 1 1 auto; min-width: 0; padding-bottom: 26px; }
+  input[type="range"].pkg-slider {
+    width: 100%; height: 6px; border-radius: 999px; outline: none; margin: 0; display: block;
+    -webkit-appearance: none; appearance: none; cursor: pointer; background: var(--border);
+  }
+  input[type="range"].pkg-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(33,28,21,0.35); cursor: pointer;
+    transition: transform .15s ease, background .15s ease;
+  }
+  input[type="range"].pkg-slider::-webkit-slider-thumb:hover { background: #A5732F; transform: scale(1.08); }
+  input[type="range"].pkg-slider::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--accent);
+    border: 3px solid #fff; box-shadow: 0 1px 4px rgba(33,28,21,0.35); cursor: pointer;
+  }
+  .pkg-slider-ruler { position: absolute; top: 100%; left: 0; right: 0; height: 22px; margin-top: -20px; pointer-events: none; }
+  .pkg-ruler-mark { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; transform: translateX(-50%); opacity: 0.35; transition: opacity .3s ease; }
+  .pkg-ruler-mark[data-hours="1"] { align-items: flex-start; transform: none; }
+  .pkg-ruler-tick { width: 1px; height: 6px; background: var(--accent); }
+  .pkg-ruler-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 9.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
  
   .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   @media (max-width: 720px) {
@@ -622,6 +651,7 @@
   </div>
   <div class="header-right">
     <span class="save-status" id="save-status"></span>
+<a class="reset-btn" id="msds-btn" href="Blend%20and%20Brew%20-%20MSDS.html" target="_blank" rel="noopener" style="text-decoration:none;" title="Open Blend & Brew - MSDS"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>MSDS</a>
     <button class="pdf-btn" id="generate-quote-btn"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 11h1"/></svg> Generate Quote</button>
     <button class="reset-btn" id="reset-btn" title="Clear all saved values and reload the dashboard exactly as it ships in the HTML file"><svg class="icon-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg> Reset</button>
   </div>
@@ -798,15 +828,15 @@
         <div class="card-body">
           <div class="package-list" id="packageList">
             <div class="package-row">
-              <div class="package-option" data-package="babycino" data-price="350" data-coffees="25" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Babycino package">
+              <div class="package-option" data-package="babycino" data-price="295" data-coffees="25" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Babycino package">
                 <div class="package-display">
                   <span class="package-name">Babycino</span>
                   <span class="package-meta">25 coffees / 1 hrs of service</span>
-                  <span class="package-price">$350</span>
+                  <span class="package-price">$295</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="Babycino"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="350" step="1" min="0"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="295" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="25" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="1" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
@@ -818,15 +848,15 @@
               <button type="button" class="package-edit-btn" aria-label="Edit Babycino package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="piccolo" data-price="500" data-coffees="50" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Piccolo package">
+              <div class="package-option" data-package="piccolo" data-price="450" data-coffees="50" data-beanprice="32" data-milkprice="1.72" data-hours="1" role="button" tabindex="0" aria-label="Select Piccolo package">
                 <div class="package-display">
                   <span class="package-name">Piccolo</span>
                   <span class="package-meta">50 coffees / 1 hrs of service</span>
-                  <span class="package-price">$500</span>
+                  <span class="package-price">$450</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="Piccolo"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="500" step="1" min="0"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="450" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="50" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="1" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
@@ -838,15 +868,15 @@
               <button type="button" class="package-edit-btn" aria-label="Edit Piccolo package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="latte" data-price="750" data-coffees="100" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Latte package">
+              <div class="package-option" data-package="latte" data-price="650" data-coffees="100" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Latte package">
                 <div class="package-display">
                   <span class="package-name">The Latte</span>
                   <span class="package-meta">100 coffees / 2 hrs of service</span>
-                  <span class="package-price">$750</span>
+                  <span class="package-price">$650</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Latte"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="750" step="1" min="0"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="650" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="100" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="2" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
@@ -858,15 +888,15 @@
               <button type="button" class="package-edit-btn" aria-label="Edit The Latte package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="grande" data-price="900" data-coffees="150" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Grande package">
+              <div class="package-option" data-package="grande" data-price="850" data-coffees="150" data-beanprice="32" data-milkprice="1.72" data-hours="2" role="button" tabindex="0" aria-label="Select The Grande package">
                 <div class="package-display">
                   <span class="package-name">The Grande</span>
                   <span class="package-meta">150 coffees / 2 hrs of service</span>
-                  <span class="package-price">$900</span>
+                  <span class="package-price">$850</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Grande"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="900" step="1" min="0"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="850" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="150" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="2" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
@@ -878,15 +908,15 @@
               <button type="button" class="package-edit-btn" aria-label="Edit The Grande package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
             </div>
             <div class="package-row">
-              <div class="package-option" data-package="barista" data-price="1200" data-coffees="200" data-beanprice="32" data-milkprice="1.72" data-hours="3" role="button" tabindex="0" aria-label="Select The Barista package">
+              <div class="package-option" data-package="barista" data-price="1050" data-coffees="200" data-beanprice="32" data-milkprice="1.72" data-hours="3" role="button" tabindex="0" aria-label="Select The Barista package">
                 <div class="package-display">
                   <span class="package-name">The Barista</span>
                   <span class="package-meta">200 coffees / 3 hrs of service</span>
-                  <span class="package-price">$1,200</span>
+                  <span class="package-price">$1,050</span>
                 </div>
                 <div class="package-edit-fields">
                   <label>Name<input type="text" class="pkg-edit-name" value="The Barista"></label>
-                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1200" step="1" min="0"></label>
+                  <label>Price ($)<input type="number" class="pkg-edit-price" value="1050" step="1" min="0"></label>
                   <label>Coffees<input type="number" class="pkg-edit-coffees" value="200" step="1" min="0"></label>
                   <label>Hours<input type="number" class="pkg-edit-hours" value="3" step="0.5" min="0"></label>
                   <div class="package-edit-actions">
@@ -916,6 +946,24 @@
                 </div>
               </div>
               <button type="button" class="package-edit-btn" aria-label="Edit Custom package"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            </div>
+          </div>
+          <div class="pkg-slider-wrap">
+            <div class="pkg-slider-readout">
+              <span><span class="pkg-slider-coffees" id="pkgSliderCoffees">100 coffees</span><span class="pkg-slider-meta" id="pkgSliderMeta">2hr service</span></span>
+              <span class="pkg-slider-price" id="pkgSliderPrice">$750</span>
+            </div>
+            <div class="pkg-slider-row">
+              <span class="pkg-slider-end">25</span>
+              <div class="pkg-slider-track">
+                <input type="range" id="pkgSlider" class="pkg-slider" min="0" max="42" step="1" value="15" aria-label="Coffees">
+                <div class="pkg-slider-ruler" aria-hidden="true">
+                  <span class="pkg-ruler-mark" data-hours="1" data-coffees="25" style="left:0%;"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">1hr</span></span>
+                  <span class="pkg-ruler-mark" data-hours="2" data-coffees="80" style="left:50%;"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">2hr</span></span>
+                  <span class="pkg-ruler-mark" data-hours="3" data-coffees="175" style="left:95.455%;"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">3hr</span></span>
+                </div>
+              </div>
+              <span class="pkg-slider-end">200</span>
             </div>
           </div>
         </div>
@@ -2195,6 +2243,100 @@ packageButtons.forEach((btn) => {
   }
 });
 
+
+// ----- Packages slider (same stepped slider as the booking site) -----
+// Steps: +5 (25-50), +5 (50-100), +10 (100-150), +25 (150-200).
+const PKG_SLIDER_STEPS = (function () {
+  const ranges = [[25,50,5],[50,100,5],[100,150,10],[150,200,25]];
+  const out = [];
+  ranges.forEach((r, i) => { for (let v = i === 0 ? r[0] : r[0] + r[2]; v <= r[1]; v += r[2]) out.push(v); });
+  return out;
+})();
+const pkgSlider = document.getElementById("pkgSlider");
+pkgSlider.max = PKG_SLIDER_STEPS.length - 1;
+let syncingPkgSlider = false;
+
+function getPresetPackageData() {
+  return Array.from(packageButtons)
+    .filter((b) => b.getAttribute("data-package") !== "custom")
+    .map((b) => ({
+      btn: b,
+      coffees: parseFloat(b.getAttribute("data-coffees")) || 0,
+      price: parseFloat(b.getAttribute("data-price")) || 0,
+      hours: parseFloat(b.getAttribute("data-hours")) || 0,
+    }))
+    .sort((a, b) => a.coffees - b.coffees);
+}
+
+function pkgSliderCustomFor(c) {
+  const presets = getPresetPackageData();
+  // Same pricing curve as the website calculator: linear between the five
+  // package prices, hand-set values for 30 and 35, rounded to the nearest $5.
+  const anchors = [[25,295],[50,450],[100,650],[150,850],[200,1050]];
+  const overrides = { 30: 330, 35: 360 };
+  let price;
+  if (overrides[c] !== undefined) price = overrides[c];
+  else if (c <= anchors[0][0]) price = anchors[0][1];
+  else if (c >= anchors[anchors.length - 1][0]) price = anchors[anchors.length - 1][1];
+  else {
+    for (let i = 0; i < anchors.length - 1; i++) {
+      const lo = anchors[i], hi = anchors[i + 1];
+      if (c >= lo[0] && c <= hi[0]) { price = lo[1] + ((c - lo[0]) / (hi[0] - lo[0])) * (hi[1] - lo[1]); break; }
+    }
+  }
+  price = Math.round(price / 5) * 5;
+  // Hours follow the smallest package that covers this many coffees.
+  const cover = presets.find((p) => p.coffees >= c) || presets[presets.length - 1];
+  return { price, hours: cover.hours };
+}
+
+function onPkgSliderInput() {
+  if (syncingPkgSlider) return;
+  const c = PKG_SLIDER_STEPS[Math.max(0, Math.min(PKG_SLIDER_STEPS.length - 1, parseInt(pkgSlider.value, 10) || 0))];
+  const exact = getPresetPackageData().find((p) => p.coffees === c);
+  if (exact) {
+    selectPackage(exact.btn);
+    return;
+  }
+  const customBtn = document.querySelector('.package-option[data-package="custom"]');
+  if (!customBtn) return;
+  const { price, hours } = pkgSliderCustomFor(c);
+  const nameEl = customBtn.querySelector(".package-name");
+  const data = { name: nameEl ? nameEl.textContent.trim() : "Custom", price, coffees: c, hours };
+  applyPackageDataToDOM(customBtn, data);
+  packageOverrides["custom"] = data;
+  selectPackage(customBtn);
+}
+pkgSlider.addEventListener("input", onPkgSliderInput);
+
+// Called from recalc(): keeps the slider position, fill, ruler and readout
+// in step with whatever the Coffee cap / selected package currently is.
+function syncPkgSliderFromFields() {
+  const coffees = Math.max(0, num("coffeeCap"));
+  let idx = 0;
+  for (let i = 0; i < PKG_SLIDER_STEPS.length; i++) { if (PKG_SLIDER_STEPS[i] <= coffees) idx = i; }
+  if (coffees > PKG_SLIDER_STEPS[PKG_SLIDER_STEPS.length - 1]) idx = PKG_SLIDER_STEPS.length - 1;
+  syncingPkgSlider = true;
+  pkgSlider.value = idx;
+  syncingPkgSlider = false;
+
+  const max = parseFloat(pkgSlider.max);
+  const pct = max > 0 ? (idx / max) * 100 : 0;
+  pkgSlider.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
+
+  const hrs = num("packageIncludedHours");
+  document.getElementById("pkgSliderCoffees").textContent = coffees + (coffees === 1 ? " coffee" : " coffees");
+  document.getElementById("pkgSliderMeta").textContent = hrs ? hrs.toFixed(1).replace(/\.0$/, "") + "hr service" : "";
+  document.getElementById("pkgSliderPrice").textContent = currency(num("bookingPrice"));
+
+  document.querySelectorAll(".pkg-ruler-mark").forEach((mark) => {
+    const mIdx = PKG_SLIDER_STEPS.indexOf(parseInt(mark.getAttribute("data-coffees"), 10));
+    if (mIdx === -1) return;
+    const t = Math.max(0, 1 - Math.abs(idx - mIdx) / 9);
+    mark.style.opacity = (0.35 + 0.65 * t).toFixed(3);
+  });
+}
+
 document.getElementById("clearPackage").addEventListener("click", clearPackageSelection);
 document.getElementById("clearBookingQuote").addEventListener("click", () => {
   const confirmed = window.confirm("Clear the Booking Details fields? Client details, event details, and booking price will be reset - this can't be undone.");
@@ -2828,6 +2970,7 @@ function recalc() {
   }
   updatePackagePriceTag();
   syncPackageServiceTimeDisplay();
+  if (typeof syncPkgSliderFromFields === "function") syncPkgSliderFromFields();
 }
 
 function syncPackageServiceTimeDisplay() {
