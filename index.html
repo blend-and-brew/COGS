@@ -251,9 +251,10 @@
   .booking-chevron.on svg { transform: scaleY(-1); }
   .booking-details-collapse {
     display: grid; grid-template-rows: 1fr;
-    transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1), margin-top 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .booking-details-collapse.off { grid-template-rows: 0fr; }
+  /* Closed: cancel the card-body's 16px flex gap so there's no dead space below the arrow. */
+  .booking-details-collapse.off { grid-template-rows: 0fr; margin-top: -16px; }
   .booking-details-body { display: flex; flex-direction: column; gap: 16px; overflow: hidden; min-height: 0; }
   .booking-subsection-label {
     font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
@@ -295,7 +296,6 @@
   }
   .pkg-slider-ruler { position: absolute; top: 100%; left: 0; right: 0; height: 22px; margin-top: -20px; pointer-events: none; }
   .pkg-ruler-mark { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; transform: translateX(-50%); opacity: 0.35; transition: opacity .3s ease; }
-  .pkg-ruler-mark[data-hours="1"] { align-items: flex-start; transform: none; }
   .pkg-ruler-tick { width: 1px; height: 6px; background: var(--accent); }
   .pkg-ruler-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 9.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
  
@@ -958,9 +958,9 @@
               <div class="pkg-slider-track">
                 <input type="range" id="pkgSlider" class="pkg-slider" min="0" max="42" step="1" value="15" aria-label="Coffees">
                 <div class="pkg-slider-ruler" aria-hidden="true">
-                  <span class="pkg-ruler-mark" data-hours="1" data-coffees="25" style="left:0%;"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">1hr</span></span>
-                  <span class="pkg-ruler-mark" data-hours="2" data-coffees="80" style="left:42.308%;"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">2hr</span></span>
-                  <span class="pkg-ruler-mark" data-hours="3" data-coffees="175" style="left:80.769%;"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">3hr</span></span>
+                  <span class="pkg-ruler-mark" data-hours="1" data-coffees="25" style="left:calc(10px + (100% - 20px) * 0);"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">1hr</span></span>
+                  <span class="pkg-ruler-mark" data-hours="2" data-coffees="80" style="left:calc(10px + (100% - 20px) * 0.423077);"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">2hr</span></span>
+                  <span class="pkg-ruler-mark" data-hours="3" data-coffees="175" style="left:calc(10px + (100% - 20px) * 0.807692);"><span class="pkg-ruler-tick"></span><span class="pkg-ruler-label">3hr</span></span>
                 </div>
               </div>
               <span class="pkg-slider-end">300</span>
@@ -2285,9 +2285,10 @@ function pkgSliderCustomFor(c) {
     }
   }
   price = Math.round(price / 5) * 5;
-  // Hours follow the smallest package that covers this many coffees.
-  const cover = presets.find((p) => p.coffees >= c) || presets[presets.length - 1];
-  return { price, hours: cover.hours };
+  // Service-hour tiers match the 1hr / 2hr / 3hr ruler marks under the slider:
+  // 1hr below 80 coffees, 2hr from 80, 3hr from 175.
+  const hours = c >= 175 ? 3 : c >= 80 ? 2 : 1;
+  return { price, hours };
 }
 
 function onPkgSliderInput() {
